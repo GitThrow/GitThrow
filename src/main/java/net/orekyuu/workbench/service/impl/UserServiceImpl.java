@@ -4,8 +4,8 @@ import net.orekyuu.workbench.entity.User;
 import net.orekyuu.workbench.entity.dao.UserDao;
 import net.orekyuu.workbench.service.UserService;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
-import org.seasar.doma.jdbc.UniqueConstraintException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
         User user = new User(id, name, passwordEncoder.encode(rawPassword), admin);
         try {
             userDao.insert(user);
-        } catch (UniqueConstraintException e) {
+        } catch (DuplicateKeyException e) {
             //ユーザーが存在してるので失敗
             throw new UserExistsException(id, e);
         }
