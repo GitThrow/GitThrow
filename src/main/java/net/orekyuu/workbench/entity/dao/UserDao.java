@@ -2,8 +2,10 @@ package net.orekyuu.workbench.entity.dao;
 
 import net.orekyuu.workbench.entity.User;
 import org.seasar.doma.Dao;
+import org.seasar.doma.Insert;
 import org.seasar.doma.Select;
 import org.seasar.doma.boot.ConfigAutowireable;
+import org.seasar.doma.jdbc.UniqueConstraintException;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +19,7 @@ public interface UserDao {
 
     @Select
     Optional<User> findById(String id);
+
+    @Insert
+    int insert(User user) throws UniqueConstraintException;
 }

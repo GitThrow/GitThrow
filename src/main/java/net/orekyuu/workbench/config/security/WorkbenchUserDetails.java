@@ -13,6 +13,9 @@ public class WorkbenchUserDetails extends org.springframework.security.core.user
         this.user = user;
     }
 
+    /**
+     * @return DB上のユーザー情報
+     */
     public User getUser() {
         return user;
     }

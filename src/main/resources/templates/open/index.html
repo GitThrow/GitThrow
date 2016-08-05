@@ -1,10 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html >
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Workbench</title>
+  <meta charset="UTF-8">
+  <title>Workbench</title>
 </head>
 <body>
 ログインページ
+<form action="/login" method="post">
+  <table>
+    <tr>
+      <td>ユーザーID</td>
+      <td><input type="text" name="username"/></td>
+    </tr>
+    <tr>
+      <td>パスワード</td>
+      <td><input type="password" name="password"/></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><input type="submit" value="ログイン"></td>
+    </tr>
+  </table>
+  <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+</form>
 </body>
 </html>
