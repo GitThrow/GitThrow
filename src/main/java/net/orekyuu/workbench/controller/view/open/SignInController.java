@@ -8,6 +8,6 @@ public class SignInController {
 
     @GetMapping(value = "/login")
     public String showIndex() {
-        return "open/index";
+        return "open/login";
     }
 }

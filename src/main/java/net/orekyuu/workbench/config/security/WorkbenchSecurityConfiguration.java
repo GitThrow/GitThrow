@@ -35,7 +35,7 @@ public class WorkbenchSecurityConfiguration extends WebSecurityConfigurerAdapter
     @Override
     public void configure(WebSecurity web) throws Exception {
         //静的リソースは常にアクセス許可
-        web.ignoring().antMatchers("/css/**", "/js/**", "/image/**");
+        web.ignoring().antMatchers("/css/**", "/js/**", "/img/**", "/plugins/**", "/fonts/**");
     }
 
     @Bean
