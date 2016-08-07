@@ -1,6 +1,7 @@
 package net.orekyuu.workbench.service;
 
 import net.orekyuu.workbench.entity.User;
+import net.orekyuu.workbench.entity.UserAvatar;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
 import org.springframework.stereotype.Service;
 
@@ -34,4 +35,23 @@ public interface UserService {
      * @return ユーザー
      */
     Optional<User> findById(String id);
+
+    /**
+     * ユーザーのアバターを検索します
+     * @param userId ユーザー
+     * @return 画像データ
+     */
+    Optional<byte[]> findAvatar(String userId);
+
+    /**
+     * ユーザー情報を更新する
+     * @param user 新しいユーザー
+     */
+    void update(User user);
+
+    /**
+     * アバターを更新します
+     * @param avatar 新しいアバター
+     */
+    void updateIcon(UserAvatar avatar);
 }

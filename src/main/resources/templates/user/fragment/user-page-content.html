@@ -35,12 +35,12 @@
         <ul class="nav navbar-nav">
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-              <img src="../../../static/img/user2-160x160.jpg" alt="" class="user-image">
+              <img src="../../../static/img/user2-160x160.jpg" th:src="|@{/user/icon/}${#authentication.principal.user.id}|" alt="" class="user-image">
               <span class="hidden-xs" th:text="${#authentication.principal.user.name}">orekyuu</span>
             </a>
             <ul class="dropdown-menu">
               <li class="user-header">
-                <img src="../../../static/img/user2-160x160.jpg" alt="" class="img-circle">
+                <img src="../../../static/img/user2-160x160.jpg" th:src="|@{/user/icon/}${#authentication.principal.user.id}|" alt="" class="img-circle">
                 <p th:text="|${#authentication.principal.user.name}(id: ${#authentication.principal.user.id})|">
                   username(id: userid)</p>
               </li>
@@ -87,7 +87,7 @@
             <li th:remove="all"><a href=""><i class="fa fa-circle-o"></i> Project4</a></li>
           </ul>
         </li>
-        <li class="" th:class="${#httpServletRequest.requestURI.equals('/settings')}?'active'"><a href="">
+        <li class="" th:class="${#httpServletRequest.requestURI.equals('/user-setting')}?'active'"><a href="" th:href="@{/user-setting}">
           <i class="fa fa-gear"></i> <span>設定</span>
         </a></li>
         <li class="" th:class="${#httpServletRequest.requestURI.equals('/admin/settings')}?'active'"><a href="">

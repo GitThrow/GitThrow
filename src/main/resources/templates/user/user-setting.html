@@ -1,0 +1,60 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Workbench</title>
+  <link th:replace="user/fragment/user-page-content :: user-page-head" rel="stylesheet" type="text/css"/>
+</head>
+<body class="skin-blue">
+<div class="wrapper">
+
+  <div th:replace="user/fragment/user-page-content :: user-page-topmenu"></div>
+  <div th:replace="user/fragment/user-page-content :: user-page-sidebar"></div>
+
+
+  <!-- content -->
+  <div class="content-wrapper">
+
+    <!-- コンテンツヘッダ -->
+    <section class="content-header">
+      <h1>ユーザー設定</h1>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <section class="content">
+
+      <div class="box">
+        <form action="" th:action="@{/user-setting}" th:object="${userSettingForm}" method="post"
+              class="" enctype="multipart/form-data">
+          <!--最大サイズは4M-->
+          <div class="box-body">
+            <div class="form-group" th:class="${#fields.hasErrors('name')}?'has-error form-group':'form-group'">
+              <label for="user-name" class="control-label">ユーザー名</label>
+              <input type="text" th:field="*{name}" class="form-control" id="user-name" placeholder="UserName">
+              <p class="help-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">エラーメッセージ</p>
+            </div>
+            <div class="form-group" th:class="${#fields.hasErrors('avatar')}?'has-error form-group':'form-group'">
+              <label for="user-avatar" class="control-label">アバター</label> <br>
+              <img src="../../static/img/user2-160x160.jpg" th:src="|@{/user/icon/}${#authentication.principal.user.id}|" width="200px" height="200px" alt="" class="img-circle">
+              <input type="file" class="form-control" id="user-avatar" th:field="*{avatar}">
+              <p class="help-block" th:if="${#fields.hasErrors('avatar')}" th:errors="*{avatar}">エラーメッセージ</p>
+            </div>
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+          </div>
+          <div class="box-footer">
+            <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-check"></i> OK</button>
+          </div>
+        </form>
+      </div>
+
+    </section>
+  </div><!-- end content -->
+
+
+  <div th:replace="user/fragment/user-page-content :: user-page-footer"></div>
+
+
+</div><!-- end wrapper -->
+<div th:replace="user/fragment/user-page-content :: user-page-script"></div>
+</body>
+</html>

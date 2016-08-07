@@ -6,6 +6,12 @@ CREATE TABLE IF NOT EXISTS `users` (
   `admin`    BOOL         NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS `user_avatar` (
+  `id`     VARCHAR(32) PRIMARY KEY,
+  `avatar` LONGBLOB NOT NULL,
+  CONSTRAINT `user_avatar_id_fk` FOREIGN KEY (`id`) REFERENCES `users` (`id`)
+);
+
 /* プロジェクト */
 CREATE TABLE IF NOT EXISTS `projects`
 (
