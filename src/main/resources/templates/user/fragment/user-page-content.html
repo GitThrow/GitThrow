@@ -5,14 +5,18 @@
   <!-- for responsive -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- bootstrap -->
-  <link href="../../../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet" type="text/css" />
+  <link href="../../../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet"
+        type="text/css"/>
   <!-- font awesome -->
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet"
+        type="text/css"/>
   <!-- ionicons -->
-  <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+  <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css"/>
   <!-- adminLTE style -->
-  <link href="../../../static/css/AdminLTE.min.css" rel="stylesheet" type="text/css" th:href="@{/css/AdminLTE.min.css}"/>
-  <link href="../../../static/css/skins/skin-blue.min.css" rel="stylesheet" type="text/css" th:href="@{/css/skins/skin-blue.min.css}"/>
+  <link href="../../../static/css/AdminLTE.min.css" rel="stylesheet" type="text/css"
+        th:href="@{/css/AdminLTE.min.css}"/>
+  <link href="../../../static/css/skins/skin-blue.min.css" rel="stylesheet" type="text/css"
+        th:href="@{/css/skins/skin-blue.min.css}"/>
 </head>
 <body class="skin-blue">
 <div class="wrapper">
@@ -21,7 +25,7 @@
   <header class="main-header" th:fragment="user-page-topmenu">
 
     <!-- ロゴ -->
-    <a href="" class="logo">Workbench</a>
+    <a href="" class="logo" th:href="@{/}">Workbench</a>
 
     <!-- トップメニュー -->
     <nav class="navbar navbar-static-top" role="navigation">
@@ -32,12 +36,13 @@
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
               <img src="../../../static/img/user2-160x160.jpg" alt="" class="user-image">
-              <span class="hidden-xs">User Name</span>
+              <span class="hidden-xs" th:text="${#authentication.principal.user.name}">orekyuu</span>
             </a>
             <ul class="dropdown-menu">
               <li class="user-header">
                 <img src="../../../static/img/user2-160x160.jpg" alt="" class="img-circle">
-                <p>username(id: userid)</p>
+                <p th:text="|${#authentication.principal.user.name}(id: ${#authentication.principal.user.id})|">
+                  username(id: userid)</p>
               </li>
               <li class="user-footer">
                 <div class="pull-left">
@@ -59,7 +64,7 @@
       <ul class="sidebar-menu">
 
         <!-- メニュー項目 -->
-        <li class="active" th:class="${#httpServletRequest.requestURI.equals('/')}?'active'"><a href="">
+        <li class="active" th:class="${#httpServletRequest.requestURI.equals('/')}?'active'"><a href="" th:href="@{/}">
           <i class="fa fa-dashboard"></i> <span>ダッシュボード</span>
         </a></li>
         <li class="treeview">
@@ -71,10 +76,11 @@
             </span>
           </a>
           <ul class="treeview-menu">
+            <li><a href="" th:href="@{/new-project}"><i class="fa fa-plus"></i> 新規プロジェクト</a></li>
             <li><a href=""><i class="fa fa-circle-o"></i> Project1</a></li>
-            <li><a href=""><i class="fa fa-circle-o"></i> Project2</a></li>
-            <li><a href=""><i class="fa fa-circle-o"></i> Project3</a></li>
-            <li><a href=""><i class="fa fa-circle-o"></i> Project4</a></li>
+            <li th:remove="all"><a href=""><i class="fa fa-circle-o"></i> Project2</a></li>
+            <li th:remove="all"><a href=""><i class="fa fa-circle-o"></i> Project3</a></li>
+            <li th:remove="all"><a href=""><i class="fa fa-circle-o"></i> Project4</a></li>
           </ul>
         </li>
         <li class="" th:class="${#httpServletRequest.requestURI.equals('/settings')}?'active'"><a href="">
@@ -94,20 +100,72 @@
 
     <!-- コンテンツヘッダ -->
     <section class="content-header">
-      <h1>ページタイトル</h1>
+      <h1>ダッシュボード</h1>
     </section>
 
     <!-- メインコンテンツ -->
     <section class="content">
 
-      <!-- コンテンツ1 -->
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">ボックスタイトル</h3>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="box box-info">
+            <div class="box-header with-border">
+              <h3 class="box-title">活動</h3>
+
+            </div>
+            <div class="box-body">
+              <div class="chart">
+                <canvas id="lineChart" style="height:250px"></canvas>
+              </div>
+            </div>
+            <!-- /.box-body -->
+          </div>
         </div>
-        <div class="box-body">
-          <p>ボックスボディー</p>
+
+        <div class="col-md-6">
+          <div class="box box-info col-md-6">
+            <div class="box-header with-border">
+              <h3 class="box-title">プルリクエスト</h3>
+            </div>
+            <div class="box-body">
+              <table class="table table-striped">
+                <tr>
+                  <th style="width: 10px">#</th>
+                  <th>プロジェクト</th>
+                  <th>タイトル</th>
+                  <th style="width: 40px">タイプ</th>
+                </tr>
+                <tr>
+                  <td>#1</td>
+                  <td><a href="">Project1</a></td>
+                  <td><a href="">ログインを実装</a></td>
+                  <td><span class="badge bg-light-blue">新規機能</span></td>
+                </tr>
+                <tr>
+                  <td>#3</td>
+                  <td><a href="">Project1</a></td>
+                  <td><a href="">XSS出来る問題を修正</a></td>
+                  <td><span class="badge bg-red">バグ</span></td>
+                </tr>
+                <tr>
+                  <td>#3</td>
+                  <td><a href="">Project2</a></td>
+                  <td><a href="">/hogeにアクセスすると500エラー</a></td>
+                  <td><span class="badge bg-red">バグ</span></td>
+                </tr>
+                <tr>
+                  <td>#10</td>
+                  <td><a href="">Project1</a></td>
+                  <td><a href="">テストが落ちていたので修正</a></td>
+                  <td><span class="badge bg-red">バグ</span></td>
+                </tr>
+              </table>
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="raw">
+
       </div>
 
     </section>
@@ -127,11 +185,98 @@
 
 <div th:fragment="user-page-script" th:remove="tag">
   <!-- jquery -->
-  <script src="../../../static/plugins/jQuery/jquery-2.2.3.min.js" th:src="@{/plugins/jQuery/jquery-2.2.3.min.js}" type="text/javascript"></script>
+  <script src="../../../static/plugins/jQuery/jquery-2.2.3.min.js" th:src="@{/plugins/jQuery/jquery-2.2.3.min.js}"
+          type="text/javascript"></script>
   <!-- bootstrap -->
   <script src="../../../static/js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}" type="text/javascript"></script>
   <!-- adminLTE -->
   <script src="../../../static/js/app.min.js" th:src="@{/js/app.min.js}" type="text/javascript"></script>
+  <script src="../../../static/plugins/chartjs/Chart.min.js"></script>
 </div>
+
+<script>
+  $(function () {
+    /* ChartJS
+     * -------
+     * Here we will create a few charts using ChartJS
+     */
+    var areaChartData = {
+      labels: ["8/2", "8/3", "8/4", "8/5", "8/6", "8/7", "8/6"],
+      datasets: [
+        {
+          label: "Project1",
+          fillColor: "rgba(210, 214, 222, 1)",
+          strokeColor: "rgba(210, 214, 222, 1)",
+          pointColor: "rgba(210, 214, 222, 1)",
+          pointStrokeColor: "#c1c7d1",
+          pointHighlightFill: "#fff",
+          pointHighlightStroke: "rgba(220,220,220,1)",
+          data: [1, 4, 2, 2, 4, 2, 1, 1]
+        },
+        {
+          label: "Project2",
+          fillColor: "rgba(60,141,188,0.9)",
+          strokeColor: "rgba(60,141,188,0.8)",
+          pointColor: "#3b8bba",
+          pointStrokeColor: "rgba(60,141,188,1)",
+          pointHighlightFill: "#fff",
+          pointHighlightStroke: "rgba(60,141,188,1)",
+          data: [0, 0, 0, 9, 2, 1, 1, 0]
+        }
+      ]
+    };
+
+    var areaChartOptions = {
+      //Boolean - If we should show the scale at all
+      showScale: true,
+      //Boolean - Whether grid lines are shown across the chart
+      scaleShowGridLines: false,
+      //String - Colour of the grid lines
+      scaleGridLineColor: "rgba(0,0,0,.05)",
+      //Number - Width of the grid lines
+      scaleGridLineWidth: 1,
+      //Boolean - Whether to show horizontal lines (except X axis)
+      scaleShowHorizontalLines: true,
+      //Boolean - Whether to show vertical lines (except Y axis)
+      scaleShowVerticalLines: true,
+      //Boolean - Whether the line is curved between points
+      bezierCurve: true,
+      //Number - Tension of the bezier curve between points
+      bezierCurveTension: 0.3,
+      //Boolean - Whether to show a dot for each point
+      pointDot: false,
+      //Number - Radius of each point dot in pixels
+      pointDotRadius: 4,
+      //Number - Pixel width of point dot stroke
+      pointDotStrokeWidth: 1,
+      //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+      pointHitDetectionRadius: 20,
+      //Boolean - Whether to show a stroke for datasets
+      datasetStroke: true,
+      //Number - Pixel width of dataset stroke
+      datasetStrokeWidth: 2,
+      //Boolean - Whether to fill the dataset with a color
+      datasetFill: true,
+      //Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
+      maintainAspectRatio: true,
+      //Boolean - whether to make the chart responsive to window resizing
+      responsive: true
+    };
+
+    //Create the line chart
+
+
+    //-------------
+    //- LINE CHART -
+    //--------------
+    var lineChartCanvas = $("#lineChart").get(0).getContext("2d");
+    console.log(lineChartCanvas);
+    var lineChart = new Chart(lineChartCanvas);
+    var lineChartOptions = areaChartOptions;
+    lineChartOptions.datasetFill = false;
+    lineChart.Line(areaChartData, lineChartOptions);
+
+  });
+</script>
 </body>
 </html>

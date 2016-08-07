@@ -1,0 +1,64 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Workbench</title>
+  <link th:replace="user/fragment/user-page-content :: user-page-head" rel="stylesheet" type="text/css"/>
+</head>
+<body class="skin-blue">
+<div class="wrapper">
+
+  <div th:replace="user/fragment/user-page-content :: user-page-topmenu"></div>
+  <div th:replace="user/fragment/user-page-content :: user-page-sidebar"></div>
+
+
+  <!-- content -->
+  <div class="content-wrapper">
+
+    <!-- コンテンツヘッダ -->
+    <section class="content-header">
+      <h1>新規プロジェクト</h1>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <section class="content">
+
+      <!-- コンテンツ1 -->
+      <div class="box">
+        <form action="" th:action="@{/new-project}" th:object="${createProjectForm}" method="post"
+              class="form-horizontal">
+          <div class="box-body">
+            <div class="form-group" th:class="${#fields.hasErrors('id')}?'has-error form-group':'form-group'">
+              <label for="project-id" class="col-sm-3 control-label">プロジェクトID</label>
+              <div class="col-sm-9">
+                <input type="text" th:field="*{id}" class="form-control" id="project-id" placeholder="ProjectID">
+                <p class="help-block" th:if="${#fields.hasErrors('id')}" th:errors="*{id}">エラーメッセージ</p>
+              </div>
+            </div>
+            <div class="form-group" th:class="${#fields.hasErrors('name')}?'has-error form-group':'form-group'">
+              <label for="project-name" class="col-sm-3 control-label">プロジェクト名</label>
+
+              <div class="col-sm-9">
+                <input type="text" th:field="*{name}" class="form-control" id="project-name" placeholder="ProjectName">
+                <p class="help-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">エラーメッセージ</p>
+              </div>
+            </div>
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+          </div>
+          <div class="box-footer">
+            <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-check"></i> OK</button>
+          </div>
+        </form>
+      </div>
+
+    </section>
+  </div><!-- end content -->
+
+
+  <div th:replace="user/fragment/user-page-content :: user-page-footer"></div>
+
+
+</div><!-- end wrapper -->
+<div th:replace="user/fragment/user-page-content :: user-page-script"></div>
+</body>
+</html>
