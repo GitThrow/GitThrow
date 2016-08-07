@@ -45,6 +45,13 @@ public interface ProjectService {
     List<User> findProjectMember(String projectId) throws ProjectNotFoundException;
 
     /**
+     * 指定のユーザーが参加しているプロジェクトのリストを返します
+     * @param userId ユーザー
+     * @return ユーザーが参加しているプロジェクト
+     */
+    List<Project> findProjectByUser(String userId);
+
+    /**
      * プロジェクト名を更新します
      * @param projectId プロジェクトID
      * @param projectName 新しいプロジェクト名

@@ -68,6 +68,11 @@ public class ProjectServiceImpl implements ProjectService {
         return projectDao.findProjectMember(projectId, Collectors.toList());
     }
 
+    @Override
+    public List<Project> findProjectByUser(String userId) {
+        return projectDao.findByUser(userId, Collectors.toList());
+    }
+
     @Transactional(readOnly = false)
     @Override
     public void updateProjectName(String projectId, String projectName) throws ProjectNotFoundException {

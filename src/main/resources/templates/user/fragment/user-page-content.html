@@ -77,7 +77,11 @@
           </a>
           <ul class="treeview-menu">
             <li><a href="" th:href="@{/new-project}"><i class="fa fa-plus"></i> 新規プロジェクト</a></li>
-            <li><a href=""><i class="fa fa-circle-o"></i> Project1</a></li>
+            <li th:each="project : ${@projectService.findProjectByUser(#authentication.principal.user.id)}">
+              <a href="">
+                <i class="fa fa-circle-o"></i> <div th:remove="tag" th:text="${project.name}">Project1</div>
+              </a>
+            </li>
             <li th:remove="all"><a href=""><i class="fa fa-circle-o"></i> Project2</a></li>
             <li th:remove="all"><a href=""><i class="fa fa-circle-o"></i> Project3</a></li>
             <li th:remove="all"><a href=""><i class="fa fa-circle-o"></i> Project4</a></li>
