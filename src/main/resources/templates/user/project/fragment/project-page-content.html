@@ -65,28 +65,28 @@
       <ul class="sidebar-menu">
 
         <!-- メニュー項目 -->
-        <li class="active" th:class="${#httpServletRequest.requestURI.matches('')}?'active'"><a href="" th:href="|@{/project/}${project.id}|">
+        <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/?$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}|">
           <i class="fa fa-dashboard"></i> <span>ダッシュボード</span>
         </a></li>
-        <li class="" th:class="${#httpServletRequest.requestURI.equals('')}?'active'"><a href="" th:href="|@{/project/}${project.id}/pullrequest|">
+        <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/pullrequest.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/pullrequest|">
           <i class="fa fa-code-fork"></i> <span>プルリクエスト</span>
         </a></li>
-        <li class="" th:class="${#httpServletRequest.requestURI.equals('')}?'active'"><a href="" th:href="|@{/project/}${project.id}/ticket|">
+        <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/ticket.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/ticket|">
           <i class="fa fa-tasks"></i> <span>チケット</span>
         </a></li>
-        <li class="" th:class="${#httpServletRequest.requestURI.equals('')}?'active'"><a href="" th:href="|@{/project/}${project.id}/ticketboard|">
+        <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/ticketboard.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/ticketboard|">
           <i class="fa fa-edit"></i> <span>チケットボード</span>
         </a></li>
-        <li class="" th:class="${#httpServletRequest.requestURI.equals('')}?'active'"><a href="" th:href="|@{/project/}${project.id}/test|">
+        <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/test.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/test|">
           <i class="fa fa-flask"></i> <span>テスト</span>
         </a></li>
-        <li class="" th:class="${#httpServletRequest.requestURI.equals('')}?'active'"><a href="" th:href="|@{/project/}${project.id}/files|">
+        <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/files.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/files|">
           <i class="fa fa-download"></i> <span>成果物</span>
         </a></li>
-        <li class="" th:class="${#httpServletRequest.requestURI.equals('')}?'active'"><a href="" th:href="|@{/project/}${project.id}/settings|">
+        <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/settings.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/settings|">
           <i class="fa fa-gear"></i> <span>設定</span>
         </a></li>
-        <li class="" th:class="${#httpServletRequest.requestURI.equals('')}?'active'"><a href="" th:href="|@{/project/}${project.id}/admin-settings|">
+        <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/admin-settings.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/admin-settings|">
           <i class="fa fa-wrench"></i> <span>管理者設定</span>
         </a></li>
       </ul>
