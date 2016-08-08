@@ -16,7 +16,7 @@ public class WorkbenchSecurityConfiguration extends WebSecurityConfigurerAdapter
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         //ログイン画面は常にアクセス許可 それ以外は要検証
-        http.authorizeRequests().antMatchers("/login", "/signup", "/favicon.ico").permitAll()
+        http.authorizeRequests().antMatchers("/login", "/signup", "/favicon.ico", "/git/repos/**").permitAll()
             .anyRequest().authenticated();
         //ログインの設定
         http.formLogin().loginProcessingUrl("/login").loginPage("/login")
