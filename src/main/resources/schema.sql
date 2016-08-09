@@ -66,13 +66,12 @@ CREATE TABLE IF NOT EXISTS `ticket_priority` (
 
 /* オープンしているチケット */
 CREATE TABLE IF NOT EXISTS `open_tickets` (
-  `id`          INT PRIMARY KEY AUTO_INCREMENT,
   `project`     VARCHAR(32)  NOT NULL,
+  `ticket_num`  INT          NOT NULL, /* チケット番号 */
   `title`       VARCHAR(128) NOT NULL,
   `description` TEXT         NOT NULL, /* TEXTにデフォルト値を設定できないので、コード側で対応 */
   `assignee`    VARCHAR(32), /* 担当者 */
   `proponent`   VARCHAR(32)  NOT NULL, /* 提案者 */
-  `ticket_num`  INT          NOT NULL, /* チケット番号 */
   `limit`       DATETIME, /* 期日 */
   `type`        INT          NOT NULL, /*タイプ*/
   `status`      INT          NOT NULL, /*状態*/
@@ -82,18 +81,18 @@ CREATE TABLE IF NOT EXISTS `open_tickets` (
   CONSTRAINT `open_tickets_proponent_fk` FOREIGN KEY (`proponent`) REFERENCES `users` (`id`),
   CONSTRAINT `open_tickets_type_fk` FOREIGN KEY (`type`) REFERENCES `ticket_type` (`id`),
   CONSTRAINT `open_tickets_status_fk` FOREIGN KEY (`status`) REFERENCES `ticket_status` (`id`),
-  CONSTRAINT `open_tickets_priority_fk` FOREIGN KEY (`priority`) REFERENCES `ticket_priority` (`id`)
+  CONSTRAINT `open_tickets_priority_fk` FOREIGN KEY (`priority`) REFERENCES `ticket_priority` (`id`),
+  PRIMARY KEY (`project`, `ticket_num`)
 );
 
 /* クローズしているチケット */
 CREATE TABLE IF NOT EXISTS `closed_tickets` (
-  `id`          INT PRIMARY KEY AUTO_INCREMENT,
   `project`     VARCHAR(32)  NOT NULL,
+  `ticket_num`  INT          NOT NULL, /* チケット番号 */
   `title`       VARCHAR(128) NOT NULL,
   `description` TEXT         NOT NULL, /* TEXTにデフォルト値を設定できないので、コード側で対応 */
   `assignee`    VARCHAR(32), /* 担当者 */
   `proponent`   VARCHAR(32)  NOT NULL, /* 提案者 */
-  `ticket_num`  INT          NOT NULL, /* チケット番号 */
   `limit`       DATETIME, /* 期日 */
   `type`        INT          NOT NULL, /*タイプ*/
   `status`      INT          NOT NULL, /*状態*/
@@ -103,7 +102,8 @@ CREATE TABLE IF NOT EXISTS `closed_tickets` (
   CONSTRAINT `closed_tickets_proponent_fk` FOREIGN KEY (`proponent`) REFERENCES `users` (`id`),
   CONSTRAINT `closed_tickets_type_fk` FOREIGN KEY (`type`) REFERENCES `ticket_type` (`id`),
   CONSTRAINT `closed_tickets_status_fk` FOREIGN KEY (`status`) REFERENCES `ticket_status` (`id`),
-  CONSTRAINT `closed_tickets_priority_fk` FOREIGN KEY (`priority`) REFERENCES `ticket_priority` (`id`)
+  CONSTRAINT `closed_tickets_priority_fk` FOREIGN KEY (`priority`) REFERENCES `ticket_priority` (`id`),
+  PRIMARY KEY (`project`, `ticket_num`)
 );
 
 /* チケットのコメント */

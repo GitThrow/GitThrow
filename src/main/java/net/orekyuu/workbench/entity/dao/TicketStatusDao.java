@@ -5,6 +5,7 @@ import org.seasar.doma.*;
 import org.seasar.doma.boot.ConfigAutowireable;
 
 import java.util.Optional;
+import java.util.stream.Collector;
 
 @ConfigAutowireable
 @Dao
@@ -21,4 +22,7 @@ public interface TicketStatusDao {
 
     @Select
     Optional<TicketStatus> findById(int id);
+
+    @Select(strategy = SelectType.COLLECT)
+    <RESULT> RESULT findByProject(String projectId, Collector<TicketStatus, ?, RESULT> collector);
 }

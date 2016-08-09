@@ -33,7 +33,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private TicketNumDao ticketNumDao;
 
-    private static final List<String> defaultTicketStatus = Arrays.asList("新規", "進行中", "レビュー", "完了");
+    private static final List<String> defaultTicketStatus = Arrays.asList("新規", "a");
     private static final List<String> defaultTicketPriority = Arrays.asList("低", "中", "高");
     private static final List<String> defaultTicketType = Arrays.asList("バグ", "新規機能", "提案", "リリース", "etc");
 
@@ -45,8 +45,8 @@ public class ProjectServiceImpl implements ProjectService {
             projectUserDao.insert(new ProjectUser(projectId, owner.id));
 
             TicketNum num = new TicketNum();
-            num.project = projectId;
             num.ticketCount = 0;
+            num.project = projectId;
             ticketNumDao.insert(num);
             //デフォルトの優先度一覧
             defaultTicketPriority.stream().map(str -> {
@@ -72,6 +72,7 @@ public class ProjectServiceImpl implements ProjectService {
                 return type;
             }).forEach(t -> ticketTypeDao.insert(t));
         } catch (DuplicateKeyException e) {
+            e.printStackTrace();
             throw new ProjectExistsException(projectId);
         }
     }

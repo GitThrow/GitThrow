@@ -15,4 +15,7 @@ public interface TicketNumDao {
 
     @Update
     int update(TicketNum num);
+
+    @Update(sqlFile = true)
+    int increment(String projectId);
 }
