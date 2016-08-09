@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 
 public class WorkbenchGitRepositoryResolver implements RepositoryResolver<HttpServletRequest> {
 
-    private static final Path REPOSITORIES_DIR = Paths.get("repos");
+    public static final Path REPOSITORIES_DIR = Paths.get("repos");
     @Override
     public Repository open(HttpServletRequest req, String repoName) throws RepositoryNotFoundException, ServiceNotAuthorizedException, ServiceNotEnabledException, ServiceMayNotContinueException {
         Path repositoryDir = REPOSITORIES_DIR.resolve(repoName);
