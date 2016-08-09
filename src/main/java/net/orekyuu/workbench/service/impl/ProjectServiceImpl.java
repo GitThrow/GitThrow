@@ -1,10 +1,7 @@
 package net.orekyuu.workbench.service.impl;
 
-import net.orekyuu.workbench.entity.Project;
-import net.orekyuu.workbench.entity.ProjectUser;
-import net.orekyuu.workbench.entity.User;
-import net.orekyuu.workbench.entity.dao.ProjectDao;
-import net.orekyuu.workbench.entity.dao.ProjectUserDao;
+import net.orekyuu.workbench.entity.*;
+import net.orekyuu.workbench.entity.dao.*;
 import net.orekyuu.workbench.service.ProjectService;
 import net.orekyuu.workbench.service.exceptions.NotProjectMemberException;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
@@ -14,6 +11,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +24,18 @@ public class ProjectServiceImpl implements ProjectService {
     private ProjectDao projectDao;
     @Autowired
     private ProjectUserDao projectUserDao;
+    @Autowired
+    private TicketStatusDao ticketStatusDao;
+    @Autowired
+    private TicketPriorityDao ticketPriorityDao;
+    @Autowired
+    private TicketTypeDao ticketTypeDao;
+    @Autowired
+    private TicketNumDao ticketNumDao;
+
+    private static final List<String> defaultTicketStatus = Arrays.asList("新規", "進行中", "レビュー", "完了");
+    private static final List<String> defaultTicketPriority = Arrays.asList("低", "中", "高");
+    private static final List<String> defaultTicketType = Arrays.asList("バグ", "新規機能", "提案", "リリース", "etc");
 
     @Transactional(readOnly = false)
     @Override
@@ -33,6 +43,34 @@ public class ProjectServiceImpl implements ProjectService {
         try {
             projectDao.insert(new Project(projectId, projectName, owner.id));
             projectUserDao.insert(new ProjectUser(projectId, owner.id));
+
+            TicketNum num = new TicketNum();
+            num.project = projectId;
+            num.ticketCount = 0;
+            ticketNumDao.insert(num);
+            //デフォルトの優先度一覧
+            defaultTicketPriority.stream().map(str -> {
+                TicketPriority priority = new TicketPriority();
+                priority.project = projectId;
+                priority.priority = str;
+                return priority;
+            }).forEach(t -> ticketPriorityDao.insert(t));
+
+            //デフォルトの状態一覧
+            defaultTicketStatus.stream().map(str -> {
+                TicketStatus status = new TicketStatus();
+                status.project = projectId;
+                status.status = str;
+                return status;
+            }).forEach(t -> ticketStatusDao.insert(t));
+
+            //デフォルトのタイプ一覧
+            defaultTicketType.stream().map(str -> {
+                TicketType type = new TicketType();
+                type.project = projectId;
+                type.type = str;
+                return type;
+            }).forEach(t -> ticketTypeDao.insert(t));
         } catch (DuplicateKeyException e) {
             throw new ProjectExistsException(projectId);
         }
