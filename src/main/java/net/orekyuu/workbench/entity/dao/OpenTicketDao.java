@@ -18,4 +18,7 @@ public interface OpenTicketDao {
 
     @Select(strategy = SelectType.COLLECT)
     <RESULT> RESULT findByProject(String projectId, Collector<OpenTicket, ?, RESULT> collector);
+
+    @Delete(sqlFile = true)
+    int deleteByProject(String projectId);
 }

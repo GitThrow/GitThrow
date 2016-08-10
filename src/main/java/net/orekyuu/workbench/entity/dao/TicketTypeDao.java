@@ -25,4 +25,7 @@ public interface TicketTypeDao {
 
     @Select(strategy = SelectType.COLLECT)
     <RESULT> RESULT findByProject(String projectId, Collector<TicketType, ?, RESULT> collector);
+
+    @Delete(sqlFile = true)
+    int deleteByProject(String projectId);
 }

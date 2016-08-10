@@ -25,5 +25,8 @@ public interface TicketPriorityDao {
 
     @Select(strategy = SelectType.COLLECT)
     <RESULT> RESULT findByProject(String projectId, Collector<TicketPriority, ?, RESULT> collector);
+
+    @Delete(sqlFile = true)
+    int deleteByProject(String projectId);
 }
 

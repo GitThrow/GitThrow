@@ -32,6 +32,8 @@ public class ProjectServiceImpl implements ProjectService {
     private TicketTypeDao ticketTypeDao;
     @Autowired
     private TicketNumDao ticketNumDao;
+    @Autowired
+    private OpenTicketDao ticketDao;
 
     private static final List<String> defaultTicketStatus = Arrays.asList("新規", "a");
     private static final List<String> defaultTicketPriority = Arrays.asList("低", "中", "高");
@@ -148,6 +150,11 @@ public class ProjectServiceImpl implements ProjectService {
             .map(user -> new ProjectUser(projectId, user.id))
             .collect(Collectors.toList())
         );
+        ticketDao.deleteByProject(projectId);
+        ticketStatusDao.deleteByProject(projectId);
+        ticketTypeDao.deleteByProject(projectId);
+        ticketPriorityDao.deleteByProject(projectId);
+        ticketNumDao.deleteByProject(projectId);
         projectDao.delete(new Project(projectId, "", ""));
     }
 }

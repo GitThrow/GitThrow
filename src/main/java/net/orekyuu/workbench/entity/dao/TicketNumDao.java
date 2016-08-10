@@ -2,6 +2,7 @@ package net.orekyuu.workbench.entity.dao;
 
 import net.orekyuu.workbench.entity.TicketNum;
 import org.seasar.doma.Dao;
+import org.seasar.doma.Delete;
 import org.seasar.doma.Insert;
 import org.seasar.doma.Update;
 import org.seasar.doma.boot.ConfigAutowireable;
@@ -18,4 +19,7 @@ public interface TicketNumDao {
 
     @Update(sqlFile = true)
     int increment(String projectId);
+
+    @Delete(sqlFile = true)
+    int deleteByProject(String projectId);
 }
