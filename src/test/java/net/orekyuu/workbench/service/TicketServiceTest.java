@@ -98,4 +98,19 @@ public class TicketServiceTest {
         Assertions.assertThat(project.get(1).ticketNum).isEqualTo(2);
     }
 
+    @Test
+    public void testFindTicketModelByProject() {
+        createTicket("project1", "タスク1", "テスト");
+        createTicket("project1", "タスク2", "テスト");
+        createTicket("project2", "タスク3", "テスト");
+
+        List<TicketModel> project = ticketService.findOpenTicketModelByProject("project1");
+        Assertions.assertThat(project).hasSize(2);
+        Assertions.assertThat(project.get(0).getTitle()).isEqualTo("タスク1");
+        Assertions.assertThat(project.get(0).getNumber()).isEqualTo(1);
+        Assertions.assertThat(project.get(1).getTitle()).isEqualTo("タスク2");
+        Assertions.assertThat(project.get(1).getNumber()).isEqualTo(2);
+
+    }
+
 }
