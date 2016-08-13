@@ -23,4 +23,4 @@
 1. src/main/java/net/orekyuu/workbench/Workbench2Applicationを実行
   
 ローカルにMySQLがある場合は開発用に実行構成をいじると便利です。  
-![img](img/dev-settings.png)
+![img](img/dev-setting.png)
