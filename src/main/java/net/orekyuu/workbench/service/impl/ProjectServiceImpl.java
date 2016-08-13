@@ -9,6 +9,7 @@ import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -103,22 +104,15 @@ public class ProjectServiceImpl implements ProjectService {
         Files.createDirectories(repositoryDir);
 
         Repository repo = new FileRepositoryBuilder()
-            .setWorkTree(repositoryDir.toFile())
+            .setGitDir(repositoryDir.toFile())
+            .setBare()
             .build();
-        repo.create();
-        try {
-            Git git = new Git(repo);
-            git.add()
-                .addFilepattern(".")
-                .call();
+        final boolean isBare = true;
+        repo.create(isBare);
 
-            git.commit()
-                .setAuthor("Workbench", "workbench@orekyuu.net")
-                .setMessage("first commit")
-                .call();
-        } catch (GitAPIException e) {
-            e.printStackTrace();
-        }
+        StoredConfig config = repo.getConfig();
+        config.setBoolean("http", null, "receivepack", true);
+        config.save();
     }
 
     @Transactional(readOnly = false)
