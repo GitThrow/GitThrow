@@ -6,15 +6,27 @@ import net.orekyuu.workbench.service.ProjectService;
 import net.orekyuu.workbench.service.exceptions.NotProjectMemberException;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.StoredConfig;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static net.orekyuu.workbench.config.git.WorkbenchGitRepositoryResolver.REPOSITORIES_DIR;
 
 @Transactional(readOnly = true)
 @Component
@@ -45,6 +57,7 @@ public class ProjectServiceImpl implements ProjectService {
         try {
             projectDao.insert(new Project(projectId, projectName, owner.id));
             projectUserDao.insert(new ProjectUser(projectId, owner.id));
+            createGitRepository(projectId);
 
             TicketNum num = new TicketNum();
             num.ticketCount = 0;
@@ -76,7 +89,30 @@ public class ProjectServiceImpl implements ProjectService {
         } catch (DuplicateKeyException e) {
             e.printStackTrace();
             throw new ProjectExistsException(projectId);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    private void createGitRepository(String projectId) throws IOException {
+        Path repositoryDir = REPOSITORIES_DIR.resolve(Paths.get(projectId));
+        if (Files.exists(repositoryDir)) {
+            IOException exception = new IOException("すでに存在している: " + projectId);
+            throw new UncheckedIOException(exception);
+        }
+
+        Files.createDirectories(repositoryDir);
+
+        Repository repo = new FileRepositoryBuilder()
+            .setGitDir(repositoryDir.toFile())
+            .setBare()
+            .build();
+        final boolean isBare = true;
+        repo.create(isBare);
+
+        StoredConfig config = repo.getConfig();
+        config.setBoolean("http", null, "receivepack", true);
+        config.save();
     }
 
     @Transactional(readOnly = false)
