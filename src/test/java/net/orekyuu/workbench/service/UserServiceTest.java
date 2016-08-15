@@ -2,7 +2,9 @@ package net.orekyuu.workbench.service;
 
 import net.orekyuu.workbench.entity.User;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
+import net.orekyuu.workbench.util.TestRepositoryUtil;
 import org.assertj.core.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,11 @@ public class UserServiceTest {
 
     @Autowired
     private UserService userService;
+
+    @Before
+    public void before() {
+        TestRepositoryUtil.deleteGitRepositoryDir();
+    }
 
     @Test
     public void testCreate() throws UserExistsException {

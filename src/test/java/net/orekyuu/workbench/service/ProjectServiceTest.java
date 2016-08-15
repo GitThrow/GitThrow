@@ -5,6 +5,7 @@ import net.orekyuu.workbench.service.exceptions.NotProjectMemberException;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
+import net.orekyuu.workbench.util.TestRepositoryUtil;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -28,12 +33,15 @@ public class ProjectServiceTest {
     private User user2;
 
     @Before
-    public void before() throws UserExistsException {
+    public void before() throws UserExistsException, IOException {
+        TestRepositoryUtil.deleteGitRepositoryDir();
+
         userService.createUser("user1", "user1", "pw");
         userService.createUser("user2", "user2", "pw");
 
         user1 = userService.findById("user1").get();
         user2 = userService.findById("user2").get();
+
     }
 
     @Test

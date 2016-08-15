@@ -7,6 +7,7 @@ import net.orekyuu.workbench.entity.dao.TicketStatusDao;
 import net.orekyuu.workbench.entity.dao.TicketTypeDao;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
+import net.orekyuu.workbench.util.TestRepositoryUtil;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +17,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,6 +56,8 @@ public class TicketServiceTest {
 
     @Before
     public void before() throws UserExistsException, ProjectExistsException {
+        TestRepositoryUtil.deleteGitRepositoryDir();
+
         userService.createUser("user1", "user1", "pw");
         userService.createUser("user2", "user2", "pw");
 
