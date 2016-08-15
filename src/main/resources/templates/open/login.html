@@ -35,23 +35,23 @@
     <form  action="/login" method="post" th:class="${param.error}? 'has-error'">
 
       <div class="form-group has-feedback">
-        <input type="text" class="form-control" name="username" placeholder="User ID">
+        <input type="text" class="form-control" name="username" placeholder="User ID" th:placeholder="#{html.open.login.username}">
         <span class="glyphicon glyphicon-user form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback">
-        <input type="password" class="form-control" name="password" placeholder="Password">
+        <input type="password" class="form-control" name="password" placeholder="Password" th:placeholder="#{html.open.login.password}">
         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
       </div>
 
       <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-      <div class="raw help-block" th:if="${param.error}">
-        UserIDもしくはPasswordが正しくありません
+      <div class="raw help-block" th:if="${param.error}" th:text="html.open.login.param_error">
+        User ID or password is not incorrect.
       </div>
 
       <div class="row">
         <!-- /.col -->
         <div class="col-xs-4">
-          <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+          <button type="submit" class="btn btn-primary btn-block btn-flat" th:text="#{html.open.login.sign_in}">Sign In</button>
         </div>
         <!-- /.col -->
       </div>
