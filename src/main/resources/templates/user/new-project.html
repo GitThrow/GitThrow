@@ -17,7 +17,7 @@
 
     <!-- コンテンツヘッダ -->
     <section class="content-header">
-      <h1>新規プロジェクト</h1>
+      <h1 th:text="#{html.user.new_project.new_project}">新規プロジェクト</h1>
     </section>
 
     <!-- メインコンテンツ -->
@@ -29,24 +29,23 @@
               class="form-horizontal">
           <div class="box-body">
             <div class="form-group" th:class="${#fields.hasErrors('id')}?'has-error form-group':'form-group'">
-              <label for="project-id" class="col-sm-3 control-label">プロジェクトID</label>
+              <label for="project-id" class="col-sm-3 control-label" th:text="#{html.user.new_project.project_id}">プロジェクトID</label>
               <div class="col-sm-9">
-                <input type="text" th:field="*{id}" class="form-control" id="project-id" placeholder="ProjectID">
+                <input type="text" th:field="*{id}" class="form-control" id="project-id" placeholder="ProjectID" th:placeholder="#{html.user.new_project.project_id_placeholder}">
                 <p class="help-block" th:if="${#fields.hasErrors('id')}" th:errors="*{id}">エラーメッセージ</p>
               </div>
             </div>
             <div class="form-group" th:class="${#fields.hasErrors('name')}?'has-error form-group':'form-group'">
-              <label for="project-name" class="col-sm-3 control-label">プロジェクト名</label>
-
+              <label for="project-name" class="col-sm-3 control-label" th:text="#{html.user.new_project.project_name}">プロジェクト名</label>
               <div class="col-sm-9">
-                <input type="text" th:field="*{name}" class="form-control" id="project-name" placeholder="ProjectName">
+                <input type="text" th:field="*{name}" class="form-control" id="project-name" placeholder="ProjectName" th:placeholder="#{html.user.new_project.project_name_placeholder}">
                 <p class="help-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">エラーメッセージ</p>
               </div>
             </div>
             <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
           </div>
           <div class="box-footer">
-            <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-check"></i> OK</button>
+            <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-check"></i><span th:text="#{html.user.new_project.ok}">OK</span></button>
           </div>
         </form>
       </div>
