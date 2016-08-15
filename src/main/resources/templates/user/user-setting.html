@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <title>Workbench</title>
   <link th:replace="user/fragment/user-page-content :: user-page-head" rel="stylesheet" type="text/css"/>
+    <link href="../../static/plugins/jquery-toast-plugin/jquery.toast.min.css"
+     th:href="@{/plugins/jquery-toast-plugin/jquery.toast.min.css}" rel="stylesheet"type="text/css"/>
 </head>
 <body class="skin-blue">
 <div class="wrapper">
@@ -28,10 +30,17 @@
               class="" enctype="multipart/form-data">
           <!--最大サイズは4M-->
           <div class="box-body">
+            <!-- ユーザー名 -->
             <div class="form-group" th:class="${#fields.hasErrors('name')}?'has-error form-group':'form-group'">
               <label for="user-name" class="control-label">ユーザー名</label>
-              <input type="text" th:field="*{name}" class="form-control" id="user-name" placeholder="UserName">
+              <input type="text" th:field="*{name}" class="form-control" id="user-name" placeholder="UserName" size="16">
               <p class="help-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">エラーメッセージ</p>
+            </div>
+            <!-- パスワード -->
+            <div class="form-group" th:class="${#fields.hasErrors('password')}?'has-error form-group':'form-group'">
+              <label for="user-password" class="control-label">パスワード</label>
+              <input type="password" th:field="*{password}" class="form-control" id="user-password" placeholder="Password">
+              <p class="help-block" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">エラーメッセージ</p>
             </div>
             <div class="form-group" th:class="${#fields.hasErrors('avatar')}?'has-error form-group':'form-group'">
               <label for="user-avatar" class="control-label">アバター</label> <br>
@@ -54,7 +63,29 @@
   <div th:replace="user/fragment/user-page-content :: user-page-footer"></div>
 
 
-</div><!-- end wrapper -->
+</div>
+<!-- end wrapper -->
 <div th:replace="user/fragment/user-page-content :: user-page-script"></div>
+<!-- end script -->
+<script src="../../static/plugins/jquery-toast-plugin/jquery.toast.min.js" th:src="@{/plugins/jquery-toast-plugin/jquery.toast.min.js}" type="text/javascript"></script>
+<script>
+$(function () {
+
+    console.log(location.search);
+    if(location.search.indexOf('update=success') != -1){
+        $.toast({
+            heading: 'Success',
+            text : "ユーザー設定の変更に成功しました。</a>",
+            icon: 'success',
+            showHideTransition : 'slide',
+            allowToastClose : true,
+            hideAfter : 5000,
+            stack : 5,
+            textAlign : 'left',
+            position : 'top-right'
+        });
+    }
+});
+</script>
 </body>
 </html>

@@ -6,6 +6,7 @@ import net.orekyuu.workbench.entity.UserAvatar;
 import net.orekyuu.workbench.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,9 @@ public class UserSettingController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @GetMapping("/user-setting")
     public String show(Model model, @AuthenticationPrincipal WorkbenchUserDetails principal) {
         UserSettingForm form = (UserSettingForm) model.asMap().get("userSettingForm");
@@ -34,6 +38,10 @@ public class UserSettingController {
 
     @PostMapping("/user-setting")
     public String update(@Valid UserSettingForm form, BindingResult result, @AuthenticationPrincipal WorkbenchUserDetails principal) {
+
+        //データに変更があるかどうか
+        boolean change = false;
+
         if (result.hasErrors()) {
             return "user/user-setting";
         }
@@ -42,6 +50,15 @@ public class UserSettingController {
         if (!Objects.equals(user.name, form.name)) {
             user.name = form.name;
             userService.update(user);
+            change = true;
+        }
+
+        if(form.password.length() > 0 && !Objects.equals(user.password, form.password)){
+
+            user.password = passwordEncoder.encode(form.password);
+            userService.update(user);
+
+            change = true;
         }
 
         if (form.avatar != null && form.avatar.getSize() != 0) {
@@ -52,12 +69,14 @@ public class UserSettingController {
                 userAvatar.id = user.id;
                 userAvatar.avatar = bytes;
                 userService.updateIcon(userAvatar);
+
+                change = true;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        return "redirect:/user-setting";
+        return "redirect:/user-setting" + (!change ? "":"?update=success");
     }
 
     @ModelAttribute
@@ -69,6 +88,9 @@ public class UserSettingController {
         @Size(min = 3, max = 16)
         private String name;
 
+        @Size(min = 0, max = 16)
+        private String password;
+
         private MultipartFile avatar;
 
         public String getName() {
@@ -79,7 +101,15 @@ public class UserSettingController {
             this.name = name;
         }
 
-        public MultipartFile getAvatar() {
+        public String getPassword() {
+			return password;
+		}
+
+		public void setPassword(String password) {
+			this.password = password;
+		}
+
+		public MultipartFile getAvatar() {
             return avatar;
         }
 
