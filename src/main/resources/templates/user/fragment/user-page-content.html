@@ -79,7 +79,7 @@
             <li>
               <a href="" th:href="@{/new-project}">
                 <i class="fa fa-plus"></i>
-                <span th:text="#{html.user.fragment.user_page_content.new_project}">新規プロジェクト</span>>
+                <span th:text="#{html.user.fragment.user_page_content.new_project}">新規プロジェクト</span>
               </a>
             </li>
             <li th:each="project : ${@projectService.findProjectByUser(#authentication.principal.user.id)}">
