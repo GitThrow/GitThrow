@@ -2,7 +2,9 @@ package net.orekyuu.workbench;
 
 import net.orekyuu.workbench.entity.User;
 import net.orekyuu.workbench.service.UserService;
+import net.orekyuu.workbench.util.TestRepositoryUtil;
 import org.assertj.core.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,11 @@ public class Workbench2ApplicationTests {
     UserService userService;
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Before
+    public void before() {
+        TestRepositoryUtil.deleteGitRepositoryDir();
+    }
 
 	@Test
 	public void contextLoads() {
