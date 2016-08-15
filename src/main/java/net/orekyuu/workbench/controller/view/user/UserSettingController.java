@@ -53,7 +53,7 @@ public class UserSettingController {
             change = true;
         }
 
-        if(form.password.length() > 0 && !Objects.equals(user.password, form.password)){
+        if(form.password.length() > 0 && !passwordEncoder.matches(form.password, user.password)){
 
             user.password = passwordEncoder.encode(form.password);
             userService.update(user);
