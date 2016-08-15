@@ -24,3 +24,7 @@
   
 ローカルにMySQLがある場合は開発用に実行構成をいじると便利です。  
 ![img](img/dev-setting.png)
+
+### AnnotationProcessorの設定
+- IntelliJの場合設定からAnnotationProcessorを有効化する必要がある
+![img](img/intellij_annotation.png)
