@@ -3,3 +3,10 @@
 *.iml
 database.db.mv.db
 /repos/**
+
+#Eclipse—p‚Ìİ’è
+.apt_generated/**
+.settings/**
+.project
+.factorypath
+.classpath
