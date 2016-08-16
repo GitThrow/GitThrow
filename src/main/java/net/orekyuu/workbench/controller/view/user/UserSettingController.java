@@ -53,14 +53,6 @@ public class UserSettingController {
             change = true;
         }
 
-        if(form.password.length() > 0 && !passwordEncoder.matches(form.password, user.password)){
-
-            user.password = passwordEncoder.encode(form.password);
-            userService.update(user);
-
-            change = true;
-        }
-
         if (form.avatar != null && form.avatar.getSize() != 0) {
 
             try {
@@ -79,6 +71,33 @@ public class UserSettingController {
         return "redirect:/user-setting" + (!change ? "":"?update=success");
     }
 
+    @PostMapping("/user-setting-pw")
+    public String update(@Valid UserPWSettingForm form, BindingResult result, @AuthenticationPrincipal WorkbenchUserDetails principal) {
+
+      //データに変更があるかどうか
+        boolean change = false;
+
+        if (result.hasErrors()) {
+            return "redirect:/user-setting";
+        }
+
+        User user = principal.getUser();
+
+        if(form.password.length() == 0 || form.oldPassword.length() == 0)return "redirect:/user-setting";
+
+        if(!passwordEncoder.matches(form.oldPassword, user.password))return "redirect:/user-setting?update=pw_error";
+
+        if(!passwordEncoder.matches(form.password, user.password)){
+
+            user.password = passwordEncoder.encode(form.password);
+            userService.update(user);
+
+            change = true;
+        }
+
+        return "redirect:/user-setting" + (!change ? "":"?update=success");
+    }
+
     @ModelAttribute
     public UserSettingForm userSettingForm() {
         return new UserSettingForm();
@@ -88,8 +107,6 @@ public class UserSettingController {
         @Size(min = 3, max = 16)
         private String name;
 
-        @Size(min = 0, max = 16)
-        private String password;
 
         private MultipartFile avatar;
 
@@ -101,13 +118,6 @@ public class UserSettingController {
             this.name = name;
         }
 
-        public String getPassword() {
-			return password;
-		}
-
-		public void setPassword(String password) {
-			this.password = password;
-		}
 
 		public MultipartFile getAvatar() {
             return avatar;
@@ -116,5 +126,38 @@ public class UserSettingController {
         public void setAvatar(MultipartFile avatar) {
             this.avatar = avatar;
         }
+    }
+
+    @ModelAttribute
+    public UserPWSettingForm userPWSettingForm() {
+        return new UserPWSettingForm();
+    }
+
+    public static class UserPWSettingForm {
+
+
+        @Size(min = 0, max = 16)
+        private String password;
+
+        @Size(min = 0, max = 16)
+        private String oldPassword;
+
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public String getOldPassword() {
+            return oldPassword;
+        }
+
+        public void setOldPassword(String oldPassword) {
+            this.oldPassword = oldPassword;
+        }
+
     }
 }
