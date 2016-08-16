@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
@@ -72,12 +73,14 @@ public class UserSettingController {
     }
 
     @PostMapping("/user-setting-pw")
-    public String update(@Valid UserPWSettingForm form, BindingResult result, @AuthenticationPrincipal WorkbenchUserDetails principal) {
+    public String update(@Valid UserPWSettingForm form, BindingResult result,RedirectAttributes attr, @AuthenticationPrincipal WorkbenchUserDetails principal) {
 
       //データに変更があるかどうか
         boolean change = false;
 
         if (result.hasErrors()) {
+            attr.addFlashAttribute("org.springframework.validation.BindingResult.userPWSettingForm", result);
+            attr.addFlashAttribute("userPWSettingForm", form);
             return "redirect:/user-setting";
         }
 
