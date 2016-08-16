@@ -44,7 +44,7 @@
       </div>
 
       <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-      <div class="raw help-block" th:if="${param.error}" th:text="html.open.login.param_error">
+      <div class="raw help-block" th:if="${param.error}" th:text="#{html.open.login.param_error}">
         User ID or password is not incorrect.
       </div>
 
