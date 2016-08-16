@@ -26,7 +26,7 @@ public class Workbench2WebConfig extends WebMvcConfigurerAdapter {
     public ReloadableResourceBundleMessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:messages");
-        messageSource.addBasenames("classpath:i18n/messages");
+        messageSource.addBasenames("classpath:i18n/language");
         messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
     }
