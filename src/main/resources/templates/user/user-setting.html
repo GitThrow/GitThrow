@@ -26,6 +26,9 @@
     <section class="content">
 
       <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">基本設定</h3>
+        </div>
         <form action="" th:action="@{/user-setting}" th:object="${userSettingForm}" method="post"
               class="" enctype="multipart/form-data">
           <!--最大サイズは4M-->
@@ -35,12 +38,6 @@
               <label for="user-name" class="control-label">ユーザー名</label>
               <input type="text" th:field="*{name}" class="form-control" id="user-name" placeholder="UserName" size="16">
               <p class="help-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">エラーメッセージ</p>
-            </div>
-            <!-- パスワード -->
-            <div class="form-group" th:class="${#fields.hasErrors('password')}?'has-error form-group':'form-group'">
-              <label for="user-password" class="control-label">パスワード</label>
-              <input type="password" th:field="*{password}" class="form-control" id="user-password" placeholder="Password">
-              <p class="help-block" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">エラーメッセージ</p>
             </div>
             <div class="form-group" th:class="${#fields.hasErrors('avatar')}?'has-error form-group':'form-group'">
               <label for="user-avatar" class="control-label">アバター</label> <br>
@@ -52,6 +49,36 @@
           </div>
           <div class="box-footer">
             <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-check"></i> OK</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">パスワード変更</h3>
+        </div>
+        <form action="" th:action="@{/user-setting-pw}" th:object="${userPWSettingForm}" method="post"
+              class="" enctype="multipart/form-data">
+          <!--最大サイズは4M-->
+          <div class="box-body">
+            <!-- 古いパスワード -->
+            <div class="form-group" th:class="${#fields.hasErrors('oldPassword')}?'has-error form-group':'form-group'">
+              <label for="user-password" class="control-label">古いパスワード</label>
+              <input type="password" th:field="*{oldPassword}" class="form-control" id="user-oldPassword" placeholder="OldPassword"
+              required>
+              <p class="help-block" th:if="${#fields.hasErrors('oldPassword')}" th:errors="*{oldPassword}">エラーメッセージ</p>
+            </div>
+            <!-- パスワード -->
+            <div class="form-group" th:class="${#fields.hasErrors('password')}?'has-error form-group':'form-group'">
+              <label for="user-password" class="control-label">新しいパスワード</label>
+              <input type="password" th:field="*{password}" class="form-control" id="user-password" placeholder="Password"
+              required>
+              <p class="help-block" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">エラーメッセージ</p>
+            </div>
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+          </div>
+          <div class="box-footer">
+            <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-check"></i>OK</button>
           </div>
         </form>
       </div>
@@ -71,12 +98,23 @@
 <script>
 $(function () {
 
-    console.log(location.search);
     if(location.search.indexOf('update=success') != -1){
         $.toast({
             heading: 'Success',
-            text : "ユーザー設定の変更に成功しました。</a>",
+            text : "ユーザー設定の変更に成功しました。",
             icon: 'success',
+            showHideTransition : 'slide',
+            allowToastClose : true,
+            hideAfter : 5000,
+            stack : 5,
+            textAlign : 'left',
+            position : 'top-right'
+        });
+    }else if(location.search.indexOf('update=pw_error') != -1){
+        $.toast({
+            heading: 'Error',
+            text : "古いパスワードが間違っています。",
+            icon: 'error',
             showHideTransition : 'slide',
             allowToastClose : true,
             hideAfter : 5000,
