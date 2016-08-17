@@ -77,4 +77,12 @@ public interface ProjectService {
      * @param projectId プロジェクトID
      */
     void deleteProject(String projectId) throws ProjectNotFoundException;
+
+    /**
+     * ユーザーが指定のプロジェクトに参加しているか
+     * @param projectId プロジェクトID
+     * @param userId ユーザーID
+     * @return 参加していればtrue
+     */
+    boolean isJoined(String projectId, String userId);
 }

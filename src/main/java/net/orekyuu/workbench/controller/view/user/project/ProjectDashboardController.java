@@ -2,6 +2,8 @@ package net.orekyuu.workbench.controller.view.user.project;
 
 import net.orekyuu.workbench.entity.Project;
 import net.orekyuu.workbench.entity.User;
+import net.orekyuu.workbench.infra.ProjectMemberOnly;
+import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.service.ProjectService;
 import net.orekyuu.workbench.service.UserService;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
@@ -23,8 +25,9 @@ public class ProjectDashboardController {
     @Autowired
     private UserService userService;
 
+    @ProjectMemberOnly
     @GetMapping("/project/{projectId}")
-    public String show(@PathVariable String projectId, Model model) throws ProjectNotFoundException {
+    public String show(@ProjectName @PathVariable String projectId, Model model) throws ProjectNotFoundException {
         Object project = model.asMap().get("project");
         if (project == null || !(project instanceof Project)) {
             throw new RuntimeException("project not found");

@@ -1,14 +1,13 @@
 package net.orekyuu.workbench.entity.dao;
 
 import net.orekyuu.workbench.entity.ProjectUser;
-import org.seasar.doma.BatchDelete;
-import org.seasar.doma.Dao;
-import org.seasar.doma.Delete;
-import org.seasar.doma.Insert;
+import org.seasar.doma.*;
 import org.seasar.doma.boot.ConfigAutowireable;
 import org.seasar.doma.jdbc.BatchResult;
 import org.seasar.doma.jdbc.Result;
 import org.springframework.dao.DuplicateKeyException;
+
+import java.util.Optional;
 
 @ConfigAutowireable
 @Dao
@@ -21,4 +20,7 @@ public interface ProjectUserDao {
 
     @BatchDelete
     BatchResult<ProjectUser> delete(Iterable<ProjectUser> projectUser);
+
+    @Select
+    Optional<ProjectUser> findByUserAndProject(String projectId, String userId);
 }

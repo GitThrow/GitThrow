@@ -137,4 +137,15 @@ public class ProjectServiceTest {
         Assertions.assertThat(projectService.findById("project1")).isEmpty();
         Assertions.assertThat(projectService.findProjectMember("project1")).hasSize(0);
     }
+
+    @Test
+    public void testJoined() throws Exception {
+        projectService.createProject("project1", "project1", user1);
+
+        Assertions.assertThat(projectService.isJoined("project1", user1.id)).isTrue();
+        Assertions.assertThat(projectService.isJoined("project1", user2.id)).isFalse();
+        Assertions.assertThat(projectService.isJoined("hoge", user1.id)).isFalse();
+        Assertions.assertThat(projectService.isJoined("project1", "hoge")).isFalse();
+
+    }
 }

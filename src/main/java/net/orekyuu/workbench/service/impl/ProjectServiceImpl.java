@@ -193,4 +193,9 @@ public class ProjectServiceImpl implements ProjectService {
         ticketNumDao.deleteByProject(projectId);
         projectDao.delete(new Project(projectId, "", ""));
     }
+
+    @Override
+    public boolean isJoined(String projectId, String userId) {
+        return projectUserDao.findByUserAndProject(projectId, userId).isPresent();
+    }
 }

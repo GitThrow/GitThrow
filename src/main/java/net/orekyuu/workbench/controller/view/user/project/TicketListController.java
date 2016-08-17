@@ -1,5 +1,7 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
+import net.orekyuu.workbench.infra.ProjectMemberOnly;
+import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.service.TicketModel;
 import net.orekyuu.workbench.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +18,9 @@ public class TicketListController {
     @Autowired
     private TicketService ticketService;
 
+    @ProjectMemberOnly
     @GetMapping("/project/{projectId}/ticket")
-    public String showTicketList(@PathVariable String projectId, Model model) {
+    public String showTicketList(@ProjectName @PathVariable String projectId, Model model) {
         List<TicketModel> models = ticketService.findOpenTicketModelByProject(projectId);
 
         model.addAttribute("ticketList", models);
