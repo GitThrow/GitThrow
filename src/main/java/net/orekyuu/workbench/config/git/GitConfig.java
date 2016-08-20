@@ -1,26 +1,33 @@
 package net.orekyuu.workbench.config.git;
 
 import org.eclipse.jgit.http.server.GitServlet;
-import org.eclipse.jgit.transport.ReceivePack;
-import org.eclipse.jgit.transport.UploadPack;
-import org.eclipse.jgit.transport.resolver.FileResolver;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 @Configuration
 public class GitConfig {
 
+    @Autowired
+    private ApplicationContext context;
+
     @Bean
-    @Scope("singleton")
     public ServletRegistrationBean gitServlet() {
         GitServlet servlet = new GitServlet();
         servlet.setRepositoryResolver(new WorkbenchGitRepositoryResolver());
         return new ServletRegistrationBean(servlet, "/git/repos/*");
+    }
+
+    @Bean
+    public FilterRegistrationBean gitAuthFilter() {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(new GitAuthFilter(context));
+        registration.addUrlPatterns("/git/repos/*");
+        registration.setName("gitAuthFilter");
+        return registration;
     }
 }

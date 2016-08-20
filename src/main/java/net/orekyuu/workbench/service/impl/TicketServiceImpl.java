@@ -1,14 +1,13 @@
 package net.orekyuu.workbench.service.impl;
 
-import net.orekyuu.workbench.service.TicketModel;
 import net.orekyuu.workbench.entity.OpenTicket;
 import net.orekyuu.workbench.entity.TicketPriority;
 import net.orekyuu.workbench.entity.TicketStatus;
 import net.orekyuu.workbench.entity.TicketType;
 import net.orekyuu.workbench.entity.dao.*;
+import net.orekyuu.workbench.service.TicketModel;
 import net.orekyuu.workbench.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
-@Component
 public class TicketServiceImpl implements TicketService {
 
     @Autowired

@@ -9,7 +9,6 @@ import net.orekyuu.workbench.service.exceptions.UserExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 
@@ -19,7 +18,6 @@ import java.io.InputStream;
 import java.util.Optional;
 
 @Transactional(readOnly = true)
-@Component
 public class UserServiceImpl implements UserService {
 
     @Autowired
