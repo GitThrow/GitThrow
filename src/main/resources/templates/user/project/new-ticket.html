@@ -1,0 +1,141 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Workbench</title>
+  <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css"/>
+  <!-- Select2 -->
+  <link rel="stylesheet" href="../../../static/plugins/select2/select2.min.css" th:href="@{/plugins/select2/select2.min.css}">
+</head>
+<body class="skin-blue">
+<div class="wrapper">
+
+  <div th:replace="user/project/fragment/project-page-content :: project-page-topmenu"></div>
+  <div th:replace="user/project/fragment/project-page-content :: project-page-sidebar"></div>
+
+
+  <!-- content -->
+  <div class="content-wrapper">
+
+    <!-- コンテンツヘッダ -->
+    <section class="content-header">
+      <h1>新規チケット</h1>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <section class="content">
+
+      <!-- コンテンツ1 -->
+      <div class="box">
+        <form action="" th:action="@{/new-project}" method="post"
+              class="form-horizontal">
+          <div class="box-header with-border">
+            <h3 class="box-title">新規チケット</h3>
+          </div>
+          <div class="box-body no-padding">
+
+            <div class="form-group">
+              <label for="title" class="col-sm-3 control-label">タイトル</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="title" placeholder="チケットタイトル">
+                <p class="help-block">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="desc" class="col-sm-3 control-label">説明文</label>
+              <div class="col-sm-9">
+                <textarea id="desc" cols="30" rows="10" class="form-control"></textarea>
+                <p class="help-block">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="type" class="col-sm-3 control-label">タイプ</label>
+              <div class="col-sm-9">
+                <select class="form-control" title="type" id="type">
+                  <option>hoge</option>
+                </select>
+                <p class="help-block">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="priority" class="col-sm-3 control-label">優先度</label>
+              <div class="col-sm-9">
+                <select class="form-control" title="priority" id="priority">
+                  <option>hoge</option>
+                </select>
+                <p class="help-block">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="status" class="col-sm-3 control-label">ステータス</label>
+              <div class="col-sm-9">
+                <select class="form-control" title="status" id="status">
+                  <option>hoge</option>
+                </select>
+                <p class="help-block">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="assign" class="col-sm-3 control-label">担当者</label>
+              <div class="col-sm-9">
+                <select class="form-control select2" title="assign" id="assign">
+                  <option selected="selected">hoge</option>
+                  <option>fuga</option>
+                  <option>hage</option>
+                </select>
+                <p class="help-block">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="limit" class="col-sm-3 control-label">期限</label>
+              <div class="col-sm-9">
+                <div class="input-group date">
+                  <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                  </div>
+                  <input type="text" class="form-control pull-right" id="limit">
+                </div>
+                <p class="help-block">エラーメッセージ</p>
+              </div>
+            </div>
+
+          </div>
+          <div class="box-footer">
+            <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-check"></i><span th:text="#{html.user.new_project.ok}">OK</span></button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div><!-- end content -->
+
+
+  <div th:replace="user/project/fragment/project-page-content :: project-page-footer"></div>
+
+
+</div><!-- end wrapper -->
+<div th:replace="user/project/fragment/project-page-content :: project-page-script"></div>
+<!-- Select2 -->
+<script src="../../../static/plugins/select2/select2.full.min.js" th:src="@{/plugins/select2/select2.full.min.js}"></script>
+<!-- bootstrap datepicker -->
+<script src="../../../static/plugins/datepicker/bootstrap-datepicker.js" th:src="@{/plugins/datepicker/bootstrap-datepicker.js}"></script>
+
+<script>
+  $(function () {
+    //select2
+    $(".select2").select2();
+
+    //DatePicker
+    $('#limit').datepicker({
+      autoclose: true,
+      format: 'yyyy/mm/dd'
+    });
+  });
+</script>
+</body>
+</html>
