@@ -5,13 +5,12 @@ import net.orekyuu.workbench.service.ProjectService;
 import net.orekyuu.workbench.service.UserService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import sun.misc.BASE64Decoder;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.util.Base64;
 import java.util.Optional;
 
 public class GitAuthFilter implements Filter {
@@ -82,11 +81,7 @@ public class GitAuthFilter implements Filter {
 
     private String decode(String authorizationHeader) {
         String str = authorizationHeader.substring("BASIC ".length());
-        try {
-            return new String(new BASE64Decoder().decodeBuffer(str));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        return new String(Base64.getDecoder().decode(str));
     }
 
     @Override
