@@ -17,6 +17,9 @@ public class GitAuthFilter implements Filter {
 
     private final ApplicationContext context;
 
+    private static final String AUTH_HEADER_NAME = "WWW-Authenticate";
+    private static final String AUTH_HEADER_VALUE = "BASIC realm=\"Workbench\"";
+
     public GitAuthFilter(ApplicationContext context) {
         this.context = context;
     }
@@ -33,7 +36,7 @@ public class GitAuthFilter implements Filter {
 
         String authorization = req.getHeader("Authorization");
         if (authorization == null) {
-            res.addHeader("WWW-Authenticate", "BASIC realm=\"Workbench\"");
+            res.addHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE);
             res.sendError(401);
             return;
         }
@@ -52,7 +55,7 @@ public class GitAuthFilter implements Filter {
             .orElse(false);
 
         if (!auth) {
-            res.addHeader("WWW-Authenticate", "BASIC realm=\"Workbench\"");
+            res.addHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE);
             res.sendError(401);
             return;
         }
