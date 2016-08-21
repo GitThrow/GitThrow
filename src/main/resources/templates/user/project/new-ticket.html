@@ -35,7 +35,7 @@
           </div>
           <div class="box-body">
 
-            <div class="form-group" th:classappend="${#fields.hasErrors('title')?: 'has-error'}">
+            <div class="form-group" th:classappend="${#fields.hasErrors('title')?'has-error':''}">
               <label for="title" class="col-sm-3 control-label">タイトル</label>
               <div class="col-sm-9">
                 <input type="text" class="form-control" id="title" th:field="*{title}" placeholder="チケットタイトル">
@@ -43,7 +43,7 @@
               </div>
             </div>
 
-            <div class="form-group" th:classappend="${#fields.hasErrors('desc')?: 'has-error'}">
+            <div class="form-group" th:classappend="${#fields.hasErrors('desc')? 'has-error' :''}">
               <label for="desc" class="col-sm-3 control-label">説明文</label>
               <div class="col-sm-9">
                 <textarea id="desc" th:field="*{desc}" cols="30" rows="10" class="form-control"></textarea>
@@ -51,7 +51,7 @@
               </div>
             </div>
 
-            <div class="form-group" th:classappend="${#fields.hasErrors('type')?: 'has-error'}">
+            <div class="form-group" th:classappend="${#fields.hasErrors('type')? 'has-error':''}">
               <label for="type" class="col-sm-3 control-label">タイプ</label>
               <div class="col-sm-9">
                 <select class="form-control" title="type" id="type" th:field="*{type}">
@@ -62,7 +62,7 @@
               </div>
             </div>
 
-            <div class="form-group" th:classappend="${#fields.hasErrors('priority')?: 'has-error'}">
+            <div class="form-group" th:classappend="${#fields.hasErrors('priority')?'has-error':''}">
               <label for="priority" class="col-sm-3 control-label">優先度</label>
               <div class="col-sm-9">
                 <select class="form-control" title="priority" id="priority" th:field="*{priority}">
@@ -73,7 +73,7 @@
               </div>
             </div>
 
-            <div class="form-group" th:classappend="${#fields.hasErrors('status')?: 'has-error'}">
+            <div class="form-group" th:classappend="${#fields.hasErrors('status')? 'has-error':''}">
               <label for="status" class="col-sm-3 control-label">ステータス</label>
               <div class="col-sm-9">
                 <select class="form-control" title="status" id="status" th:field="*{status}">
@@ -84,7 +84,7 @@
               </div>
             </div>
 
-            <div class="form-group" th:classappend="${#fields.hasErrors('assignee')?: 'has-error'}">
+            <div class="form-group" th:classappend="${#fields.hasErrors('assignee')? 'has-error' :''}">
               <label for="assign" class="col-sm-3 control-label">担当者</label>
               <div class="col-sm-9">
                 <select class="form-control select2" title="assign" id="assign" th:remove="all-but-first" th:field="*{assignee}">
@@ -96,7 +96,7 @@
               </div>
             </div>
 
-            <div class="form-group" th:classappend="${#fields.hasErrors('limit')?: 'has-error'}">
+            <div class="form-group" th:classappend="${#fields.hasErrors('limit')? 'has-error' :''}">
               <label for="limit" class="col-sm-3 control-label">期限</label>
               <div class="col-sm-9">
                 <div class="input-group date">

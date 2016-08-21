@@ -7,12 +7,15 @@ import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.service.*;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import org.hibernate.validator.constraints.NotBlank;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +41,8 @@ public class CreateTicketController {
     @Autowired
     private ProjectService projectService;
 
+    private static final Logger logger = LoggerFactory.getLogger(CreateTicketController.class);
+
     @ProjectMemberOnly
     @GetMapping("/project/{projectId}/ticket/create")
     public String show(@ProjectName @PathVariable String projectId, Model model) throws ProjectNotFoundException {
@@ -52,6 +57,7 @@ public class CreateTicketController {
                                @Valid CreateTicketForm form, BindingResult result,
                                @AuthenticationPrincipal WorkbenchUserDetails principal) throws ProjectNotFoundException {
         setupModel(model, projectId);
+        check(form, projectId, result);
 
         if (result.hasErrors()) {
             return "user/project/new-ticket";
@@ -62,10 +68,10 @@ public class CreateTicketController {
         ticket.proponent = principal.getUser().id;
         ticket.title = form.title;
         ticket.description = form.desc == null ? "" : form.desc;
-        ticket.status = form.status;
+        ticket.status = form.status; //違うプロジェクトのものが指定されるかも
         ticket.priority = form.priority;
         ticket.type = form.type;
-        ticket.assignee = form.assignee;
+        ticket.assignee = form.assignee; //プロジェクトに参加していないユーザーが割り当てられるかも
         Date limit = form.limit;
         if (limit != null) {
             ticket.limit = limit.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -99,19 +105,33 @@ public class CreateTicketController {
         model.addAttribute("member", member);
     }
 
+    private void check(CreateTicketForm form, String projectId, BindingResult result) {
+        if (!typeService.findById(form.getType()).map(t -> t.project.equals(projectId)).orElse(false)) {
+            result.addError(new FieldError("createTicketForm", "type", "このプロジェクトには存在しません"));
+            logger.warn(String.format("不正なTicketTypeのID: type_id=%d, project_id=%s", form.getType(), projectId));
+        }
+
+        if (!statusService.findById(form.getStatus()).map(t -> t.project.equals(projectId)).orElse(false)) {
+            result.addError(new FieldError("createTicketForm", "status", "このプロジェクトには存在しません"));
+            logger.warn(String.format("不正なTicketStatusのID: status_id=%d, project_id=%s", form.getStatus(), projectId));
+        }
+
+        if (!priorityService.findById(form.getPriority()).map(t -> t.project.equals(projectId)).orElse(false)) {
+            result.addError(new FieldError("createTicketForm", "priority", "このプロジェクトには存在しません"));
+            logger.warn(String.format("不正なTicketPriorityのID: priority_id=%d, project_id=%s", form.getPriority(), projectId));
+        }
+    }
+
     public static class CreateTicketForm {
         @NotBlank
         @Size(max = 128)
         private String title;
         private String desc;
         @NotNull
-        @NotBlank
         private int type;
         @NotNull
-        @NotBlank
         private int priority;
         @NotNull
-        @NotBlank
         private int status;
         @Size(max = 32)
         private String assignee;
