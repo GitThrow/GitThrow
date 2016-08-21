@@ -43,7 +43,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private OpenTicketDao ticketDao;
 
-    private static final List<String> defaultTicketStatus = Arrays.asList("新規", "a");
+    private static final List<String> defaultTicketStatus = Arrays.asList("新規", "進行中", "完了", "保留");
     private static final List<String> defaultTicketPriority = Arrays.asList("低", "中", "高");
     private static final List<String> defaultTicketType = Arrays.asList("バグ", "新規機能", "提案", "リリース", "etc");
 

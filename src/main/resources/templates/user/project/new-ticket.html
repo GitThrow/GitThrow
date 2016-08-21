@@ -1,0 +1,145 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Workbench</title>
+  <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css"/>
+  <!-- Select2 -->
+  <link rel="stylesheet" href="../../../static/plugins/select2/select2.min.css" th:href="@{/plugins/select2/select2.min.css}">
+</head>
+<body class="skin-blue">
+<div class="wrapper">
+
+  <div th:replace="user/project/fragment/project-page-content :: project-page-topmenu"></div>
+  <div th:replace="user/project/fragment/project-page-content :: project-page-sidebar"></div>
+
+
+  <!-- content -->
+  <div class="content-wrapper">
+
+    <!-- コンテンツヘッダ -->
+    <section class="content-header">
+      <h1>新規チケット</h1>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <section class="content">
+
+      <!-- コンテンツ1 -->
+      <div class="box">
+        <!--/*@thymesVar id="createTicketForm" type="net.orekyuu.workbench.controller.view.user.project.CreateTicketController.CreateTicketForm"*/-->
+        <form action="" th:action="|@{/project}/${project.id}/ticket/create|" th:object="${createTicketForm}" method="post"
+              class="form-horizontal">
+          <div class="box-header with-border">
+            <h3 class="box-title">新規チケット</h3>
+          </div>
+          <div class="box-body">
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('title')?'has-error':''}">
+              <label for="title" class="col-sm-3 control-label">タイトル</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="title" th:field="*{title}" placeholder="チケットタイトル">
+                <p class="help-block" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('desc')? 'has-error' :''}">
+              <label for="desc" class="col-sm-3 control-label">説明文</label>
+              <div class="col-sm-9">
+                <textarea id="desc" th:field="*{desc}" cols="30" rows="10" class="form-control"></textarea>
+                <p class="help-block" th:if="${#fields.hasErrors('desc')}" th:errors="*{desc}">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('type')? 'has-error':''}">
+              <label for="type" class="col-sm-3 control-label">タイプ</label>
+              <div class="col-sm-9">
+                <select class="form-control" title="type" id="type" th:field="*{type}">
+                  <!--/*@thymesVar id="type" type="net.orekyuu.workbench.entity.TicketType"*/-->
+                  <option th:each="type : ${typeList}" th:text="${type.type}" th:value="${type.id}">hoge</option>
+                </select>
+                <p class="help-block" th:if="${#fields.hasErrors('type')}" th:errors="*{type}">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('priority')?'has-error':''}">
+              <label for="priority" class="col-sm-3 control-label">優先度</label>
+              <div class="col-sm-9">
+                <select class="form-control" title="priority" id="priority" th:field="*{priority}">
+                  <!--/*@thymesVar id="priority" type="net.orekyuu.workbench.entity.TicketPriority"*/-->
+                  <option th:each="priority : ${priorityList}" th:text="${priority.priority}" th:value="${priority.id}">hoge</option>
+                </select>
+                <p class="help-block" th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('status')? 'has-error':''}">
+              <label for="status" class="col-sm-3 control-label">ステータス</label>
+              <div class="col-sm-9">
+                <select class="form-control" title="status" id="status" th:field="*{status}">
+                  <!--/*@thymesVar id="status" type="net.orekyuu.workbench.entity.TicketStatus"*/-->
+                  <option th:each="status : ${statusList}" th:text="${status.status}" th:value="${status.id}">hoge</option>
+                </select>
+                <p class="help-block" th:if="${#fields.hasErrors('status')}" th:errors="*{status}">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('assignee')? 'has-error' :''}">
+              <label for="assign" class="col-sm-3 control-label">担当者</label>
+              <div class="col-sm-9">
+                <select class="form-control select2" title="assign" id="assign" th:remove="all-but-first" th:field="*{assignee}">
+                  <!--/*@thymesVar id="u" type="net.orekyuu.workbench.entity.User"*/-->
+                  <option selected="selected" th:each="u : ${member}" th:text="${u.name}"
+                          th:selected="${#authentication.principal.user.id == u.id}" th:value="${u.id}">hoge</option>
+                </select>
+                <p class="help-block" th:if="${#fields.hasErrors('assignee')}" th:errors="*{assignee}">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('limit')? 'has-error' :''}">
+              <label for="limit" class="col-sm-3 control-label">期限</label>
+              <div class="col-sm-9">
+                <div class="input-group date">
+                  <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                  </div>
+                  <input type="text" class="form-control pull-right" id="limit" th:field="*{limit}">
+                </div>
+                <p class="help-block" th:if="${#fields.hasErrors('limit')}" th:errors="*{limit}">エラーメッセージ</p>
+              </div>
+            </div>
+
+          </div>
+          <div class="box-footer">
+            <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-check"></i><span th:text="#{html.user.new_project.ok}">OK</span></button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div><!-- end content -->
+
+
+  <div th:replace="user/project/fragment/project-page-content :: project-page-footer"></div>
+
+
+</div><!-- end wrapper -->
+<div th:replace="user/project/fragment/project-page-content :: project-page-script"></div>
+<!-- Select2 -->
+<script src="../../../static/plugins/select2/select2.full.min.js" th:src="@{/plugins/select2/select2.full.min.js}"></script>
+<!-- bootstrap datepicker -->
+<script src="../../../static/plugins/datepicker/bootstrap-datepicker.js" th:src="@{/plugins/datepicker/bootstrap-datepicker.js}"></script>
+
+<script>
+  $(function () {
+    //select2
+    $(".select2").select2();
+
+    //DatePicker
+    $('#limit').datepicker({
+      autoclose: true,
+      format: 'yyyy/mm/dd'
+    });
+  });
+</script>
+</body>
+</html>
