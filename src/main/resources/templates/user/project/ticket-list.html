@@ -40,10 +40,10 @@
               <th>優先度</th>
               <th>ステータス</th>
             </tr>
-            <tr th:each="tciket : ${ticketList}">
+            <tr th:each="ticket : ${ticketList}">
               <!--/*@thymesVar id="ticket" type="net.orekyuu.workbench.service.TicketModel"*/-->
               <td th:text="${ticket.number}">1</td>
-              <td><a href="" th:href="|@{/project/}project.id'/ticket/'ticket.number|" th:text="${ticket.title}">タイトル</a></td>
+              <td><a href="" th:href="|@{/project/}${project.id}/ticket/${ticket.number}|" th:text="${ticket.title}">タイトル</a></td>
               <td th:text="${ticket.type}">バグ</td>
               <td th:text="${ticket.priority}">高</td>
               <td th:text="${ticket.status}">新規</td>
