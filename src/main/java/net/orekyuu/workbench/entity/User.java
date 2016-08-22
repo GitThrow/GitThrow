@@ -18,6 +18,8 @@ public class User {
     public String name;
     @Column(name = "password")
     public String password;
+    @Column(name = "email")
+    public String email;
     @Column(name = "admin")
     public boolean admin;
 
@@ -28,6 +30,7 @@ public class User {
         this.id = id;
         this.name = name;
         this.password = password;
+        this.email="";
         this.admin = admin;
     }
 

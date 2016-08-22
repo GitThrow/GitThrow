@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `id`       VARCHAR(32) PRIMARY KEY,
   `name`     VARCHAR(16)  NOT NULL,
   `password` VARCHAR(128) NOT NULL,
+  `email`    VARCHAR(128) NOT NULL,
   `admin`    BOOL         NOT NULL
 );
 
@@ -10,6 +11,12 @@ CREATE TABLE IF NOT EXISTS `user_avatar` (
   `id`     VARCHAR(32) PRIMARY KEY,
   `avatar` LONGBLOB NOT NULL,
   CONSTRAINT `user_avatar_id_fk` FOREIGN KEY (`id`) REFERENCES `users` (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `user_setting` (
+  `id`     VARCHAR(32) PRIMARY KEY,
+  `gravatar` BOOL        NOT NULL,
+  CONSTRAINT `user_setting_id_fk` FOREIGN KEY (`id`) REFERENCES `users` (`id`)
 );
 
 /* プロジェクト */

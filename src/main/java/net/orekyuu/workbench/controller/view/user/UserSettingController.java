@@ -3,6 +3,7 @@ package net.orekyuu.workbench.controller.view.user;
 import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
 import net.orekyuu.workbench.entity.User;
 import net.orekyuu.workbench.entity.UserAvatar;
+import net.orekyuu.workbench.entity.UserSetting;
 import net.orekyuu.workbench.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,9 +17,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.imageio.ImageIO;
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
 @Controller
@@ -34,6 +44,12 @@ public class UserSettingController {
     public String show(Model model, @AuthenticationPrincipal WorkbenchUserDetails principal) {
         UserSettingForm form = (UserSettingForm) model.asMap().get("userSettingForm");
         form.name = principal.getUser().name;
+        form.email = principal.getUser().email;
+
+        if(userService.findSettingById(principal.getUser().id).get().useGravatar){
+            form.useGravatar = "on";
+        }
+
         return "user/user-setting";
     }
 
@@ -54,6 +70,31 @@ public class UserSettingController {
             change = true;
         }
 
+        if (!Objects.equals(user.email, form.email)) {
+            user.email = form.email;
+            userService.update(user);
+            change = true;
+
+            if(form.email.length()>0 && form.useGravatar != null){
+                try {
+
+                    String md5 = md5Hex(form.email);
+
+
+                    byte[] bytes = getImageByteArray("https://www.gravatar.com/avatar/"+md5+"?s=200", "jpg");
+                    UserAvatar userAvatar = new UserAvatar();
+                    userAvatar.id = user.id;
+                    userAvatar.avatar = bytes;
+                    userService.updateIcon(userAvatar);
+
+                    change = true;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        }
+
         if (form.avatar != null && form.avatar.getSize() != 0) {
 
             try {
@@ -68,6 +109,13 @@ public class UserSettingController {
                 throw new RuntimeException(e);
             }
         }
+
+        UserSetting userSetting = userService.findSettingById(principal.getUser().id).get();
+        if(userSetting.useGravatar != (form.useGravatar!=null)){
+            userSetting.useGravatar = form.useGravatar!=null ;
+            userService.updateSetting(userSetting);
+        }
+
 
         return "redirect:/user-setting" + (!change ? "":"?update=success");
     }
@@ -101,6 +149,37 @@ public class UserSettingController {
         return "redirect:/user-setting" + (!change ? "":"?update=success");
     }
 
+    //Gravatar関係 別クラスに分けてもいいかも
+    public static String hex(byte[] array) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < array.length; ++i) {
+        sb.append(Integer.toHexString((array[i]
+            & 0xFF) | 0x100).substring(1,3));
+        }
+        return sb.toString();
+    }
+
+    public static String md5Hex (String message) {
+        try {
+        MessageDigest md =
+            MessageDigest.getInstance("MD5");
+        return hex (md.digest(message.getBytes("CP1252")));
+        } catch (NoSuchAlgorithmException e) {
+        } catch (UnsupportedEncodingException e) {
+        }
+        return null;
+    }
+
+    public byte[] getImageByteArray(String imageUrl, String fileNameExtension) throws IOException {
+        URL url = new URL(imageUrl);
+        BufferedImage readImage = ImageIO.read(url);
+        ByteArrayOutputStream outPutStream = new ByteArrayOutputStream();
+        ImageIO.write(readImage, fileNameExtension, outPutStream);
+        return outPutStream.toByteArray();
+    }
+
+
+
     @ModelAttribute
     public UserSettingForm userSettingForm() {
         return new UserSettingForm();
@@ -110,6 +189,11 @@ public class UserSettingController {
         @Size(min = 3, max = 16)
         private String name;
 
+        @Size(min = 0, max = 64)
+        private String email;
+
+        @Pattern(regexp = "on")
+        private String useGravatar="";
 
         private MultipartFile avatar;
 
@@ -121,8 +205,23 @@ public class UserSettingController {
             this.name = name;
         }
 
+        public String getEmail() {
+            return email;
+        }
 
-		public MultipartFile getAvatar() {
+        public void setEmail(String mail) {
+            this.email = mail;
+        }
+
+        public String getUseGravatar() {
+            return useGravatar;
+        }
+
+        public void setUseGravatar(String useGravatar) {
+            this.useGravatar = useGravatar;
+        }
+
+        public MultipartFile getAvatar() {
             return avatar;
         }
 
