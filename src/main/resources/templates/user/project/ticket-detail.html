@@ -6,6 +6,7 @@
   <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css"/>
   <!-- Select2 -->
   <link rel="stylesheet" href="../../../static/plugins/select2/select2.min.css" th:href="@{/plugins/select2/select2.min.css}">
+  <link rel="stylesheet" href="../../../static/css/github-markdown.css" th:href="@{/css/github-markdown.css}">
 </head>
 <body class="skin-blue">
 <!--/*@thymesVar id="ticket" type="net.orekyuu.workbench.service.TicketModel"*/-->
@@ -32,7 +33,7 @@
             <h3 class="box-title" th:text="${ticket.title}" id="title">チケットタイトル</h3>
           </div>
           <div class="box-body">
-            <div class="col-sm-8" id="desc">
+            <div class="col-sm-8 markdown-body" id="desc">
 
             </div>
             <div class="col-sm-4">
@@ -158,7 +159,7 @@
         project: [[${project.id}]],
         ticketNum: [[${ticket.number}]],
         title:  $('#title').text(),
-        description: $('#desc').text(),
+        description: [[${ticket.desc}]],
         assignee: $('#assign').val(),
         type: $('#type').val(),
         priority: $('#priority').val(),
