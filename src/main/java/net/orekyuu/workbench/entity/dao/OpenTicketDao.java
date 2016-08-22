@@ -4,6 +4,7 @@ import net.orekyuu.workbench.entity.OpenTicket;
 import org.seasar.doma.*;
 import org.seasar.doma.boot.ConfigAutowireable;
 
+import java.util.Optional;
 import java.util.stream.Collector;
 
 @ConfigAutowireable
@@ -21,4 +22,7 @@ public interface OpenTicketDao {
 
     @Delete(sqlFile = true)
     int deleteByProject(String projectId);
+
+    @Select
+    Optional<OpenTicket> findByProjectAndNum(String projectId, int ticketNum);
 }

@@ -39,7 +39,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Optional<OpenTicket> findByProjectAndNum(String projectId, int number) {
-        return null;
+        return openTicketDao.findByProjectAndNum(projectId, number);
     }
 
     @Override
@@ -61,9 +61,14 @@ public class TicketServiceImpl implements TicketService {
         List<TicketModel> modelList = openTicketList.stream().map(t -> new TicketModel(
             t.ticketNum,
             t.title,
+            t.description,
             typeMap.get(t.type),
             priorityMap.get(t.priority),
-            statusMap.get(t.status))
+            statusMap.get(t.status),
+            t.limit,
+            t.assignee,
+            t.proponent
+            )
         ).collect(Collectors.toList());
 
         return modelList;
