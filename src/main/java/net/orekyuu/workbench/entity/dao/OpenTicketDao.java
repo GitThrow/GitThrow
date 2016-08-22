@@ -14,7 +14,7 @@ public interface OpenTicketDao {
     @Insert(sqlFile = true)
     int insert(OpenTicket ticket);
 
-    @Update
+    @Update(sqlFile = true)
     int update(OpenTicket ticket);
 
     @Select(strategy = SelectType.COLLECT)

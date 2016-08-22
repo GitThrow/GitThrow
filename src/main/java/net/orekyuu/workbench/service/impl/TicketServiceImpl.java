@@ -1,12 +1,16 @@
 package net.orekyuu.workbench.service.impl;
 
+import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
 import net.orekyuu.workbench.entity.OpenTicket;
 import net.orekyuu.workbench.entity.TicketPriority;
 import net.orekyuu.workbench.entity.TicketStatus;
 import net.orekyuu.workbench.entity.TicketType;
 import net.orekyuu.workbench.entity.dao.*;
+import net.orekyuu.workbench.service.ProjectService;
 import net.orekyuu.workbench.service.TicketModel;
 import net.orekyuu.workbench.service.TicketService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,12 +33,24 @@ public class TicketServiceImpl implements TicketService {
     private TicketPriorityDao priorityDao;
     @Autowired
     private TicketTypeDao typeDao;
+    @Autowired
+    private ProjectService projectService;
+
+    private Logger logger = LoggerFactory.getLogger(TicketServiceImpl.class);
 
     @Transactional(readOnly = false)
     @Override
     public void createTicket(OpenTicket ticket) {
+        check(ticket);
         ticketNumDao.increment(ticket.project);
         openTicketDao.insert(ticket);
+    }
+
+    @Transactional(readOnly = false)
+    @Override
+    public void update(OpenTicket ticket) {
+        check(ticket);
+        openTicketDao.update(ticket);
     }
 
     @Override
@@ -72,5 +88,31 @@ public class TicketServiceImpl implements TicketService {
         ).collect(Collectors.toList());
 
         return modelList;
+    }
+
+    private void check(OpenTicket ticket) {
+        if (!typeDao.findById(ticket.type).map(t -> t.project.equals(ticket.project)).orElse(false)) {
+            logger.warn(String.format("不正なTicketTypeのID: type_id=%d, project_id=%s", ticket.type, ticket.project));
+            throw new IllegalArgumentException("プロジェクトに存在しないtype_id");
+        }
+
+        if (!statusDao.findById(ticket.status).map(t -> t.project.equals(ticket.project)).orElse(false)) {
+            logger.warn(String.format("不正なTicketStatusのID: status_id=%d, project_id=%s", ticket.status, ticket.project));
+            throw new IllegalArgumentException("プロジェクトに存在しないstatus_id");
+        }
+
+        if (!priorityDao.findById(ticket.priority).map(t -> t.project.equals(ticket.project)).orElse(false)) {
+            logger.warn(String.format("不正なTicketPriorityのID: priority_id=%d, project_id=%s", ticket.priority, ticket.project));
+            throw new IllegalArgumentException("プロジェクトに存在しないpriority_id");
+        }
+
+        //担当者がプロジェクトメンバーか
+        if (!projectService.isJoined(ticket.project, ticket.assignee)) {
+            throw new NotMemberException();
+        }
+        //作成者がプロジェクトメンバーか
+        if (!projectService.isJoined(ticket.project, ticket.proponent)) {
+            throw new NotMemberException();
+        }
     }
 }

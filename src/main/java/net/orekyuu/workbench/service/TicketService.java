@@ -15,6 +15,12 @@ public interface TicketService {
      */
     void createTicket(OpenTicket ticket);
 
+    /**
+     * チケットを更新する
+     * @param ticket チケット
+     */
+    void update(OpenTicket ticket);
+
     Optional<OpenTicket> findByProjectAndNum(String projectId, int number);
 
     /**

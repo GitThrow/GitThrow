@@ -29,7 +29,7 @@
       <!-- コンテンツ1 -->
       <div class="box">
         <div class="box-header with-border">
-            <h3 class="box-title" th:text="${ticket.title}">チケットタイトル</h3>
+            <h3 class="box-title" th:text="${ticket.title}" id="title">チケットタイトル</h3>
           </div>
           <div class="box-body">
             <div class="col-sm-8" id="desc">
@@ -131,6 +131,43 @@
 
     //marked.js
     $('#desc').html(marked([[${ticket.desc}]]));
+
+    //イベントでチケットの更新
+    $('#type').change(function (e) {
+      update();
+    });
+
+    $('#status').change(function (e) {
+      update();
+    });
+
+    $('#priority').change(function (e) {
+      update();
+    });
+
+    $limit.datepicker().on('changeDate', function (e) {
+      update();
+    });
+
+    $('#assign').on('select2:select', function (e) {
+      update();
+    });
+
+    function update() {
+      var ticket = {
+        project: [[${project.id}]],
+        ticketNum: [[${ticket.number}]],
+        title:  $('#title').text(),
+        description: $('#desc').text(),
+        assignee: $('#assign').val(),
+        type: $('#type').val(),
+        priority: $('#priority').val(),
+        status: $('#status').val(),
+        limit: $('#limit').val()
+      };
+      updateTicket(ticket);
+    }
+
   });
 </script>
 </body>
