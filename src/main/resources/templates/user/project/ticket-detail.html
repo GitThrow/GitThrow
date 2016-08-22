@@ -7,6 +7,7 @@
   <!-- Select2 -->
   <link rel="stylesheet" href="../../../static/plugins/select2/select2.min.css" th:href="@{/plugins/select2/select2.min.css}">
   <link rel="stylesheet" href="../../../static/css/github-markdown.css" th:href="@{/css/github-markdown.css}">
+  <link rel="stylesheet" href="../../../static/css/highlight/default.css" th:href="@{/css/highlight/default.css}">
 </head>
 <body class="skin-blue">
 <!--/*@thymesVar id="ticket" type="net.orekyuu.workbench.service.TicketModel"*/-->
@@ -116,6 +117,7 @@
 <script src="../../../static/plugins/datepicker/bootstrap-datepicker.js" th:src="@{/plugins/datepicker/bootstrap-datepicker.js}"></script>
 <!-- marked.js -->
 <script src="../../../static/plugins/marked/marked.min.js" th:src="@{/plugins/marked/marked.min.js}"></script>
+<script src="../../../static/js/highlight.pack.js" th:src="@{/js/highlight.pack.js}"></script>
 
 <script th:inline="javascript">
   $(function () {
@@ -131,6 +133,13 @@
     $limit.datepicker('update');
 
     //marked.js
+    marked.setOptions({
+      highlight: function(code, lang) {
+        return hljs.highlightAuto(code, lang).value;
+      }
+    });
+
+
     $('#desc').html(marked([[${ticket.desc}]]));
 
     //イベントでチケットの更新
