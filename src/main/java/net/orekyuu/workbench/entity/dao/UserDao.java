@@ -11,7 +11,7 @@ import java.util.stream.Collector;
 @ConfigAutowireable
 @Dao
 public interface UserDao {
-    
+
     @Select(strategy = SelectType.COLLECT)
     <RESULT> RESULT selectAll(Collector<User, ?, RESULT> collector);
 
@@ -23,4 +23,5 @@ public interface UserDao {
 
     @Update
     int update(User user);
+
 }

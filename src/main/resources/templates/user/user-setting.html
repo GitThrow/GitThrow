@@ -39,8 +39,18 @@
               <input type="text" th:field="*{name}" class="form-control" id="user-name" placeholder="UserName" size="16">
               <p class="help-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">エラーメッセージ</p>
             </div>
+            <!-- メールアドレス -->
+            <div class="form-group" th:class="${#fields.hasErrors('email')}?'has-error form-group':'form-group'">
+              <label for="user-name" class="control-label">メールアドレス</label>
+              <input type="email" th:field="*{email}" class="form-control" id="user-email" placeholder="UsereMail" size="32">
+              <p class="help-block" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">エラーメッセージ</p>
+            </div>
+            <!-- アバター -->
             <div class="form-group" th:class="${#fields.hasErrors('avatar')}?'has-error form-group':'form-group'">
               <label for="user-avatar" class="control-label">アバター</label> <br>
+              <div class="checkbox">
+                <label><input type="checkbox" value="on" id="user-useGravatar" th:field="*{useGravatar}">Gravatarを利用する</label>
+              </div>
               <img src="../../static/img/user2-160x160.jpg" th:src="|@{/user/icon/}${#authentication.principal.user.id}|" width="200px" height="200px" alt="" class="img-circle">
               <input type="file" class="form-control" id="user-avatar" th:field="*{avatar}">
               <p class="help-block" th:if="${#fields.hasErrors('avatar')}" th:errors="*{avatar}">エラーメッセージ</p>

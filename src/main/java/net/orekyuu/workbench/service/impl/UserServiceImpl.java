@@ -2,8 +2,10 @@ package net.orekyuu.workbench.service.impl;
 
 import net.orekyuu.workbench.entity.User;
 import net.orekyuu.workbench.entity.UserAvatar;
+import net.orekyuu.workbench.entity.UserSetting;
 import net.orekyuu.workbench.entity.dao.UserAvatarDao;
 import net.orekyuu.workbench.entity.dao.UserDao;
+import net.orekyuu.workbench.entity.dao.UserSettingDao;
 import net.orekyuu.workbench.service.UserService;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserAvatarDao userAvatarDao;
     @Autowired
+    private UserSettingDao userSettingDao;
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = false)
@@ -38,6 +42,7 @@ public class UserServiceImpl implements UserService {
             throw new UserExistsException(id, e);
         }
 
+        //アバター
         UserAvatar avatar = new UserAvatar();
         avatar.id = user.id;
         try(InputStream in = getClass().getClassLoader().getResourceAsStream("default-user-icon.png")) {
@@ -54,6 +59,17 @@ public class UserServiceImpl implements UserService {
             //ユーザーが存在してるので失敗
             throw new UserExistsException(id, e);
         }
+
+        //設定
+        UserSetting setting = new UserSetting();
+        setting.id = user.id;
+        try {
+            userSettingDao.insert(setting);
+        } catch (DuplicateKeyException e) {
+            //ユーザーが存在してるので失敗
+            throw new UserExistsException(id, e);
+        }
+
     }
 
     @Override
@@ -64,6 +80,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<byte[]> findAvatar(String userId) {
         return userAvatarDao.findById(userId).map(a -> a.avatar);
+    }
+
+    @Override
+    public Optional<UserSetting> findSettingById(String id) {
+        return userSettingDao.findById(id);
     }
 
     @Transactional(readOnly = false)
@@ -77,4 +98,11 @@ public class UserServiceImpl implements UserService {
     public void updateIcon(UserAvatar avatar) {
         userAvatarDao.update(avatar);
     }
+
+    @Override
+    public void updateSetting(UserSetting setting) {
+        userSettingDao.update(setting);
+    }
+
+
 }
