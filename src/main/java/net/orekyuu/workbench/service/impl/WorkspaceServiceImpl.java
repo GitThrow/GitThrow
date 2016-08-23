@@ -122,7 +122,19 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public Optional<String> getReadmeFile(String projectId) throws ProjectNotFoundException, GitAPIException {
         update(projectId);
         try (Repository repository = getRepository(getProjectWorkspaceDir(projectId))) {
-            new Git(repository).checkout().setName(DEFAULT_BRANCH).call();
+            Git git = new Git(repository);
+            //ブランチの一覧を取得
+            List<Ref> branchResult = git.branchList()
+                .setListMode(ListBranchCommand.ListMode.REMOTE)
+                .call();
+
+            //デフォルトブランチがなければ何もしない(まっさらなリポジトリとかの状況でありえる)
+            Optional<Ref> defaultBranch = branchResult.stream().filter(ref -> ref.getName().equals(DEFAULT_BRANCH)).findFirst();
+            if (!defaultBranch.isPresent()) {
+                return Optional.empty();
+            }
+
+            git.checkout().setName(DEFAULT_BRANCH).call();
 
             ObjectId head = repository.resolve("HEAD").toObjectId();
             try (RevWalk walk = new RevWalk(repository)) {
