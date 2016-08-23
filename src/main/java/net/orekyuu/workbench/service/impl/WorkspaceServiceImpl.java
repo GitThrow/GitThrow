@@ -129,7 +129,9 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                 .call();
 
             //デフォルトブランチがなければ何もしない(まっさらなリポジトリとかの状況でありえる)
-            Optional<Ref> defaultBranch = branchResult.stream().filter(ref -> ref.getName().equals(DEFAULT_BRANCH)).findFirst();
+            Optional<Ref> defaultBranch = branchResult.stream()
+                .filter(ref -> ref.getName().equals("refs/remotes/origin/" + DEFAULT_BRANCH))
+                .findFirst();
             if (!defaultBranch.isPresent()) {
                 return Optional.empty();
             }
