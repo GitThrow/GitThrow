@@ -28,8 +28,10 @@ public class WorkbenchSecurityConfiguration extends WebSecurityConfigurerAdapter
             .logoutSuccessUrl("/login")
             .permitAll();
         //CSRFトークンをCookieに保存する(X-CSRF-TOKENに保存される)
+        CookieCsrfTokenRepository csrfTokenRepository = new CookieCsrfTokenRepository();
+        csrfTokenRepository.setCookieHttpOnly(false);//jsから読み取り可能にする
         http.csrf()
-            .csrfTokenRepository(new CookieCsrfTokenRepository())
+            .csrfTokenRepository(csrfTokenRepository)
             .ignoringAntMatchers("/git/repos/**"); //gitリポジトリはCSRFトークン不要
 
     }

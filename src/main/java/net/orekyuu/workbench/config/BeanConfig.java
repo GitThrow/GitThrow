@@ -1,9 +1,12 @@
 package net.orekyuu.workbench.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.orekyuu.workbench.service.*;
 import net.orekyuu.workbench.service.impl.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class BeanConfig {
@@ -36,5 +39,14 @@ public class BeanConfig {
     @Bean
     public TicketPriorityService ticketPriorityService() {
         return new TicketPriorityServiceImpl();
+    }
+
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        objectMapper.registerModule(new JavaTimeModule());
+        return objectMapper;
     }
 }
