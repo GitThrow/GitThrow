@@ -9,15 +9,17 @@ import org.eclipse.jgit.transport.resolver.ServiceNotAuthorizedException;
 import org.eclipse.jgit.transport.resolver.ServiceNotEnabledException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class WorkbenchGitRepositoryResolver implements RepositoryResolver<HttpServletRequest> {
 
-    public static final Path REPOSITORIES_DIR = Paths.get("repos");
+    private final FileResolver<HttpServletRequest> resolver;
 
-    private FileResolver<HttpServletRequest> resolver = new FileResolver<>(REPOSITORIES_DIR.toFile(), true);
+    WorkbenchGitRepositoryResolver(String reposDir) {
+        this.resolver = new FileResolver<>(new File(reposDir), true);
+    }
+
     @Override
     public Repository open(HttpServletRequest req, String repoName) throws RepositoryNotFoundException, ServiceNotAuthorizedException, ServiceNotEnabledException, ServiceMayNotContinueException {
         try {

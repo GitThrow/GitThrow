@@ -51,9 +51,12 @@ public class TicketServiceTest {
     private TicketPriority priority2;
     private TicketType type2;
 
+    @Autowired
+    private TestRepositoryUtil testRepositoryUtil;
+
     @Before
     public void before() throws UserExistsException, ProjectExistsException {
-        TestRepositoryUtil.deleteGitRepositoryDir();
+        testRepositoryUtil.deleteGitRepositoryAndWorkspaceDir();
 
         userService.createUser("user1", "user1", "pw");
         userService.createUser("user2", "user2", "pw");

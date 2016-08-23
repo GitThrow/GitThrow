@@ -3,8 +3,10 @@
 *.iml
 database.db.mv.db
 /repos/**
+/workspace/**
+/test/**
 
-#Eclipse—p‚Ìİ’è
+#Eclipseï¿½pï¿½Ìİ’ï¿½
 .apt_generated/**
 .settings/**
 .project

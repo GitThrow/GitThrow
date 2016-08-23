@@ -16,8 +16,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -32,9 +30,12 @@ public class ProjectServiceTest {
     private User user1;
     private User user2;
 
+    @Autowired
+    private TestRepositoryUtil testRepositoryUtil;
+
     @Before
     public void before() throws UserExistsException, IOException {
-        TestRepositoryUtil.deleteGitRepositoryDir();
+        testRepositoryUtil.deleteGitRepositoryAndWorkspaceDir();
 
         userService.createUser("user1", "user1", "pw");
         userService.createUser("user2", "user2", "pw");

@@ -100,6 +100,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public void updateSetting(UserSetting setting) {
         userSettingDao.update(setting);
     }

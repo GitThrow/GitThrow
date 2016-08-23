@@ -6,7 +6,9 @@ import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.service.ProjectService;
 import net.orekyuu.workbench.service.UserService;
+import net.orekyuu.workbench.service.WorkspaceService;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
@@ -24,10 +26,12 @@ public class ProjectDashboardController {
     private ProjectService projectService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private WorkspaceService workspaceService;
 
     @ProjectMemberOnly
     @GetMapping("/project/{projectId}")
-    public String show(@ProjectName @PathVariable String projectId, Model model) throws ProjectNotFoundException {
+    public String show(@ProjectName @PathVariable String projectId, Model model) throws ProjectNotFoundException, GitAPIException {
         Object project = model.asMap().get("project");
         if (project == null || !(project instanceof Project)) {
             throw new RuntimeException("project not found");
@@ -39,6 +43,9 @@ public class ProjectDashboardController {
             .filter(u -> Objects.equals(u.id, prj.ownerUserId)).findFirst()
             .orElseThrow(() -> new UsernameNotFoundException(prj.id));
 
+        String readme = workspaceService.getReadmeFile(projectId).orElse("");
+
+        model.addAttribute("readme", readme);
         model.addAttribute("member", member);
         model.addAttribute("admin", admin);
 

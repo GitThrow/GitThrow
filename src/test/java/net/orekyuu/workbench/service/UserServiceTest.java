@@ -22,9 +22,12 @@ public class UserServiceTest {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private TestRepositoryUtil testRepositoryUtil;
+
     @Before
     public void before() {
-        TestRepositoryUtil.deleteGitRepositoryDir();
+        testRepositoryUtil.deleteGitRepositoryAndWorkspaceDir();
     }
 
     @Test

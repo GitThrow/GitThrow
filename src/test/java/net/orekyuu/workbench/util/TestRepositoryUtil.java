@@ -1,20 +1,34 @@
 package net.orekyuu.workbench.util;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
+@Component
 public class TestRepositoryUtil {
 
-    public static void deleteGitRepositoryDir() {
-        Path reposPath = Paths.get("repos");
-        if (Files.notExists(reposPath)) {
+    @Value("${net.orekyuu.workbench.repository-dir}")
+    private String gitDir;
+    @Value("${net.orekyuu.workbench.workspace-dir}")
+    private String workspaceDir;
+
+    public void deleteGitRepositoryAndWorkspaceDir() {
+        deleteDir(gitDir);
+        deleteDir(workspaceDir);
+    }
+
+    private void deleteDir(String dir) {
+        Path path = Paths.get(dir);
+        if (Files.notExists(path)) {
             return;
         }
         try {
 
-            Files.walkFileTree(reposPath, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
 
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -27,6 +41,7 @@ public class TestRepositoryUtil {
                     Files.delete(dir);
                     return FileVisitResult.CONTINUE;
                 }
+
             });
         } catch (IOException e) {
             throw new UncheckedIOException(e);

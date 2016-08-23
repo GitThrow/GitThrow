@@ -25,9 +25,12 @@ public class Workbench2ApplicationTests {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private TestRepositoryUtil testRepositoryUtil;
+
     @Before
     public void before() {
-        TestRepositoryUtil.deleteGitRepositoryDir();
+        testRepositoryUtil.deleteGitRepositoryAndWorkspaceDir();
     }
 
 	@Test

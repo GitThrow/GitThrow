@@ -42,6 +42,16 @@ public class BeanConfig {
     }
 
     @Bean
+    public WorkspaceService workspaceService() {
+        return new WorkspaceServiceImpl();
+    }
+
+    @Bean
+    public GitService gitService() {
+        return new GitServiceImpl();
+    }
+
+    @Bean
     @Primary
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
