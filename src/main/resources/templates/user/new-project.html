@@ -31,7 +31,11 @@
             <div class="form-group" th:class="${#fields.hasErrors('id')}?'has-error form-group':'form-group'">
               <label for="project-id" class="col-sm-3 control-label" th:text="#{html.user.new_project.project_id}">プロジェクトID</label>
               <div class="col-sm-9">
+                <div class="input-group">
+                <span class="input-group-addon" id="project-id-add"
+                th:text="|http://${#httpServletRequest.serverName}:${#httpServletRequest.serverPort}/git/repos/|">https://example.com/git/</span>
                 <input type="text" th:field="*{id}" class="form-control" id="project-id" placeholder="ProjectID" th:placeholder="#{html.user.new_project.project_id_placeholder}">
+                </div>
                 <p class="help-block" th:if="${#fields.hasErrors('id')}" th:errors="*{id}">エラーメッセージ</p>
               </div>
             </div>

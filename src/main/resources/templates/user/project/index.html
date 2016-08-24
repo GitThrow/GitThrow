@@ -43,7 +43,8 @@
                              value="http://localhost:8080/repos/git/hoge"
                              th:value="|http://${#httpServletRequest.serverName}:${#httpServletRequest.serverPort}/git/repos/${project.id}|">
                       <span class="input-group-btn">
-                      <button type="button" class="btn btn-info btn-flat" id="repo-copy">Copy</button>
+                      <button type="button" class="btn btn-info btn-flat btn-copy" id="repo-copy"
+                       th:attr="data-clipboard-text=|http://${#httpServletRequest.serverName}:${#httpServletRequest.serverPort}/git/repos/${project.id}|">Copy</button>
                     </span>
                     </div>
                   </td>
@@ -94,6 +95,36 @@
 
 
     $('#readme').html(marked([[${readme}]]));
+
+    //copy
+    $('.btn-copy').tooltip({
+        trigger: 'click',
+        placement: 'bottom'
+      });
+
+      function setTooltip(btn, message) {
+        $(btn).tooltip('hide')
+          .attr('data-original-title', message)
+          .tooltip('show');
+      }
+
+      function hideTooltip(btn) {
+        setTimeout(function() {
+          $(btn).tooltip('hide');
+        }, 1400);
+      }
+
+    var clipboard = new Clipboard('.btn-copy');
+
+    clipboard.on('success', function(e) {
+      setTooltip(e.trigger, 'Copied!');
+      hideTooltip(e.trigger);
+    });
+
+    clipboard.on('error', function(e) {
+      setTooltip(e.trigger, 'Failed!');
+      hideTooltip(e.trigger);
+    });
 
   });
 </script>
