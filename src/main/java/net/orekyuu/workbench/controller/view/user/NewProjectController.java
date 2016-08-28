@@ -45,7 +45,7 @@ public class NewProjectController {
             result.addError(new FieldError("id", "id", "すでに存在しているプロジェクトです"));
             return "user/new-project";
         }
-        return "user/new-project";
+        return "redirect:/project/" + form.id;
     }
 
     @ModelAttribute
