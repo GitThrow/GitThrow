@@ -23,8 +23,7 @@ public class JobRestController {
         if (!projectService.isJoined(projectId, principal.getUser().id)) {
             throw new NotMemberException();
         }
-
-        SseEmitter emitter = new SseEmitter();
+        SseEmitter emitter = new SseEmitter(-1L);
         BuildJob job = buildJob();
         job.start(emitter, projectId, principal.getUser());
         return emitter;

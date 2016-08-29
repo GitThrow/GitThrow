@@ -70,7 +70,12 @@ public abstract class Job {
     @Async
     public void start(SseEmitter emitter, String projectId, User user) {
         init(projectId, user);
-        JobMessenger messenger = new JobMessenger(emitter, getJobId(), e -> {});
+        emitter.onTimeout(() -> {
+            System.out.println("timeout");
+        });
+        JobMessenger messenger = new JobMessenger(emitter, getJobId(), e -> {
+            System.out.println(e);
+        });
         TaskArguments args = new TaskArguments(jobId, projectId, user);
 
         for (Task task : taskList) {
