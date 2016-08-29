@@ -28,14 +28,14 @@ public abstract class Job {
      * @param projectId プロジェクトID
      * @param user 実行するユーザー
      */
-    public final void init(String projectId, User user) {
+    private final void init(String projectId, User user) {
         if (this.projectId != null) {
             throw new IllegalStateException("すでに初期化済み");
         }
 
         this.projectId = projectId;
         this.user = user;
-        jobId = UUID.randomUUID();
+        this.jobId = UUID.randomUUID();
         onInit();
     }
 
@@ -68,14 +68,18 @@ public abstract class Job {
      * @param emitter
      */
     @Async
-    public void start(SseEmitter emitter) {
-
+    public void start(SseEmitter emitter, String projectId, User user) {
+        init(projectId, user);
         JobMessenger messenger = new JobMessenger(emitter, getJobId(), e -> {});
         TaskArguments args = new TaskArguments(jobId, projectId, user);
 
         for (Task task : taskList) {
             try {
-                task.process(messenger, args);
+                boolean next = task.process(messenger, args);
+                //falseが返ったら次のタスクを実行しない
+                if (!next) {
+                    break;
+                }
             } catch (Exception e) {
                 onTaskException(e);
                 break;
@@ -88,21 +92,21 @@ public abstract class Job {
     /**
      * @return ジョブが実行されるプロジェクトID
      */
-    public final String getProjectId() {
+    protected final String getProjectId() {
         return projectId;
     }
 
     /**
      * @return ジョブを実行するユーザー
      */
-    public final User getUser() {
+    protected final User getUser() {
         return user;
     }
 
     /**
      * @return ジョブ固有のID
      */
-    public final UUID getJobId() {
+    protected final UUID getJobId() {
         return jobId;
     }
 }

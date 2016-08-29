@@ -21,6 +21,9 @@ public final class JobMessenger {
     private boolean isOpen = true;
 
     JobMessenger(SseEmitter emitter, UUID jobId, Consumer<Exception> exceptionConsumer) {
+        Objects.requireNonNull(jobId);
+        Objects.requireNonNull(emitter);
+
         this.emitter = emitter;
         this.exceptionConsumer = exceptionConsumer;
         this.jobId = jobId;

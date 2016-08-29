@@ -13,10 +13,11 @@ public class SaveArtifactTask implements Task {
     private static final Logger logger = LoggerFactory.getLogger(SaveArtifactTask.class);
 
     @Override
-    public void process(JobMessenger messenger, TaskArguments args) throws Exception {
+    public boolean process(JobMessenger messenger, TaskArguments args) throws Exception {
         logger.info("Save Start");
         Thread.sleep(100);
         messenger.send("Saved!");
         logger.info("Save End");
+        return true;
     }
 }

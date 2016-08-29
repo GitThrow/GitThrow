@@ -1,6 +1,7 @@
 package net.orekyuu.workbench.job;
 
 import net.orekyuu.workbench.job.task.BuildTask;
+import net.orekyuu.workbench.job.task.CleanWorkspaceTask;
 import net.orekyuu.workbench.job.task.GitCloneTask;
 import net.orekyuu.workbench.job.task.SaveArtifactTask;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ public class BuildJob extends Job {
     private SaveArtifactTask artifactTask;
     @Autowired
     private GitCloneTask cloneTask;
+    @Autowired
+    private CleanWorkspaceTask cleanWorkspaceTask;
 
     @Override
     protected void onInit() {
@@ -24,5 +27,6 @@ public class BuildJob extends Job {
         addTask(cloneTask);
         addTask(buildTask);
         addTask(artifactTask);
+        addTask(cleanWorkspaceTask);
     }
 }

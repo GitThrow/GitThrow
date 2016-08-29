@@ -19,15 +19,14 @@ public class JobRestController {
     private ProjectService projectService;
 
     @GetMapping("/rest/job/build")
-    public SseEmitter build(@RequestParam String projectId, @AuthenticationPrincipal WorkbenchUserDetails principal) {
+    public SseEmitter build(@RequestParam("projectId") String projectId, @AuthenticationPrincipal WorkbenchUserDetails principal) {
         if (!projectService.isJoined(projectId, principal.getUser().id)) {
             throw new NotMemberException();
         }
 
         SseEmitter emitter = new SseEmitter();
         BuildJob job = buildJob();
-        job.init("projectId", principal.getUser());
-        job.start(emitter);
+        job.start(emitter, projectId, principal.getUser());
         return emitter;
     }
 
