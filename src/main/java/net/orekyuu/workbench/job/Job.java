@@ -64,8 +64,8 @@ public abstract class Job {
     }
 
     /**
-     * ジョブを開始します。ジョブヲ開始する前に{@link #init(String, User)}を呼び出してください。
-     * @param emitter
+     * ジョブを開始します。
+     * @param emitter SseEmitter
      */
     @Async
     public void start(SseEmitter emitter, String projectId, User user) {
