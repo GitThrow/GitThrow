@@ -2,7 +2,7 @@ package net.orekyuu.workbench.job.task;
 
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
-import net.orekyuu.workbench.service.GitService;
+import net.orekyuu.workbench.service.RemoteRepositoryService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ProgressMonitor;
@@ -27,7 +27,7 @@ public class GitCloneTask implements Task {
     @Autowired
     private JobWorkspaceService service;
     @Autowired
-    private GitService gitService;
+    private RemoteRepositoryService remoteRepositoryService;
 
     public void setBranch(String branch) {
         this.branch = branch;
@@ -38,7 +38,7 @@ public class GitCloneTask implements Task {
         Path path = service.getWorkspacePath(args.getJobId());
         service.createWorkspaceIfNotExists(args.getJobId());
 
-        Path remoteRepositoryDir = gitService.getProjectGitRepositoryDir(args.getProjectId());
+        Path remoteRepositoryDir = remoteRepositoryService.getProjectGitRepositoryDir(args.getProjectId());
         try {
             Git git = Git.cloneRepository()
                 .setDirectory(path.toFile())
