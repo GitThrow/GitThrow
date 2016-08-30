@@ -1,6 +1,8 @@
 package net.orekyuu.workbench.job;
 
 import net.orekyuu.workbench.entity.User;
+import net.orekyuu.workbench.job.message.JobState;
+import net.orekyuu.workbench.job.message.JobStateMessage;
 import net.orekyuu.workbench.job.task.Task;
 import net.orekyuu.workbench.job.task.TaskArguments;
 import org.slf4j.Logger;
@@ -78,6 +80,10 @@ public abstract class Job {
         });
         TaskArguments args = new TaskArguments(jobId, projectId, user);
 
+        messenger.send(new JobStateMessage(JobState.START));
+
+        JobState result = JobState.SUCCESS;
+        String message = null;
         for (Task task : taskList) {
             try {
                 boolean next = task.process(messenger, args);
@@ -85,11 +91,18 @@ public abstract class Job {
                 if (!next) {
                     break;
                 }
+            } catch (JobContinuesImpossibleException e) {
+                onTaskException(e);
+                result = JobState.ERROR;
+                message = e.getErrorMessage();
+                break;
             } catch (Exception e) {
                 onTaskException(e);
                 break;
             }
         }
+
+        messenger.send(new JobStateMessage(result, message));
 
         emitter.complete();
     }

@@ -1,6 +1,7 @@
 package net.orekyuu.workbench.job.task;
 
 import net.orekyuu.workbench.job.JobMessenger;
+import net.orekyuu.workbench.job.message.LogMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -16,7 +17,7 @@ public class SaveArtifactTask implements Task {
     public boolean process(JobMessenger messenger, TaskArguments args) throws Exception {
         logger.info("Save Start");
         Thread.sleep(100);
-        messenger.send("Saved!");
+        messenger.send(new LogMessage("Saved!"));
         logger.info("Save End");
         return true;
     }
