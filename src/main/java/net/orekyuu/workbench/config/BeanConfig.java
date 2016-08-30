@@ -2,6 +2,8 @@ package net.orekyuu.workbench.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.orekyuu.workbench.job.JobWorkspaceService;
+import net.orekyuu.workbench.job.JobWorkspaceServiceImpl;
 import net.orekyuu.workbench.service.*;
 import net.orekyuu.workbench.service.impl.*;
 import org.springframework.context.annotation.Bean;
@@ -49,6 +51,11 @@ public class BeanConfig {
     @Bean
     public RemoteRepositoryService gitService() {
         return new RemoteRepositoryServiceImpl();
+    }
+
+    @Bean
+    public JobWorkspaceService jobWorkspaceService() {
+        return new JobWorkspaceServiceImpl();
     }
 
     @Bean

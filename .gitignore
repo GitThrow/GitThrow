@@ -4,6 +4,7 @@
 database.db.mv.db
 /repos/**
 /workspace/**
+/job/**
 /test/**
 
 #Eclipse�p�̐ݒ�
