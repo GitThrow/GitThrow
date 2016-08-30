@@ -47,8 +47,8 @@ public class BeanConfig {
     }
 
     @Bean
-    public GitService gitService() {
-        return new GitServiceImpl();
+    public RemoteRepositoryService gitService() {
+        return new RemoteRepositoryServiceImpl();
     }
 
     @Bean

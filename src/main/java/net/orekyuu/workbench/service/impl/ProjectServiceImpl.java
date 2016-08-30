@@ -2,8 +2,8 @@ package net.orekyuu.workbench.service.impl;
 
 import net.orekyuu.workbench.entity.*;
 import net.orekyuu.workbench.entity.dao.*;
-import net.orekyuu.workbench.service.GitService;
 import net.orekyuu.workbench.service.ProjectService;
+import net.orekyuu.workbench.service.RemoteRepositoryService;
 import net.orekyuu.workbench.service.exceptions.NotProjectMemberException;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
@@ -34,7 +34,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private OpenTicketDao ticketDao;
     @Autowired
-    private GitService gitService;
+    private RemoteRepositoryService remoteRepositoryService;
 
     private static final List<String> defaultTicketStatus = Arrays.asList("新規", "進行中", "完了", "保留");
     private static final List<String> defaultTicketPriority = Arrays.asList("低", "中", "高");
@@ -46,7 +46,7 @@ public class ProjectServiceImpl implements ProjectService {
         try {
             projectDao.insert(new Project(projectId, projectName, owner.id));
             projectUserDao.insert(new ProjectUser(projectId, owner.id));
-            gitService.createRemoteRepository(projectId);
+            remoteRepositoryService.createRemoteRepository(projectId);
 
             TicketNum num = new TicketNum();
             num.ticketCount = 0;

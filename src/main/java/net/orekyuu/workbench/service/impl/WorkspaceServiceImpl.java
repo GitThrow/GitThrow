@@ -2,8 +2,8 @@ package net.orekyuu.workbench.service.impl;
 
 import com.sun.javafx.fxml.PropertyNotFoundException;
 import net.orekyuu.workbench.entity.Project;
-import net.orekyuu.workbench.service.GitService;
 import net.orekyuu.workbench.service.ProjectService;
+import net.orekyuu.workbench.service.RemoteRepositoryService;
 import net.orekyuu.workbench.service.WorkspaceService;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import org.eclipse.jgit.api.Git;
@@ -11,23 +11,15 @@ import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.merge.MergeStrategy;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevTree;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.treewalk.TreeWalk;
-import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.*;
@@ -40,7 +32,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Autowired
     private ProjectService projectService;
     @Autowired
-    private GitService gitService;
+    private RemoteRepositoryService remoteRepositoryService;
 
     @Value("${net.orekyuu.workbench.workspace-dir}")
     private String workspaceDir;
@@ -120,58 +112,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         }
     }
 
-    @Override
-    public Optional<String> getReadmeFile(String projectId) throws ProjectNotFoundException, GitAPIException {
-        update(projectId);
-        try (Repository repository = getRepository(getProjectWorkspaceDir(projectId))) {
-            Git git = new Git(repository);
-            //ブランチの一覧を取得
-            List<Ref> branchResult = git.branchList()
-                .setListMode(ListBranchCommand.ListMode.REMOTE)
-                .call();
-
-            //デフォルトブランチがなければ何もしない(まっさらなリポジトリとかの状況でありえる)
-            Optional<Ref> defaultBranch = branchResult.stream()
-                .filter(ref -> ref.getName().equals("refs/remotes/origin/" + DEFAULT_BRANCH))
-                .findFirst();
-            if (!defaultBranch.isPresent()) {
-                return Optional.empty();
-            }
-
-            git.checkout().setName(DEFAULT_BRANCH).call();
-
-            ObjectId head = repository.resolve("HEAD").toObjectId();
-            try (RevWalk walk = new RevWalk(repository)) {
-                RevCommit commit = walk.parseCommit(head);
-                RevTree tree = commit.getTree();
-
-                Optional<String> result;
-
-                try(TreeWalk treeWalk = new TreeWalk(repository)) {
-                    treeWalk.addTree(tree);
-                    treeWalk.setRecursive(true);
-                    treeWalk.setFilter(PathFilter.create("README.md"));
-
-                    if (!treeWalk.next()) {
-                        return Optional.empty();
-                    }
-
-                    ObjectId objectId = treeWalk.getObjectId(0);
-
-                    ObjectLoader objectLoader = repository.open(objectId);
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    objectLoader.copyTo(out);
-
-                    result = Optional.ofNullable(out.toString());
-                }
-                walk.dispose();
-                return result;
-            }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
     private void reset(Git git) throws GitAPIException {
         git.reset().setMode(ResetCommand.ResetType.HARD).call();
     }
@@ -187,7 +127,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     private void createWorkspace(Path path, String projectId) throws GitAPIException {
         try {
-            Path remoteRepositoryDir = gitService.getProjectGitRepositoryDir(projectId);
+            Path remoteRepositoryDir = remoteRepositoryService.getProjectGitRepositoryDir(projectId);
             Files.createDirectories(path);
             Git call = Git.cloneRepository()
                 .setDirectory(path.toFile())
