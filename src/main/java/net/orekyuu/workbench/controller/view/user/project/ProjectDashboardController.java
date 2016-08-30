@@ -5,6 +5,7 @@ import net.orekyuu.workbench.entity.User;
 import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.service.ProjectService;
+import net.orekyuu.workbench.service.RemoteRepositoryService;
 import net.orekyuu.workbench.service.UserService;
 import net.orekyuu.workbench.service.WorkspaceService;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
@@ -28,6 +29,8 @@ public class ProjectDashboardController {
     private UserService userService;
     @Autowired
     private WorkspaceService workspaceService;
+    @Autowired
+    private RemoteRepositoryService remoteRepositoryService;
 
     @ProjectMemberOnly
     @GetMapping("/project/{projectId}")
@@ -43,7 +46,7 @@ public class ProjectDashboardController {
             .filter(u -> Objects.equals(u.id, prj.ownerUserId)).findFirst()
             .orElseThrow(() -> new UsernameNotFoundException(prj.id));
 
-        String readme = workspaceService.getReadmeFile(projectId).orElse("");
+        String readme = remoteRepositoryService.getReadmeFile(projectId).orElse("");
 
         model.addAttribute("readme", readme);
         model.addAttribute("member", member);
