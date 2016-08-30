@@ -2,6 +2,7 @@ package net.orekyuu.workbench.job.task;
 
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
+import net.orekyuu.workbench.job.message.LogMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +59,8 @@ public class BuildTask implements Task {
             Process start = processBuilder.start();
             Thread infoThread = new Thread(() -> {
                 //コマンド実行後の標準出力をログに吐き出す
-                try (Stream<String> in = new BufferedReader(new InputStreamReader(start.getInputStream(), charset))
-                    .lines()) {
+                try (Stream<LogMessage> in = new BufferedReader(new InputStreamReader(start.getInputStream(), charset))
+                    .lines().map(LogMessage::new)) {
                     in.forEach(jobMessenger::send);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -69,8 +70,8 @@ public class BuildTask implements Task {
 
             Thread errorThread = new Thread(() -> {
                 //コマンド実行時のエラー出力をログに吐き出す
-                try (Stream<String> in = new BufferedReader(new InputStreamReader(start.getErrorStream(), charset))
-                    .lines()) {
+                try (Stream<LogMessage> in = new BufferedReader(new InputStreamReader(start.getErrorStream(), charset))
+                    .lines().map(LogMessage::new)) {
                     in.forEach(jobMessenger::send);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();

@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.job;
 
+import net.orekyuu.workbench.job.message.JobMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -36,14 +37,15 @@ public final class JobMessenger {
 
     /**
      * クライアントへjson形式でメッセージを送信します
-     * @param object 送信するメッセージ
+     * @param message 送信するメッセージ
      */
-    public void send(Object object) {
+    public void send(JobMessage message) {
 
         try {
-            logger.info(String.format("[%s] start: %s", jobId.toString(), Objects.toString(object, "null")));
+            message.setJobId(jobId.toString());
+            logger.info(String.format("[%s] start: %s", jobId.toString(), Objects.toString(message, "null")));
             if (isOpen) {
-                emitter.send(object, MediaType.APPLICATION_JSON);
+                emitter.send(message, MediaType.APPLICATION_JSON);
             }
         } catch (IOException | IllegalStateException e) {
             isOpen = false;

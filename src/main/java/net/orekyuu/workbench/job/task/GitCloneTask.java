@@ -1,7 +1,9 @@
 package net.orekyuu.workbench.job.task;
 
+import net.orekyuu.workbench.job.JobContinuesImpossibleException;
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
+import net.orekyuu.workbench.job.message.LogMessage;
 import net.orekyuu.workbench.service.RemoteRepositoryService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -52,7 +54,7 @@ public class GitCloneTask implements Task {
 
                     @Override
                     public void beginTask(String s, int i) {
-                        messenger.send(s);
+                        messenger.send(new LogMessage(s));
                     }
 
                     @Override
@@ -74,8 +76,8 @@ public class GitCloneTask implements Task {
             git.close();
         } catch (GitAPIException e) {
             e.printStackTrace();
-            messenger.send(e.getMessage());
-            return false;
+             //cloneに失敗した場合は続行不可
+            throw new JobContinuesImpossibleException(e.getMessage());
         }
         return true;
     }
