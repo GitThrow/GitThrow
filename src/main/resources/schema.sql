@@ -132,3 +132,19 @@ CREATE TABLE IF NOT EXISTS `ticket_number` (
   `ticket_count` INT NOT NULL DEFAULT 0, /* プロジェクトに存在するチケットの個数 */
   CONSTRAINT `ticket_number_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`)
 );
+
+/* ビルドの設定 */
+CREATE TABLE IF NOT EXISTS `build_settings` (
+  `project` VARCHAR(32) PRIMARY KEY,
+  `build_command` TEXT NOT NULL,
+  `artifact_path` TEXT NOT NULL ,
+  CONSTRAINT `build_config_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`)
+);
+
+/* テストの設定 */
+CREATE TABLE IF NOT EXISTS `test_settings` (
+  `project` VARCHAR(32) PRIMARY KEY,
+  `test_command` TEXT NOT NULL,
+  `xml_path` TEXT NOT NULL ,
+  CONSTRAINT `test_config_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`)
+);

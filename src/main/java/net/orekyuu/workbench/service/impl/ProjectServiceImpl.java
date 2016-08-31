@@ -3,6 +3,7 @@ package net.orekyuu.workbench.service.impl;
 import net.orekyuu.workbench.entity.*;
 import net.orekyuu.workbench.entity.dao.*;
 import net.orekyuu.workbench.service.ProjectService;
+import net.orekyuu.workbench.service.ProjectSettingService;
 import net.orekyuu.workbench.service.RemoteRepositoryService;
 import net.orekyuu.workbench.service.exceptions.NotProjectMemberException;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
@@ -35,6 +36,8 @@ public class ProjectServiceImpl implements ProjectService {
     private OpenTicketDao ticketDao;
     @Autowired
     private RemoteRepositoryService remoteRepositoryService;
+    @Autowired
+    private ProjectSettingService projectSettingService;
 
     private static final List<String> defaultTicketStatus = Arrays.asList("新規", "進行中", "完了", "保留");
     private static final List<String> defaultTicketPriority = Arrays.asList("低", "中", "高");
@@ -75,6 +78,8 @@ public class ProjectServiceImpl implements ProjectService {
                 type.type = str;
                 return type;
             }).forEach(t -> ticketTypeDao.insert(t));
+
+            projectSettingService.setupProjectSetting(projectId);
         } catch (DuplicateKeyException e) {
             e.printStackTrace();
             throw new ProjectExistsException(projectId);

@@ -32,38 +32,43 @@
       <!-- ビルド設定 -->
       <div class="box box-info">
         <div class="box-header with-border">
-          <h3 class="box-title">ビルド設定</h3>
+          <h3 class="box-title" id="build-settings">ビルド設定</h3>
         </div>
-        <form action="" class="form-horizontal">
+        <!--/*@thymesVar id="buildSettingsForm" type="net.orekyuu.workbench.controller.view.user.project.ProjectAdminSettingController.BuildSettingsForm"*/-->
+        <form action="" method="post" class="form-horizontal" th:object="${buildSettingsForm}" th:action="|@{/project}/${project.id}/admin-settings/build-settings|">
           <div class="box-body">
 
-            <div class="form-group">
+            <div class="form-group" th:classappend="${#fields.hasErrors('buildCommand')?'has-error':''}">
               <label for="build-command" class="col-sm-3 control-label">ビルドコマンド</label>
               <div class="col-sm-9">
-                <textarea id="build-command" cols="30" rows="10" class="form-control"></textarea>
+                <textarea id="build-command" cols="30" rows="10" class="form-control" th:field="*{buildCommand}"></textarea>
+                <p class="help-block" th:if="${#fields.hasErrors('buildCommand')}" th:errors="*{buildCommand}">エラーメッセージ</p>
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" th:classappend="${#fields.hasErrors('artifactPath')?'has-error':''}">
               <label for="artifact-path" class="col-sm-3 control-label">成果物のパス</label>
               <div class="col-sm-9">
-                <input type="text" id="artifact-path" class="form-control"/>
+                <input type="text" id="artifact-path" class="form-control" th:field="*{artifactPath}"/>
+                <p class="help-block" th:if="${#fields.hasErrors('artifactPath')}" th:errors="*{artifactPath}">エラーメッセージ</p>
               </div>
             </div>
 
             <hr/>
 
-            <div class="form-group">
+            <div class="form-group" th:classappend="${#fields.hasErrors('testCommand')?'has-error':''}">
               <label for="test-command" class="col-sm-3 control-label">テストコマンド</label>
               <div class="col-sm-9">
-                <textarea id="test-command" cols="30" rows="10" class="form-control"></textarea>
+                <textarea id="test-command" cols="30" rows="10" class="form-control" th:field="*{testCommand}"></textarea>
+                <p class="help-block" th:if="${#fields.hasErrors('testCommand')}" th:errors="*{testCommand}">エラーメッセージ</p>
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" th:classappend="${#fields.hasErrors('xmlPath')?'has-error':''}">
               <label for="test-result-path" class="col-sm-3 control-label">テスト結果XMLのパス</label>
               <div class="col-sm-9">
-                <input type="text" id="test-result-path" class="form-control"/>
+                <input type="text" id="test-result-path" class="form-control" th:field="*{xmlPath}"/>
+                <p class="help-block" th:if="${#fields.hasErrors('xmlPath')}" th:errors="*{xmlPath}">エラーメッセージ</p>
               </div>
             </div>
           </div>
