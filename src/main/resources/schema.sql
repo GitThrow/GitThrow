@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS `user_avatar` (
 );
 
 CREATE TABLE IF NOT EXISTS `user_setting` (
-  `id`     VARCHAR(32) PRIMARY KEY,
-  `gravatar` BOOL        NOT NULL,
+  `id`       VARCHAR(32) PRIMARY KEY,
+  `gravatar` BOOL NOT NULL,
   CONSTRAINT `user_setting_id_fk` FOREIGN KEY (`id`) REFERENCES `users` (`id`)
 );
 
@@ -135,16 +135,25 @@ CREATE TABLE IF NOT EXISTS `ticket_number` (
 
 /* ビルドの設定 */
 CREATE TABLE IF NOT EXISTS `build_settings` (
-  `project` VARCHAR(32) PRIMARY KEY,
+  `project`       VARCHAR(32) PRIMARY KEY,
   `build_command` TEXT NOT NULL,
-  `artifact_path` TEXT NOT NULL ,
+  `artifact_path` TEXT NOT NULL,
   CONSTRAINT `build_config_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`)
 );
 
 /* テストの設定 */
 CREATE TABLE IF NOT EXISTS `test_settings` (
-  `project` VARCHAR(32) PRIMARY KEY,
+  `project`      VARCHAR(32) PRIMARY KEY,
   `test_command` TEXT NOT NULL,
-  `xml_path` TEXT NOT NULL ,
+  `xml_path`     TEXT NOT NULL,
   CONSTRAINT `test_config_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`)
+);
+
+/* 成果物 */
+CREATE TABLE IF NOT EXISTS `artifact` (
+  `id`        INT AUTO_INCREMENT PRIMARY KEY,
+  `project`   VARCHAR(32)  NOT NULL,
+  `file_name` VARCHAR(512) NOT NULL,
+  CONSTRAINT `artifact_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`),
+  INDEX artifact_project(project)
 );

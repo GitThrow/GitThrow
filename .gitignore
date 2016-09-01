@@ -6,6 +6,7 @@ database.db.mv.db
 /workspace/**
 /job/**
 /test/**
+/content/**
 
 #Eclipse�p�̐ݒ�
 .apt_generated/**

@@ -64,6 +64,11 @@ public class BeanConfig {
     }
 
     @Bean
+    public ArtifactService artifactService() {
+        return new ArtifactServiceImpl();
+    }
+
+    @Bean
     @Primary
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
