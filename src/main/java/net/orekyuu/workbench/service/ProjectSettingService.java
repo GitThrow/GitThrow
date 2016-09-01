@@ -14,6 +14,12 @@ public interface ProjectSettingService {
     void setupProjectSetting(String projectId);
 
     /**
+     * プロジェクトの設定を削除します
+     * @param projectId プロジェクトID
+     */
+    void deleteProjectSetting(String projectId);
+
+    /**
      * ビルドの設定を取得
      * @param projectId プロジェクトID
      * @return ビルドの設定

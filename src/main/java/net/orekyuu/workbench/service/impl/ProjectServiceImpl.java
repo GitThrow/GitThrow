@@ -162,6 +162,8 @@ public class ProjectServiceImpl implements ProjectService {
         ticketTypeDao.deleteByProject(projectId);
         ticketPriorityDao.deleteByProject(projectId);
         ticketNumDao.deleteByProject(projectId);
+        projectSettingService.deleteProjectSetting(projectId);
+
         projectDao.delete(new Project(projectId, "", ""));
     }
 

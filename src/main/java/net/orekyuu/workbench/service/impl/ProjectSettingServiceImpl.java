@@ -34,6 +34,18 @@ public class ProjectSettingServiceImpl implements ProjectSettingService {
         testSettingsDao.insert(testSettings);
     }
 
+    @Transactional(readOnly = false)
+    @Override
+    public void deleteProjectSetting(String projectId) {
+        BuildSettings buildSettings = new BuildSettings();
+        buildSettings.projectId = projectId;
+        buildSettingsDao.delete(buildSettings);
+
+        TestSettings testSettings = new TestSettings();
+        testSettings.projectId = projectId;
+        testSettingsDao.delete(testSettings);
+    }
+
     @Override
     public Optional<BuildSettings> findBuildSettings(String projectId) {
         return buildSettingsDao.findByProject(projectId);
