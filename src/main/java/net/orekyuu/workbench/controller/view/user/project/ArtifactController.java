@@ -16,7 +16,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.util.List;
 
 @Controller
@@ -49,7 +48,8 @@ public class ArtifactController {
             ServletOutputStream outputStream = res.getOutputStream();
             IOUtils.copy(inputStream, outputStream);
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            e.printStackTrace();
+            throw new ContentNotFoundException();
         }
     }
 }
