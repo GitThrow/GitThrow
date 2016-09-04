@@ -2,6 +2,7 @@ package net.orekyuu.workbench.service.impl;
 
 import net.orekyuu.workbench.entity.*;
 import net.orekyuu.workbench.entity.dao.*;
+import net.orekyuu.workbench.service.ArtifactService;
 import net.orekyuu.workbench.service.ProjectService;
 import net.orekyuu.workbench.service.ProjectSettingService;
 import net.orekyuu.workbench.service.RemoteRepositoryService;
@@ -38,6 +39,8 @@ public class ProjectServiceImpl implements ProjectService {
     private RemoteRepositoryService remoteRepositoryService;
     @Autowired
     private ProjectSettingService projectSettingService;
+    @Autowired
+    private ArtifactService artifactService;
 
     private static final List<String> defaultTicketStatus = Arrays.asList("新規", "進行中", "完了", "保留");
     private static final List<String> defaultTicketPriority = Arrays.asList("低", "中", "高");
@@ -163,6 +166,7 @@ public class ProjectServiceImpl implements ProjectService {
         ticketPriorityDao.deleteByProject(projectId);
         ticketNumDao.deleteByProject(projectId);
         projectSettingService.deleteProjectSetting(projectId);
+        artifactService.deleteByProject(projectId);
 
         projectDao.delete(new Project(projectId, "", ""));
     }
