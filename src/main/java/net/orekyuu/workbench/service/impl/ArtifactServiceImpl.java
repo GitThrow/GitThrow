@@ -73,6 +73,14 @@ public class ArtifactServiceImpl implements ArtifactService {
         return Paths.get(dir, artifact.projectId, artifact.id.toString(), artifact.fileName);
     }
 
+    private Path getArtifactFilesDir(String projectId, int artifactId) {
+        String dir = artifactDir;
+        if (!dir.endsWith("/")) {
+            dir += "/";
+        }
+        return Paths.get(dir, projectId, String.valueOf(artifactId));
+    }
+
     private Path getProjectDir(String projectId) {
         String dir = artifactDir;
         if (!dir.endsWith("/")) {
@@ -107,13 +115,12 @@ public class ArtifactServiceImpl implements ArtifactService {
 
     @Transactional(readOnly = false)
     @Override
-    public void deleteById(int id) {
-        Artifact artifact = artifactDao.delete(new Artifact(id, "", null)).getEntity();
+    public void delete(Artifact artifact) {
         if (artifact == null) {
             return;
         }
-
-        Path artifactDir = getArtifactFilePath(artifact).getParent();
+        artifactDao.delete(artifact);
+        Path artifactDir = getArtifactFilesDir(artifact.projectId, artifact.id);
         if (Files.exists(artifactDir)) {
             try {
                 FileUtils.forceDelete(artifactDir.toFile());

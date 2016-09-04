@@ -25,7 +25,7 @@ public interface ArtifactService {
 
     void deleteByProject(String projectId);
 
-    void deleteById(int id);
+    void delete(Artifact artifact);
 
     InputStream openArtifactStreamByArtifact(Artifact artifact) throws IOException;
 

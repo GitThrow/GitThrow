@@ -29,13 +29,17 @@
           <h3 class="box-title">成果物一覧</h3>
         </div>
         <div class="box-body table-responsive no-padding">
-          <table class="table table-hover">
-            <tr th:each="artifact : ${artifacts}">
-              <!--/*@thymesVar id="artifact" type="net.orekyuu.workbench.entity.Artifact"*/-->
-              <td><a href="" th:href="|@{/project/}${project.id}/artifact/${artifact.id}|" th:text="${artifact.fileName}">ファイル名</a></td>
-              <td style="width: 30px"><button class="btn"><i class="fa fa-fw fa-close"></i></button></td>
-            </tr>
-          </table>
+          <form action="" method="post" th:action="|@{/project/}${project.id}/artifact/delete|">
+            <table class="table table-hover">
+              <tr th:each="artifact : ${artifacts}">
+                <!--/*@thymesVar id="artifact" type="net.orekyuu.workbench.entity.Artifact"*/-->
+                <td><a href="" th:href="|@{/project/}${project.id}/artifact/${artifact.id}|" th:text="${artifact.fileName}">ファイル名</a></td>
+                <td style="width: 30px">
+                  <button class="btn" type="submit" name="artifactId" th:value="${artifact.id}"><i class="fa fa-close"></i></button>
+                </td>
+              </tr>
+            </table>
+          </form>
         </div>
       </div>
 
