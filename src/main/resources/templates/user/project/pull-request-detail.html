@@ -1,0 +1,81 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Workbench</title>
+  <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css" />
+</head>
+<body class="skin-blue">
+<div class="wrapper">
+
+  <div th:replace="user/project/fragment/project-page-content :: project-page-topmenu" ></div>
+  <div th:replace="user/project/fragment/project-page-content :: project-page-sidebar" ></div>
+
+
+  <!-- content -->
+  <div class="content-wrapper">
+
+    <!-- コンテンツヘッダ -->
+    <section class="content-header">
+      <h1>TODO 名前つける</h1>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <section class="content">
+
+      <!-- コンテンツ1 -->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title">PR</h3>
+        </div>
+        <div class="box-body">
+          <div id="diff">
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div><!-- end content -->
+
+
+  <div th:replace="user/project/fragment/project-page-content :: project-page-footer" ></div>
+
+
+</div><!-- end wrapper -->
+<div th:replace="user/project/fragment/project-page-content :: project-page-script" ></div>
+<script th:inline="javascript">
+  $(function () {
+    var source = new EventSource("/rest/pull-request/diff?projectId=java&base=develop&target=master", { withCredentials: true });
+    source.onmessage = function(event) {
+      var lines = JSON.parse(event.data).lines;
+      var table = '<table style="padding-bottom: 100px">';
+      for (var i = 0; i < lines.length; i++) {
+        var color = '';
+        if (lines[i].change === 'add') {
+          color = 'background-color: green;'
+        }
+        if (lines[i].change === 'delete') {
+          color = 'background-color: red;'
+        }
+
+        var row = '<tr>';
+        row += '<td style="width: 10px;' + color + '">' + (lines[i].oldLineNum == -1 ? '' : + lines[i].oldLineNum) +  '</td>';
+        row += '<td style="' + color + '">|</td>';
+        row += '<td style="width: 10px;' + color + '">' + (lines[i].newLineNum == -1 ? '' : + lines[i].newLineNum) +  '</td>';
+        row += '<td style="' + color + '">|</td>';
+        row += '<td style="' + color + '">' + lines[i].content + '</td>';   row += '</tr>';
+
+        table += row;
+      }
+      table += '</table>';
+      table += '<hr/>';
+      $('#diff').append(table);
+    };
+    source.onerror = function (event) {
+      source.close();
+    };
+  });
+</script>
+
+</body>
+</html>
