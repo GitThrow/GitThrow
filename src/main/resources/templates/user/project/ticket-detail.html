@@ -135,7 +135,7 @@
     //marked.js
     marked.setOptions({
       highlight: function(code, lang) {
-        return hljs.highlightAuto(code, lang).value;
+        return hljs.highlightAuto(code, [lang]).value;
       }
     });
 
