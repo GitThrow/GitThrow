@@ -134,8 +134,9 @@
 
     //marked.js
     marked.setOptions({
+      sanitize:true,
       highlight: function(code, lang) {
-        return hljs.highlightAuto(code, lang).value;
+        return hljs.highlightAuto(code, [lang]).value;
       }
     });
 
