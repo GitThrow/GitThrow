@@ -17,7 +17,9 @@ import org.springframework.util.FileCopyUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
@@ -103,6 +105,11 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = false)
     public void updateSetting(UserSetting setting) {
         userSettingDao.update(setting);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userDao.selectAll(Collectors.toList());
     }
 
 

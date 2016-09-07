@@ -1,0 +1,130 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Workbench</title>
+  <link th:replace="user/fragment/user-page-content :: user-page-head" rel="stylesheet" type="text/css"/>
+    <link href="../../static/plugins/jquery-toast-plugin/jquery.toast.min.css"
+     th:href="@{/plugins/jquery-toast-plugin/jquery.toast.min.css}" rel="stylesheet"type="text/css"/>
+</head>
+<body class="skin-blue">
+<div class="wrapper">
+
+  <div th:replace="user/fragment/user-page-content :: user-page-topmenu"></div>
+  <div th:replace="user/fragment/user-page-content :: user-page-sidebar"></div>
+
+
+  <!-- content -->
+  <div class="content-wrapper">
+
+    <!-- コンテンツヘッダ -->
+    <section class="content-header">
+      <h1>ユーザー管理</h1>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <section class="content">
+
+      <div class="box box-info">
+        <div class="box-header with-border">
+          <h3 class="box-title">メンバー設定</h3>
+        </div>
+        <form action="" class="form-horizontal">
+          <div class="box-body">
+
+            <table class="table table-hover">
+              <tr>
+                <th></th>
+                <th>ユーザー名</th>
+                <th>ID</th>
+                <th>管理者</th>
+                <th>削除</th>
+              </tr>
+              <!--/*@thymesVar id="user" type="net.orekyuu.workbench.entity.User"*/-->
+              <tr th:each="user : ${users}">
+                <td><img src="../../static/img/user2-160x160.jpg" th:src="|@{/user/icon/}${user.id}|" alt="" class="img-circle" width="24"></td>
+                <td th:text="${user.name}">おれきゅう</td>
+                <td th:text="${user.id}">orekyuu</td>
+                <td><input type="checkbox" th:checked="${user.admin}"></td>
+                <!--管理者は削除できないようにする-->
+                <td><input type="checkbox"></td>
+              </tr>
+            </table>
+          </div>
+          <div class="box-footer">
+            <button class="btn btn-primary" type="submit">送信</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#registerModal">
+              メンバー追加
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="modalTitle">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="modalTitle">新規ユーザー</h4>
+            </div>
+            <!--/*@thymesVar id="newUserForm" type="net.orekyuu.workbench.controller.view.user.AdminSettingController.NewUserForm"*/-->
+            <form action="" th:action="@{/admin/user-setting/register}" method="post" th:object="${newUserForm}">
+              <div class="modal-body">
+                <div class="form-group" th:classappend="${#fields.hasErrors('id')?'has-error':''}">
+                  <label for="userid" class="col-sm-3 control-label">ユーザーID</label>
+                  <div class="col-sm-9">
+                    <input type="text" id="userid" class="form-control" th:field="*{id}">
+                    <p class="help-block" th:if="${#fields.hasErrors('id')}" th:errors="*{id}">エラーメッセージ</p>
+                  </div>
+                </div>
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('name')?'has-error':''}">
+                  <label for="username" class="col-sm-3 control-label">ユーザー名</label>
+                  <div class="col-sm-9">
+                    <input type="text" id="username" class="form-control" th:field="*{name}">
+                    <p class="help-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">エラーメッセージ</p>
+                  </div>
+                </div>
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('password')?'has-error':''}">
+                  <label for="username" class="col-sm-3 control-label">パスワード</label>
+                  <div class="col-sm-9">
+                    <input type="password" id="password" class="form-control" th:field="*{password}">
+                    <p class="help-block" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">エラーメッセージ</p>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="reset" class="btn btn-default" data-dismiss="modal">キャンセル</button>
+                <button type="submit" class="btn btn-primary">登録</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div><!-- end content -->
+
+
+  <div th:replace="user/fragment/user-page-content :: user-page-footer"></div>
+
+
+</div>
+<!-- end wrapper -->
+<div th:replace="user/fragment/user-page-content :: user-page-script"></div>
+<!-- end script -->
+<script src="../../static/plugins/jquery-toast-plugin/jquery.toast.min.js" th:src="@{/plugins/jquery-toast-plugin/jquery.toast.min.js}" type="text/javascript"></script>
+<script th:inline="javascript">
+$(function () {
+  /*<![CDATA[>*/
+  var hasRegisterModalError = /*[[ ${#fields.hasErrors('${newUserForm.*}')} ]]*/false;
+  /*]]>*/
+  if (hasRegisterModalError) {
+    $('#registerModal').modal('show');
+  }
+});
+</script>
+</body>
+</html>
