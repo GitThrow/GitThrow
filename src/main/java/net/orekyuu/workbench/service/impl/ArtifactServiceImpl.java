@@ -1,21 +1,26 @@
 package net.orekyuu.workbench.service.impl;
 
-import net.orekyuu.workbench.entity.Artifact;
-import net.orekyuu.workbench.entity.dao.ArtifactDao;
-import net.orekyuu.workbench.service.ArtifactService;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.nio.file.*;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import net.orekyuu.workbench.entity.Artifact;
+import net.orekyuu.workbench.entity.dao.ArtifactDao;
+import net.orekyuu.workbench.service.ArtifactService;
 
 @Transactional(readOnly = true)
 public class ArtifactServiceImpl implements ArtifactService {
@@ -65,28 +70,16 @@ public class ArtifactServiceImpl implements ArtifactService {
     }
 
     private Path getArtifactFilePath(Artifact artifact) {
-        String dir = artifactDir;
-        if (!dir.endsWith("/")) {
-            dir += "/";
-        }
         Objects.requireNonNull(artifact.id);
-        return Paths.get(dir, artifact.projectId, artifact.id.toString(), artifact.fileName);
+        return Paths.get(artifactDir, artifact.projectId, artifact.id.toString(), artifact.fileName);
     }
 
     private Path getArtifactFilesDir(String projectId, int artifactId) {
-        String dir = artifactDir;
-        if (!dir.endsWith("/")) {
-            dir += "/";
-        }
-        return Paths.get(dir, projectId, String.valueOf(artifactId));
+        return Paths.get(artifactDir, projectId, String.valueOf(artifactId));
     }
 
     private Path getProjectDir(String projectId) {
-        String dir = artifactDir;
-        if (!dir.endsWith("/")) {
-            dir += "/";
-        }
-        return Paths.get(dir, projectId);
+        return Paths.get(artifactDir, projectId);
     }
 
     @Override
