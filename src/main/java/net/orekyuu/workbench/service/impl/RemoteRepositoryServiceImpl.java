@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -108,13 +109,20 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
 
                 try (TreeWalk treeWalk = new TreeWalk(repository)) {
                     treeWalk.addTree(tree);
+                    treeWalk.setRecursive(true);
                     treeWalk.setFilter(PathFilter.create(relativePath));
-                    if (!treeWalk.next()) {
-                        return Optional.empty();
+                    
+                    boolean found=false;
+                    while (treeWalk.next()) {
+                        if(Objects.equals(treeWalk.getPathString(),relativePath)){
+                            found=true;
+                            break;
+                        }
                     }
+                    if(!found)return Optional.empty();
+                    
                     ObjectId objectId = treeWalk.getObjectId(0);
                     ObjectLoader objectLoader = repository.open(objectId);
-
                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                     objectLoader.copyTo(outputStream);
                     revWalk.dispose();
