@@ -4,7 +4,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,7 +64,7 @@ public class RepositoryBrowseController {
         private ContentTypeMapping(MediaType type,String... extensions){
             this.type=type;
             this.extensions.add(this.name().toLowerCase());
-            this.extensions.addAll(Stream.of(extensions).map((e)->e.toLowerCase()).collect(Collectors.toList()));
+            this.extensions.addAll(Stream.of(extensions).map(String::toLowerCase).collect(Collectors.toList()));
         }
         
         public MediaType getType(){
@@ -73,9 +72,8 @@ public class RepositoryBrowseController {
         }
         public static MediaType findType(String fileName){
             String ext=Paths.get(fileName).toFile().getName().split("\\.")[1];
-            System.out.println(ext);
             Optional<MediaType> mediaType=Arrays.stream(values())
-                    .filter(type->type.extensions.stream().anyMatch(e->Objects.equals(e, ext)))
+                    .filter(type->type.extensions.stream().anyMatch(ext::equals))
                     .findFirst().map(ContentTypeMapping::getType);
             return mediaType.orElse(MediaType.TEXT_PLAIN);
         }
