@@ -1,20 +1,5 @@
 package net.orekyuu.workbench.service.impl;
 
-import net.orekyuu.workbench.service.RemoteRepositoryService;
-import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ListBranchCommand;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.*;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevTree;
-import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.treewalk.TreeWalk;
-import org.eclipse.jgit.treewalk.filter.PathFilter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -24,6 +9,26 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectLoader;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.StoredConfig;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevTree;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
+import net.orekyuu.workbench.service.RemoteRepositoryService;
+import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 
 public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
 
@@ -36,11 +41,7 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
 
     @Override
     public Path getProjectGitRepositoryDir(String projectId) {
-        String dir = gitDir;
-        if (!dir.endsWith("/")) {
-            dir += "/";
-        }
-        return Paths.get(dir + projectId);
+        return Paths.get(gitDir, projectId);
     }
 
     @Override

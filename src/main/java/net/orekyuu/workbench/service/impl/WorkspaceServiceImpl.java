@@ -1,11 +1,16 @@
 package net.orekyuu.workbench.service.impl;
 
-import com.sun.javafx.fxml.PropertyNotFoundException;
-import net.orekyuu.workbench.entity.Project;
-import net.orekyuu.workbench.service.ProjectService;
-import net.orekyuu.workbench.service.RemoteRepositoryService;
-import net.orekyuu.workbench.service.WorkspaceService;
-import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
+import java.util.Optional;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.PullResult;
@@ -20,12 +25,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.List;
-import java.util.Optional;
+import net.orekyuu.workbench.entity.Project;
+import net.orekyuu.workbench.service.ProjectService;
+import net.orekyuu.workbench.service.RemoteRepositoryService;
+import net.orekyuu.workbench.service.WorkspaceService;
+import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 
 public class WorkspaceServiceImpl implements WorkspaceService {
 
@@ -43,7 +47,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public void update(String projectId) throws ProjectNotFoundException, GitAPIException {
-        Project project = projectService.findById(projectId).orElseThrow(PropertyNotFoundException::new);
+        Project project = projectService.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
         Path path = getProjectWorkspaceDir(projectId);
         if (!Files.exists(path)) {
             createWorkspace(path, projectId);
@@ -87,7 +91,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public void delete(String projectId) throws ProjectNotFoundException {
-        projectService.findById(projectId).orElseThrow(PropertyNotFoundException::new);
+        projectService.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
         Path dir = getProjectWorkspaceDir(projectId);
         if (Files.notExists(dir)) {
             return;
@@ -118,11 +122,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public Path getProjectWorkspaceDir(String projectId) {
-        String dir = workspaceDir;
-        if (!dir.endsWith("/")) {
-            dir += "/";
-        }
-        return Paths.get(dir + projectId);
+        return Paths.get(workspaceDir, projectId);
     }
 
     private void createWorkspace(Path path, String projectId) throws GitAPIException {

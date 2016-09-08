@@ -1,15 +1,15 @@
 package net.orekyuu.workbench.job;
 
-import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.springframework.beans.factory.annotation.Value;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+
+import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.springframework.beans.factory.annotation.Value;
 
 public class JobWorkspaceServiceImpl implements JobWorkspaceService {
 
@@ -18,11 +18,7 @@ public class JobWorkspaceServiceImpl implements JobWorkspaceService {
 
     @Override
     public Path getWorkspacePath(UUID jobId) {
-        String dir = jobDir;
-        if (!dir.endsWith("/")) {
-            dir += "/";
-        }
-        return Paths.get(dir + jobId);
+        return Paths.get(jobDir, jobId.toString());
     }
 
     @Override
