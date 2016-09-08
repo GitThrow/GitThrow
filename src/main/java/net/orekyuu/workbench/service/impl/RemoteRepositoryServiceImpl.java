@@ -2,7 +2,6 @@ package net.orekyuu.workbench.service.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -57,10 +55,7 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
         try {
             Files.createDirectories(repositoryDir);
 
-            Repository repo = new FileRepositoryBuilder()
-                .setGitDir(repositoryDir.toFile())
-                .setBare()
-                .build();
+            Repository repo = new FileRepositoryBuilder().setGitDir(repositoryDir.toFile()).setBare().build();
             final boolean isBare = true;
             repo.create(isBare);
 
@@ -73,10 +68,7 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
     }
 
     private Repository getRepository(Path path) throws IOException {
-        Repository repo = new FileRepositoryBuilder()
-            .setGitDir(path.toFile())
-            .setBare()
-            .build();
+        Repository repo = new FileRepositoryBuilder().setGitDir(path.toFile()).setBare().build();
         repo.incrementOpen();
         return repo;
     }
@@ -84,55 +76,54 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
     @Override
     public Optional<String> getReadmeFile(String projectId) throws ProjectNotFoundException, GitAPIException {
 
-        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId))) {
-            Git git = new Git(repository);
-            //ブランチの一覧を取得
-            List<Ref> branchResult = git.branchList()
-                .setListMode(ListBranchCommand.ListMode.ALL)
-                .call();
+        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId)); Git git = new Git(repository)) {
+            // ブランチの一覧を取得
+            List<Ref> branchResult = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
 
             String targetBranch = "refs/heads/" + DEFAULT_BRANCH;
 
-            //デフォルトブランチがなければ何もしない(まっさらなリポジトリとかの状況でありえる)
+            // デフォルトブランチがなければ何もしない(まっさらなリポジトリとかの状況でありえる)
             if (branchResult.stream().noneMatch(ref -> ref.getName().equals(targetBranch))) {
                 return Optional.empty();
             }
-
-            ObjectId head = repository.resolve(targetBranch).toObjectId();
-            try (RevWalk walk = new RevWalk(repository)) {
-                RevCommit commit = walk.parseCommit(head);
-                RevTree tree = commit.getTree();
-
-                Optional<String> result;
-
-                try(TreeWalk treeWalk = new TreeWalk(repository)) {
-                    treeWalk.addTree(tree);
-                    treeWalk.setRecursive(true);
-                    treeWalk.setFilter(PathFilter.create("README.md"));
-
-                    if (!treeWalk.next()) {
-                        return Optional.empty();
-                    }
-
-                    ObjectId objectId = treeWalk.getObjectId(0);
-
-                    ObjectLoader objectLoader = repository.open(objectId);
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    objectLoader.copyTo(out);
-
-                    result = Optional.ofNullable(out.toString());
-                }
-                walk.dispose();
-                return result;
-            }
+            return getRepositoryFile(projectId, targetBranch, "README.md").map((bytes) -> bytes.toString());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
     @Override
-    public Optional<OutputStream> getRepositoryFile(String projectId, String hash, Path relativePath) throws ProjectNotFoundException,
+    public Optional<ByteArrayOutputStream> getRepositoryFile(String projectId, String hash, String relativePath) throws ProjectNotFoundException,
             GitAPIException {
-        throw new NotImplementedException("not implemented");
+        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId))) {
+            // ハッシュかその他で分岐
+            // タグとかブランチも食える模様
+            ObjectId commitId = ObjectId.isId(hash)?ObjectId.fromString(hash):repository.resolve(hash);
+            if(commitId==null){
+                return Optional.empty();
+            }
+            try (RevWalk revWalk = new RevWalk(repository)) {
+                RevCommit commit = revWalk.parseCommit(commitId);
+                RevTree tree = commit.getTree();
+
+                try (TreeWalk treeWalk = new TreeWalk(repository)) {
+                    treeWalk.addTree(tree);
+                    treeWalk.setFilter(PathFilter.create(relativePath));
+                    if (!treeWalk.next()) {
+                        return Optional.empty();
+                    }
+                    ObjectId objectId = treeWalk.getObjectId(0);
+                    ObjectLoader objectLoader = repository.open(objectId);
+
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    objectLoader.copyTo(outputStream);
+                    revWalk.dispose();
+                    return Optional.of(outputStream);
+                }
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
     }
 }
