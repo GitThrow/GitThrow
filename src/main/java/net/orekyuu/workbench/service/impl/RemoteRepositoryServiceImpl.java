@@ -2,6 +2,7 @@ package net.orekyuu.workbench.service.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -126,5 +128,11 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    @Override
+    public Optional<OutputStream> getRepositoryFile(String projectId, String hash, Path relativePath) throws ProjectNotFoundException,
+            GitAPIException {
+        throw new NotImplementedException("not implemented");
     }
 }
