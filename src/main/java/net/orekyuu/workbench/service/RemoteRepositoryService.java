@@ -1,6 +1,6 @@
 package net.orekyuu.workbench.service;
 
-import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -38,6 +38,6 @@ public interface RemoteRepositoryService {
      * @throws ProjectNotFoundException
      * @throws GitAPIException
      */
-    Optional<OutputStream> getRepositoryFile(String projectId, String hash, Path relativePath) throws ProjectNotFoundException, GitAPIException;
+    Optional<ByteArrayOutputStream> getRepositoryFile(String projectId, String hash, String relativePath) throws ProjectNotFoundException, GitAPIException;
     
 }
