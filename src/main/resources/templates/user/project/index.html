@@ -106,12 +106,11 @@
     }
     
     renderer.link=function(href,title,text){
-      var markup='<p><a href="'+url(href)+'" title="'+title+'">'+text+'</a></p>';
+      var markup='<p><a href="'+url(href)+'" title="'+(title||text)+'">'+text+'</a></p>';
       return markup;
     }
     renderer.image=function(href,title,text){
-        var f=isCrossOrigin(href);
-        var markup='<img src="'+url(href)+'" alt="'+text+'" title='+title+'/>';
+        var markup='<img src="'+url(href)+'" alt="'+text+'" title="'+(title||text)+'"/>';
         return markup;
     };
     
