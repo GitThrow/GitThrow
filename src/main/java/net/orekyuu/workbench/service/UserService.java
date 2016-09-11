@@ -6,6 +6,7 @@ import net.orekyuu.workbench.entity.UserSetting;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -69,4 +70,8 @@ public interface UserService {
      */
     void updateSetting(UserSetting setting);
 
+    /**
+     * @return すべてのユーザー
+     */
+    List<User> findAll();
 }
