@@ -1,11 +1,13 @@
 package net.orekyuu.workbench.service;
 
-import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
+import java.io.ByteArrayOutputStream;
+import java.nio.file.Path;
+import java.util.Optional;
+
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Path;
-import java.util.Optional;
+import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 
 @Service
 public interface RemoteRepositoryService {
@@ -26,5 +28,16 @@ public interface RemoteRepositoryService {
      * @throws GitAPIException
      */
     Optional<String> getReadmeFile(String projectId) throws ProjectNotFoundException, GitAPIException;
-
+    
+    /**
+     * 
+     * @param projectId
+     * @param hash ハッシュもしくはブランチ
+     * @param relativePath リポジトリルートからのファイルパス
+     * @return 指定されたファイルパスの内容
+     * @throws ProjectNotFoundException
+     * @throws GitAPIException
+     */
+    Optional<ByteArrayOutputStream> getRepositoryFile(String projectId, String hash, String relativePath) throws ProjectNotFoundException, GitAPIException;
+    
 }

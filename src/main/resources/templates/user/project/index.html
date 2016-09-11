@@ -88,7 +88,34 @@
   $(function () {
 	  
     //marked.js
+    var context=[[${#httpServletRequest.requestURI}]];
+    var renderer=new marked.Renderer();
+    
+    // 外部URL？
+    var isCrossOrigin=function(href){
+      return /https?:\/\//.test(href);
+    }
+    // 外部URLじゃなければリポジトリのファイル参照する。とりあえずmaster
+    var url=function(href){
+      if(isCrossOrigin(href)){
+    	  return href;
+      }
+      var _href=href.startsWith('/')?href:'/'+href;
+      var _context=context.endsWith('/')?context:context+'/'
+      return _context+'raw/master'+_href;
+    }
+    
+    renderer.link=function(href,title,text){
+      var markup='<p><a href="'+url(href)+'" title="'+(title||text)+'">'+text+'</a></p>';
+      return markup;
+    }
+    renderer.image=function(href,title,text){
+        var markup='<img src="'+url(href)+'" alt="'+text+'" title="'+(title||text)+'"/>';
+        return markup;
+    };
+    
     marked.setOptions({
+    	renderer:renderer,
       sanitize:true,
       highlight: function(code, lang) {
         return hljs.highlightAuto(code, [lang]).value;
@@ -101,21 +128,21 @@
 
     //copy
     $('.btn-copy').tooltip({
-        trigger: 'click',
-        placement: 'bottom'
-      });
+      trigger: 'click',
+      placement: 'bottom'
+    });
 
-      function setTooltip(btn, message) {
-        $(btn).tooltip('hide')
-          .attr('data-original-title', message)
-          .tooltip('show');
-      }
+    function setTooltip(btn, message) {
+      $(btn).tooltip('hide')
+        .attr('data-original-title', message)
+        .tooltip('show');
+    }
 
-      function hideTooltip(btn) {
-        setTimeout(function() {
-          $(btn).tooltip('hide');
-        }, 1400);
-      }
+    function hideTooltip(btn) {
+      setTimeout(function() {
+        $(btn).tooltip('hide');
+      }, 1400);
+    }
 
     var clipboard = new Clipboard('.btn-copy');
 

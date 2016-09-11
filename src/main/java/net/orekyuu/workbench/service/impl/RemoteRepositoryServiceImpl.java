@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -55,10 +56,7 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
         try {
             Files.createDirectories(repositoryDir);
 
-            Repository repo = new FileRepositoryBuilder()
-                .setGitDir(repositoryDir.toFile())
-                .setBare()
-                .build();
+            Repository repo = new FileRepositoryBuilder().setGitDir(repositoryDir.toFile()).setBare().build();
             final boolean isBare = true;
             repo.create(isBare);
 
@@ -71,10 +69,7 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
     }
 
     private Repository getRepository(Path path) throws IOException {
-        Repository repo = new FileRepositoryBuilder()
-            .setGitDir(path.toFile())
-            .setBare()
-            .build();
+        Repository repo = new FileRepositoryBuilder().setGitDir(path.toFile()).setBare().build();
         repo.incrementOpen();
         return repo;
     }
@@ -82,49 +77,61 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
     @Override
     public Optional<String> getReadmeFile(String projectId) throws ProjectNotFoundException, GitAPIException {
 
-        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId))) {
-            Git git = new Git(repository);
-            //ブランチの一覧を取得
-            List<Ref> branchResult = git.branchList()
-                .setListMode(ListBranchCommand.ListMode.ALL)
-                .call();
+        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId)); Git git = new Git(repository)) {
+            // ブランチの一覧を取得
+            List<Ref> branchResult = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
 
             String targetBranch = "refs/heads/" + DEFAULT_BRANCH;
 
-            //デフォルトブランチがなければ何もしない(まっさらなリポジトリとかの状況でありえる)
+            // デフォルトブランチがなければ何もしない(まっさらなリポジトリとかの状況でありえる)
             if (branchResult.stream().noneMatch(ref -> ref.getName().equals(targetBranch))) {
                 return Optional.empty();
             }
+            return getRepositoryFile(projectId, targetBranch, "README.md").map((bytes) -> bytes.toString());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
-            ObjectId head = repository.resolve(targetBranch).toObjectId();
-            try (RevWalk walk = new RevWalk(repository)) {
-                RevCommit commit = walk.parseCommit(head);
+    @Override
+    public Optional<ByteArrayOutputStream> getRepositoryFile(String projectId, String hash, String relativePath) throws ProjectNotFoundException,
+            GitAPIException {
+        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId))) {
+            // ハッシュかその他で分岐
+            // タグとかブランチも食える模様
+            ObjectId commitId = ObjectId.isId(hash)?ObjectId.fromString(hash):repository.resolve(hash);
+            if(commitId==null){
+                return Optional.empty();
+            }
+            try (RevWalk revWalk = new RevWalk(repository)) {
+                RevCommit commit = revWalk.parseCommit(commitId);
                 RevTree tree = commit.getTree();
 
-                Optional<String> result;
-
-                try(TreeWalk treeWalk = new TreeWalk(repository)) {
+                try (TreeWalk treeWalk = new TreeWalk(repository)) {
                     treeWalk.addTree(tree);
                     treeWalk.setRecursive(true);
-                    treeWalk.setFilter(PathFilter.create("README.md"));
-
-                    if (!treeWalk.next()) {
-                        return Optional.empty();
+                    treeWalk.setFilter(PathFilter.create(relativePath));
+                    
+                    boolean found=false;
+                    while (treeWalk.next()) {
+                        if(Objects.equals(treeWalk.getPathString(),relativePath)){
+                            found=true;
+                            break;
+                        }
                     }
-
+                    if(!found)return Optional.empty();
+                    
                     ObjectId objectId = treeWalk.getObjectId(0);
-
                     ObjectLoader objectLoader = repository.open(objectId);
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    objectLoader.copyTo(out);
-
-                    result = Optional.ofNullable(out.toString());
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    objectLoader.copyTo(outputStream);
+                    revWalk.dispose();
+                    return Optional.of(outputStream);
                 }
-                walk.dispose();
-                return result;
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+
     }
 }
