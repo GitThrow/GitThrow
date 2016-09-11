@@ -29,7 +29,6 @@
         <div class="box-header with-border">
           <h3 class="box-title">メンバー設定</h3>
         </div>
-        <form action="" class="form-horizontal">
           <div class="box-body">
 
             <table class="table table-hover">
@@ -38,7 +37,6 @@
                 <th>ユーザー名</th>
                 <th>ID</th>
                 <th>管理者</th>
-                <th>削除</th>
               </tr>
               <!--/*@thymesVar id="user" type="net.orekyuu.workbench.entity.User"*/-->
               <tr th:each="user : ${users}">
@@ -47,17 +45,14 @@
                 <td th:text="${user.id}">orekyuu</td>
                 <td><input type="checkbox" th:checked="${user.admin}"></td>
                 <!--管理者は削除できないようにする-->
-                <td><input type="checkbox"></td>
               </tr>
             </table>
           </div>
           <div class="box-footer">
-            <button class="btn btn-primary" type="submit">送信</button>
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#registerModal">
               メンバー追加
             </button>
           </div>
-        </form>
       </div>
 
       <!-- Modal -->
