@@ -1,0 +1,116 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Workbench</title>
+  <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css" />
+  <!-- Select2 -->
+  <link rel="stylesheet" href="../../../static/plugins/select2/select2.min.css" th:href="@{/plugins/select2/select2.min.css}">
+</head>
+<body class="skin-blue">
+<div class="wrapper">
+
+  <div th:replace="user/project/fragment/project-page-content :: project-page-topmenu" ></div>
+  <div th:replace="user/project/fragment/project-page-content :: project-page-sidebar" ></div>
+
+
+  <!-- content -->
+  <div class="content-wrapper">
+
+    <!-- コンテンツヘッダ -->
+    <section class="content-header">
+      <h1>プルリクエスト</h1>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <section class="content">
+
+      <!-- コンテンツ1 -->
+      <div class="box">
+        <!--/*@thymesVar id="newPullRequestForm" type="net.orekyuu.workbench.controller.view.user.project.PullRequestController.NewPullRequestForm"*/-->
+        <form action="" th:action="|@{/project}/${project.id}/pull-request/create|" th:object="${newPullRequestForm}" method="post"
+              class="form-horizontal">
+
+          <div class="box-header with-border">
+            <h3 class="box-title">新規プルリクエスト</h3>
+          </div>
+
+          <div class="box-body">
+            <div class="form-group" th:classappend="${#fields.hasErrors('title')?'has-error':''}">
+              <label for="title" class="col-sm-3 control-label">タイトル</label>
+              <div class="col-sm-9">
+                <input type="text" class="form-control" id="title" th:field="*{title}" placeholder="プルリクエストタイトル">
+                <p class="help-block" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('desc')? 'has-error' :''}">
+              <label for="desc" class="col-sm-3 control-label">説明文</label>
+              <div class="col-sm-9">
+                <textarea id="desc" th:field="*{desc}" cols="30" rows="10" class="form-control"></textarea>
+                <p class="help-block" th:if="${#fields.hasErrors('desc')}" th:errors="*{desc}">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('baseBranch')? 'has-error' :''}">
+              <label for="baseBranch" class="col-sm-3 control-label">ベースブランチ</label>
+              <div class="col-sm-9">
+                <select class="form-control select2" title="baseBranch" id="baseBranch" th:remove="all-but-first" th:field="*{baseBranch}">
+                  <!--/*@thymesVar id="b" type="java.lang.String"*/-->
+                  <option selected="selected" th:each="b : ${branch}" th:text="${b}" th:value="${b}">hoge</option>
+                </select>
+                <p class="help-block" th:if="${#fields.hasErrors('baseBranch')}" th:errors="*{baseBranch}">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('targetBranch')? 'has-error' :''}">
+              <label for="targetBranch" class="col-sm-3 control-label">ターゲット</label>
+              <div class="col-sm-9">
+                <select class="form-control select2" title="targetBranch" id="targetBranch" th:remove="all-but-first" th:field="*{targetBranch}">
+                  <!--/*@thymesVar id="b" type="java.lang.String"*/-->
+                  <option selected="selected" th:each="b : ${branch}" th:text="${b}" th:value="${b}">hoge</option>
+                </select>
+                <p class="help-block" th:if="${#fields.hasErrors('targetBranch')}" th:errors="*{targetBranch}">エラーメッセージ</p>
+              </div>
+            </div>
+
+            <div class="form-group" th:classappend="${#fields.hasErrors('reviewer')? 'has-error' :''}">
+              <label for="reviewer" class="col-sm-3 control-label">レビュアー</label>
+              <div class="col-sm-9">
+                <select class="form-control select2" title="reviewer" id="reviewer" th:remove="all-but-first" th:field="*{reviewer}">
+                  <!--/*@thymesVar id="u" type="net.orekyuu.workbench.entity.User"*/-->
+                  <option selected="selected" th:each="u : ${member}" th:text="${u.name}"
+                          th:selected="${#authentication.principal.user.id == u.id}" th:value="${u.id}">hoge</option>
+                </select>
+                <p class="help-block" th:if="${#fields.hasErrors('reviewer')}" th:errors="*{reviewer}">エラーメッセージ</p>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="box-footer">
+            <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-check"></i><span th:text="#{html.user.new_project.ok}">OK</span></button>
+          </div>
+
+        </form>
+      </div>
+
+    </section>
+  </div><!-- end content -->
+
+
+  <div th:replace="user/project/fragment/project-page-content :: project-page-footer" ></div>
+
+
+</div><!-- end wrapper -->
+<div th:replace="user/project/fragment/project-page-content :: project-page-script" ></div>
+<!-- Select2 -->
+<script src="../../../static/plugins/select2/select2.full.min.js" th:src="@{/plugins/select2/select2.full.min.js}"></script>
+<script>
+  $(function () {
+    //select2
+    $(".select2").select2();
+  });
+</script>
+</body>
+</html>

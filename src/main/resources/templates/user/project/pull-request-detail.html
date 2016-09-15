@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <title>Workbench</title>
   <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css" />
+  <link href="../../../static/css/diff.css" rel="stylesheet" type="text/css"
+        th:href="@{/css/diff.css}"/>
 </head>
 <body class="skin-blue">
 <div class="wrapper">
@@ -45,32 +47,48 @@
 <div th:replace="user/project/fragment/project-page-content :: project-page-script" ></div>
 <script th:inline="javascript">
   $(function () {
-    var source = new EventSource("/rest/pull-request/diff?projectId=java&base=develop&target=master", { withCredentials: true });
+    var projectId = [[${projectId}]];
+    var baseBranch = [[${pullRequest.baseBranch}]];
+    var targetBranch = [[${pullRequest.targetBranch}]];
+
+    var source = new EventSource("/rest/pull-request/diff?projectId=" + projectId + "&base=" + baseBranch + "&target=" + targetBranch, { withCredentials: true });
     source.onmessage = function(event) {
-      var lines = JSON.parse(event.data).lines;
-      var table = '<table style="padding-bottom: 100px">';
+      var data = JSON.parse(event.data);
+      var lines = data.lines;
+
+      var diff = '<div class="file-diff">';
+      var header = '<div class="file-diff-header">' + data.fileName + '</div>';
+      diff += header;
+
+      diff += '<div class="file-diff-content">';
+
       for (var i = 0; i < lines.length; i++) {
+        var line = '<div class="line">';
+        var gutter = '<div class="gutter">';
+        gutter += '<div class="line-num line-num-a" >' + (lines[i].oldLineNum == -1 ? ' ' : + lines[i].oldLineNum) + '</div>';
+        gutter += '<div class="line-num line-num-b" >' + (lines[i].newLineNum == -1 ? ' ' : + lines[i].newLineNum) + '</div>';
+        gutter += '</div>';
+        line += gutter;
+
         var color = '';
         if (lines[i].change === 'add') {
-          color = 'background-color: green;'
+          color = 'line-add';
         }
         if (lines[i].change === 'delete') {
-          color = 'background-color: red;'
+          color = 'line-remove';
         }
 
-        var row = '<tr>';
-        row += '<td style="width: 10px;' + color + '">' + (lines[i].oldLineNum == -1 ? '' : + lines[i].oldLineNum) +  '</td>';
-        row += '<td style="' + color + '">|</td>';
-        row += '<td style="width: 10px;' + color + '">' + (lines[i].newLineNum == -1 ? '' : + lines[i].newLineNum) +  '</td>';
-        row += '<td style="' + color + '">|</td>';
-        row += '<td style="' + color + '">' + lines[i].content + '</td>';   row += '</tr>';
-
-        table += row;
+        var lineContent = '<pre class="line-content ' + color + '">' + lines[i].content + '</pre>';
+        line += lineContent;
+        line += '</div>';
+        diff += line;
       }
-      table += '</table>';
-      table += '<hr/>';
-      $('#diff').append(table);
+
+      diff += '</div>';
+      diff += '</div>';
+      $('#diff').append(diff);
     };
+
     source.onerror = function (event) {
       source.close();
     };

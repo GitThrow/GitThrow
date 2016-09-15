@@ -62,4 +62,19 @@ public class TicketModel {
     public String getStatus() {
         return status;
     }
+
+    @Override
+    public String toString() {
+        return "TicketModel{" +
+            "number=" + number +
+            ", title='" + title + '\'' +
+            ", type='" + type + '\'' +
+            ", priority='" + priority + '\'' +
+            ", status='" + status + '\'' +
+            ", desc='" + desc + '\'' +
+            ", limit='" + limit + '\'' +
+            ", assignUserId='" + assignUserId + '\'' +
+            ", proponentUserId='" + proponentUserId + '\'' +
+            '}';
+    }
 }

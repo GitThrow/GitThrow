@@ -1,16 +1,5 @@
 package net.orekyuu.workbench.service.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
-
 import difflib.Chunk;
 import difflib.Delta;
 import difflib.DiffUtils;
@@ -25,11 +14,6 @@ import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.lib.*;
-import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectLoader;
-import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -49,8 +33,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
-import net.orekyuu.workbench.service.RemoteRepositoryService;
-import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 
 public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
 
@@ -238,7 +220,8 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
                 newLineNum++;
             }
 
-            return new FileDiff("hoge.txt", lines);
+            String fileName = entry.getNewPath().equals("/dev/null") ? entry.getOldPath() : entry.getNewPath();
+            return new FileDiff(fileName, lines);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -280,6 +263,16 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
                 parser.reset(reader, tree.getId());
             }
             return parser;
+        }
+    }
+
+    @Override
+    public List<String> findBranch(String projectId) {
+        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId))) {
+            Git git = new Git(repository);
+            return git.branchList().call().stream().map(Ref::getName).collect(Collectors.toList());
+        } catch (IOException | GitAPIException e) {
+            throw new RuntimeException(e);
         }
     }
 }

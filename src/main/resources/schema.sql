@@ -133,6 +133,20 @@ CREATE TABLE IF NOT EXISTS `ticket_number` (
   CONSTRAINT `ticket_number_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`)
 );
 
+/*開いているプルリクエスト*/
+CREATE TABLE IF NOT EXISTS `open_pull_request` (
+  `project`     VARCHAR(32)  NOT NULL,
+  `pr_num`      INT          NOT NULL,
+  `title`       VARCHAR(128) NOT NULL,
+  `description` TEXT         NOT NULL, /* TEXTにデフォルト値を設定できないので、コード側で対応 */
+  `reviewer`    VARCHAR(32)  NOT NULL,
+  `proponent`   VARCHAR(32)  NOT NULL,
+  `base_branch`   VARCHAR(256)  NOT NULL,
+  `target_branch`   VARCHAR(256)  NOT NULL,
+  CONSTRAINT `open_pull_request_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`),
+  PRIMARY KEY (`project`, `pr_num`)
+);
+
 /* ビルドの設定 */
 CREATE TABLE IF NOT EXISTS `build_settings` (
   `project`       VARCHAR(32) PRIMARY KEY,
