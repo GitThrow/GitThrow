@@ -23,7 +23,6 @@ public final class JobMessenger {
 
     JobMessenger(SseEmitter emitter, UUID jobId, Consumer<Exception> exceptionConsumer) {
         Objects.requireNonNull(jobId);
-        Objects.requireNonNull(emitter);
 
         this.emitter = emitter;
         this.exceptionConsumer = exceptionConsumer;
@@ -40,18 +39,19 @@ public final class JobMessenger {
      * @param message 送信するメッセージ
      */
     public void send(JobMessage message) {
-
+        message.setJobId(jobId.toString());
+        logger.info(String.format("[%s] start: %s", jobId.toString(), Objects.toString(message, "null")));
         try {
-            message.setJobId(jobId.toString());
-            logger.info(String.format("[%s] start: %s", jobId.toString(), Objects.toString(message, "null")));
-            if (isOpen) {
+            if (isOpen && emitter != null) {
                 emitter.send(message, MediaType.APPLICATION_JSON);
             }
         } catch (IOException | IllegalStateException e) {
             isOpen = false;
             logger.info(String.format("[%s] disconnect", jobId.toString()));
             exceptionConsumer.accept(e);
-            emitter.completeWithError(e);
+            if (emitter != null) {
+                emitter.completeWithError(e);
+            }
         }
     }
 }

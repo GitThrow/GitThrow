@@ -3,11 +3,9 @@ package net.orekyuu.workbench.job.task;
 import net.orekyuu.workbench.job.JobContinuesImpossibleException;
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
-import net.orekyuu.workbench.job.message.LogMessage;
 import net.orekyuu.workbench.service.RemoteRepositoryService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.ProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,30 +45,7 @@ public class GitCloneTask implements Task {
                 .setBare(false)
                 .setURI("file://" + remoteRepositoryDir.toAbsolutePath().toString())
                 .setCloneAllBranches(true)
-                .setProgressMonitor(new ProgressMonitor() {
-                    @Override
-                    public void start(int i) {
-                    }
-
-                    @Override
-                    public void beginTask(String s, int i) {
-                        messenger.send(new LogMessage(s));
-                    }
-
-                    @Override
-                    public void update(int i) {
-
-                    }
-
-                    @Override
-                    public void endTask() {
-                    }
-
-                    @Override
-                    public boolean isCancelled() {
-                        return false;
-                    }
-                })
+                .setProgressMonitor(new SimpleLogProgressMonitor(messenger))
                 .setBranch(branch == null ? "mater" : branch)
                 .call();
             git.close();
