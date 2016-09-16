@@ -17,20 +17,50 @@
   <!-- content -->
   <div class="content-wrapper">
 
-    <!-- コンテンツヘッダ -->
     <section class="content-header">
-      <h1>TODO 名前つける</h1>
     </section>
 
-    <!-- メインコンテンツ -->
     <section class="content">
 
-      <!-- コンテンツ1 -->
+      <!--/*@thymesVar id="pullRequest" type="net.orekyuu.workbench.service.PullRequestModel"*/-->
       <div class="box">
         <div class="box-header with-border">
-          <h3 class="box-title">PR</h3>
+          <h3 class="box-title" th:text="|#${pullRequest.number} ${pullRequest.title}|">タイトル</h3>
         </div>
         <div class="box-body">
+          <div class="row">
+            <!--/* 説明文 */-->
+            <div id="desc" class="col-sm-8">
+            </div>
+            <!--/* 情報表示用のカラム */-->
+            <div class="col-sm-4">
+              <div class="form-group">
+                <button id="merge" class="btn btn-primary" style="width: 100%" th:disabled="${pullRequest.conflict}">マージ</button>
+              </div>
+              <hr>
+              <div class="form-group">
+                <label class="control-label">作成者</label>
+                <div th:text="${pullRequest.proponent}">admin</div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label">レビュアー</label>
+                <div th:text="${pullRequest.reviewer}">admin</div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label">ベースブランチ</label>
+                <div th:text="${pullRequest.baseBranch}">admin</div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label">ターゲットブランチ</label>
+                <div th:text="${pullRequest.targetBranch}">admin</div>
+              </div>
+
+            </div>
+          </div>
+          <hr>
           <div id="diff">
           </div>
         </div>
@@ -45,8 +75,13 @@
 
 </div><!-- end wrapper -->
 <div th:replace="user/project/fragment/project-page-content :: project-page-script" ></div>
+<!-- marked.js -->
+<script src="../../../static/plugins/marked/marked.min.js" th:src="@{/plugins/marked/marked.min.js}"></script>
+<script src="../../../static/js/highlight.pack.js" th:src="@{/js/highlight.pack.js}"></script>
+
 <script th:inline="javascript">
   $(function () {
+    //Diff
     var projectId = [[${projectId}]];
     var baseBranch = [[${pullRequest.baseBranch}]];
     var targetBranch = [[${pullRequest.targetBranch}]];
@@ -92,6 +127,26 @@
     source.onerror = function (event) {
       source.close();
     };
+
+    //marked.js
+    marked.setOptions({
+      sanitize:true,
+      highlight: function(code, lang) {
+        return hljs.highlightAuto(code, [lang]).value;
+      }
+    });
+    $('#desc').html(marked([[${pullRequest.description}]]));
+
+    //マージ
+    $('#merge').click(function (e) {
+      $('#merge').prop('disabled', true);
+
+      var mergeEeventSource = new EventSource("/rest/job/merge?projectId=" + projectId + "&base=" + baseBranch + "&target=" + targetBranch, { withCredentials: true });
+      mergeEeventSource.onerror = function (e) {
+        mergeEeventSource.close();
+      };
+      window.location.href = '/project/' + projectId + '/pull-request/';
+    })
   });
 </script>
 

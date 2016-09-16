@@ -25,7 +25,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class PullRequestController {
@@ -55,7 +57,9 @@ public class PullRequestController {
         List<User> projectMember = projectService.findProjectMember(projectId);
         model.addAttribute("member", projectMember);
 
-        List<String> branch = remoteRepositoryService.findBranch(projectId);
+        List<String> branch = remoteRepositoryService.findBranch(projectId).stream()
+            .map(str -> str.substring("refs/heads/".length()))
+            .collect(Collectors.toList());
         model.addAttribute("branch", branch);
         return "user/project/new-pull-request";
     }
@@ -99,14 +103,18 @@ public class PullRequestController {
 
     static class NewPullRequestForm {
         @NotNull
+        @Size(min = 1, max = 128)
         private String title;
         @NotNull
         private String desc;
         @NotNull
+        @Size(min = 1, max = 256)
         private String baseBranch;
         @NotNull
+        @Size(min = 1, max = 256)
         private String targetBranch;
         @NotNull
+        @Size(min = 1, max = 32)
         private String reviewer;
 
         public String getTitle() {

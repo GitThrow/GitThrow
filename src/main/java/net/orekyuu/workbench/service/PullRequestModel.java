@@ -8,6 +8,7 @@ public class PullRequestModel {
     private String proponent;
     private String baseBranch;
     private String targetBranch;
+    private boolean conflict;
 
     public PullRequestModel(int number, String title, String description, String reviewer, String proponent, String baseBranch, String targetBranch) {
         this.number = number;
@@ -45,6 +46,10 @@ public class PullRequestModel {
 
     public String getTargetBranch() {
         return targetBranch;
+    }
+
+    public boolean isConflict() {
+        return conflict;
     }
 
     @Override

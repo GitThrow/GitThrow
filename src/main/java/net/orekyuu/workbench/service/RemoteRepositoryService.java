@@ -52,6 +52,15 @@ public interface RemoteRepositoryService {
     List<DiffEntry> diff(String projectId, String baseBranch, String targetBranch) throws GitAPIException;
 
     /**
+     * マージが出来るかチェックします
+     * @param projectId プロジェクトID
+     * @param baseBranch ベースのブランチ
+     * @param targetBranch ターゲットのブランチ
+     * @return マージできるならtrue
+     */
+    boolean checkConflict(String projectId, String baseBranch, String targetBranch);
+
+    /**
      * ファイルDiffを求める
      * @param projectId プロジェクトID
      * @param entry DiffEntry

@@ -44,7 +44,6 @@ public class JobRestController {
         MergeJob job = mergeJob();
         job.setTargetBranch(target);
         job.setBaseBranch(base);
-        job.setDeleteBranch(true);
         job.start(emitter, projectId, principal.getUser());
         return emitter;
     }

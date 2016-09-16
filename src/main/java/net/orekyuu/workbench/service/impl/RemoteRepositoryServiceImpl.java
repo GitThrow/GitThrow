@@ -14,6 +14,8 @@ import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.lib.*;
+import org.eclipse.jgit.merge.MergeStrategy;
+import org.eclipse.jgit.merge.ThreeWayMerger;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -161,9 +163,21 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
     }
 
     @Override
+    public boolean checkConflict(String projectId, String baseBranch, String targetBranch) {
+        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId))) {
+            ObjectId base = repository.resolve(baseBranch);
+            ObjectId target = repository.resolve(targetBranch);
+
+            ThreeWayMerger merger = MergeStrategy.RECURSIVE.newMerger(repository, true);
+            return merger.merge(base, target);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    @Override
     public FileDiff calcFileDiff(String projectId, DiffEntry entry) throws GitAPIException {
         try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId))) {
-
 
             //ファイルの内容を持ってくる
             byte[] newContentBytes = entry.getNewPath().equals("/dev/null") ? null :readContentFromId(repository, entry.getNewId().toObjectId());
