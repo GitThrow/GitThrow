@@ -8,11 +8,13 @@ import net.orekyuu.workbench.job.task.TaskArguments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Future;
 
 /**
  * Workbenchで行うジョブの親
@@ -68,9 +70,11 @@ public abstract class Job {
     /**
      * ジョブを開始します。
      * @param emitter SseEmitter
+     * @param projectId プロジェクトID
+     * @param user ジョブを実行するユーザー
      */
     @Async
-    public void start(SseEmitter emitter, String projectId, User user) {
+    public Future<Void> start(SseEmitter emitter, String projectId, User user) {
         init(projectId, user);
         emitter.onTimeout(() -> {
             System.out.println("timeout");
@@ -105,6 +109,7 @@ public abstract class Job {
         messenger.send(new JobStateMessage(result, message));
 
         emitter.complete();
+        return new AsyncResult<>(null);
     }
 
     /**

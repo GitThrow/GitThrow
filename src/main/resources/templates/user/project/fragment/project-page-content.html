@@ -70,7 +70,7 @@
         <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/?$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}|">
           <i class="fa fa-dashboard"></i> <span>ダッシュボード</span>
         </a></li>
-        <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/pullrequest.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/pullrequest|">
+        <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/pull-request.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/pull-request|">
           <i class="fa fa-code-fork"></i> <span>プルリクエスト</span>
         </a></li>
         <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/ticket.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/ticket|">

@@ -21,12 +21,22 @@ public class BuildJob extends Job {
     @Autowired
     private CleanWorkspaceTask cleanWorkspaceTask;
 
+    private String branch = "master";
+
     @Override
     protected void onInit() {
-        cloneTask.setBranch("master");
+        cloneTask.setBranch(branch);
         addTask(cloneTask);
         addTask(buildTask);
         addTask(artifactTask);
         addTask(cleanWorkspaceTask);
+    }
+
+    /**
+     * ビルドするブランチを指定します
+     * @param branch ビルドするブランチ
+     */
+    public void setBranch(String branch) {
+        this.branch = branch;
     }
 }

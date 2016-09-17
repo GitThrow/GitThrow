@@ -69,6 +69,11 @@ public class BeanConfig {
     }
 
     @Bean
+    public PullRequestService pullRequestService() {
+        return new PullRequestServiceImpl();
+    }
+
+    @Bean
     @Primary
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();

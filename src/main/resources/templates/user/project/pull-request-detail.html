@@ -1,0 +1,154 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Workbench</title>
+  <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css" />
+  <link href="../../../static/css/diff.css" rel="stylesheet" type="text/css"
+        th:href="@{/css/diff.css}"/>
+</head>
+<body class="skin-blue">
+<div class="wrapper">
+
+  <div th:replace="user/project/fragment/project-page-content :: project-page-topmenu" ></div>
+  <div th:replace="user/project/fragment/project-page-content :: project-page-sidebar" ></div>
+
+
+  <!-- content -->
+  <div class="content-wrapper">
+
+    <section class="content-header">
+    </section>
+
+    <section class="content">
+
+      <!--/*@thymesVar id="pullRequest" type="net.orekyuu.workbench.service.PullRequestModel"*/-->
+      <div class="box">
+        <div class="box-header with-border">
+          <h3 class="box-title" th:text="|#${pullRequest.number} ${pullRequest.title}|">タイトル</h3>
+        </div>
+        <div class="box-body">
+          <div class="row">
+            <!--/* 説明文 */-->
+            <div id="desc" class="col-sm-8">
+            </div>
+            <!--/* 情報表示用のカラム */-->
+            <div class="col-sm-4">
+              <div class="form-group">
+                <button id="merge" class="btn btn-primary" style="width: 100%" th:disabled="${pullRequest.conflict}">マージ</button>
+              </div>
+              <hr>
+              <div class="form-group">
+                <label class="control-label">作成者</label>
+                <div th:text="${pullRequest.proponent}">admin</div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label">レビュアー</label>
+                <div th:text="${pullRequest.reviewer}">admin</div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label">ベースブランチ</label>
+                <div th:text="${pullRequest.baseBranch}">admin</div>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label">ターゲットブランチ</label>
+                <div th:text="${pullRequest.targetBranch}">admin</div>
+              </div>
+
+            </div>
+          </div>
+          <hr>
+          <div id="diff">
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div><!-- end content -->
+
+
+  <div th:replace="user/project/fragment/project-page-content :: project-page-footer" ></div>
+
+
+</div><!-- end wrapper -->
+<div th:replace="user/project/fragment/project-page-content :: project-page-script" ></div>
+<!-- marked.js -->
+<script src="../../../static/plugins/marked/marked.min.js" th:src="@{/plugins/marked/marked.min.js}"></script>
+<script src="../../../static/js/highlight.pack.js" th:src="@{/js/highlight.pack.js}"></script>
+
+<script th:inline="javascript">
+  $(function () {
+    //Diff
+    var projectId = [[${projectId}]];
+    var baseBranch = [[${pullRequest.baseBranch}]];
+    var targetBranch = [[${pullRequest.targetBranch}]];
+
+    var source = new EventSource("/rest/pull-request/diff?projectId=" + projectId + "&base=" + baseBranch + "&target=" + targetBranch, { withCredentials: true });
+    source.onmessage = function(event) {
+      var data = JSON.parse(event.data);
+      var lines = data.lines;
+
+      var diff = '<div class="file-diff">';
+      var header = '<div class="file-diff-header">' + data.fileName + '</div>';
+      diff += header;
+
+      diff += '<div class="file-diff-content">';
+
+      for (var i = 0; i < lines.length; i++) {
+        var line = '<div class="line">';
+        var gutter = '<div class="gutter">';
+        gutter += '<div class="line-num line-num-a" >' + (lines[i].oldLineNum == -1 ? ' ' : + lines[i].oldLineNum) + '</div>';
+        gutter += '<div class="line-num line-num-b" >' + (lines[i].newLineNum == -1 ? ' ' : + lines[i].newLineNum) + '</div>';
+        gutter += '</div>';
+        line += gutter;
+
+        var color = '';
+        if (lines[i].change === 'add') {
+          color = 'line-add';
+        }
+        if (lines[i].change === 'delete') {
+          color = 'line-remove';
+        }
+
+        var lineContent = '<pre class="line-content ' + color + '">' + lines[i].content + '</pre>';
+        line += lineContent;
+        line += '</div>';
+        diff += line;
+      }
+
+      diff += '</div>';
+      diff += '</div>';
+      $('#diff').append(diff);
+    };
+
+    source.onerror = function (event) {
+      source.close();
+    };
+
+    //marked.js
+    marked.setOptions({
+      sanitize:true,
+      highlight: function(code, lang) {
+        return hljs.highlightAuto(code, [lang]).value;
+      }
+    });
+    $('#desc').html(marked([[${pullRequest.description}]]));
+
+    //マージ
+    $('#merge').click(function (e) {
+      $('#merge').prop('disabled', true);
+
+      var mergeEeventSource = new EventSource("/rest/job/merge?projectId=" + projectId + "&base=" + baseBranch + "&target=" + targetBranch, { withCredentials: true });
+      mergeEeventSource.onerror = function (e) {
+        mergeEeventSource.close();
+      };
+      window.location.href = '/project/' + projectId + '/pull-request/';
+    })
+  });
+</script>
+
+</body>
+</html>
