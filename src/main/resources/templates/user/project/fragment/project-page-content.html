@@ -88,7 +88,10 @@
         <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/settings.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/settings|">
           <i class="fa fa-gear"></i> <span>設定</span>
         </a></li>
-        <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/admin-settings.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/admin-settings|">
+        <li class=""
+            th:if="${project.ownerUserId.equals(#authentication.principal.user.id)}"
+            th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/admin-settings.*$')} ? 'active'">
+          <a href="" th:href="|@{/project/}${project.id}/admin-settings|">
           <i class="fa fa-wrench"></i> <span>管理者設定</span>
         </a></li>
       </ul>

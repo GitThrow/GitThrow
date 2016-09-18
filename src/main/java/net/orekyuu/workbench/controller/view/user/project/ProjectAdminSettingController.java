@@ -4,8 +4,8 @@ import net.orekyuu.workbench.entity.BuildSettings;
 import net.orekyuu.workbench.entity.Project;
 import net.orekyuu.workbench.entity.TestSettings;
 import net.orekyuu.workbench.entity.User;
-import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
+import net.orekyuu.workbench.infra.ProjectOwnerOnly;
 import net.orekyuu.workbench.service.ProjectService;
 import net.orekyuu.workbench.service.ProjectSettingService;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
@@ -37,13 +37,13 @@ public class ProjectAdminSettingController {
         return projectMember;
     }
 
-    @ProjectMemberOnly
+    @ProjectOwnerOnly
     @GetMapping("/project/{projectId}/admin-settings")
     public String show(@ProjectName @PathVariable String projectId) {
         return "user/project/admin-setting";
     }
 
-    @ProjectMemberOnly
+    @ProjectOwnerOnly
     @PostMapping("/project/{projectId}/admin-settings/build-settings")
     public String updateBuildSettings(@ProjectName @PathVariable String projectId,
                                       @Valid BuildSettingsForm form, BindingResult result,
@@ -83,6 +83,7 @@ public class ProjectAdminSettingController {
     }
 
     //メンバーの削除
+    @ProjectOwnerOnly
     @PostMapping(value = "/project/{projectId}/admin-settings/member/delete", params = "delete")
     public String deleteMember(@ProjectName @PathVariable String projectId, @RequestParam String delete) throws ProjectNotFoundException {
         Project project = projectService.findById(projectId).get();
@@ -95,6 +96,7 @@ public class ProjectAdminSettingController {
     }
 
     @PostMapping(value = "/project/{projectId}/admin-settings/member/new")
+    @ProjectOwnerOnly
     public String newMember(@ProjectName @PathVariable String projectId, @RequestParam("newMemberId") String newMemberId) {
         if (projectService.isJoined(projectId, newMemberId)) {
             logger.info("すでに参加済み");
