@@ -64,7 +64,7 @@
             </div>
 
             <div class="form-group" th:classappend="${#fields.hasErrors('targetBranch')? 'has-error' :''}">
-              <label for="targetBranch" class="col-sm-3 control-label">ターゲット</label>
+              <label for="targetBranch" class="col-sm-3 control-label">対象ブランチ</label>
               <div class="col-sm-9">
                 <select class="form-control select2" title="targetBranch" id="targetBranch" th:remove="all-but-first" th:field="*{targetBranch}">
                   <!--/*@thymesVar id="b" type="java.lang.String"*/-->

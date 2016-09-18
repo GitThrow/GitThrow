@@ -1,9 +1,6 @@
 package net.orekyuu.workbench.job;
 
-import net.orekyuu.workbench.job.task.CleanWorkspaceTask;
-import net.orekyuu.workbench.job.task.GitCloneTask;
-import net.orekyuu.workbench.job.task.MergeTask;
-import net.orekyuu.workbench.job.task.PushTask;
+import net.orekyuu.workbench.job.task.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -20,12 +17,15 @@ public class MergeJob extends Job {
     private MergeTask mergeTask;
     @Autowired
     private PushTask pushTask;
+    @Autowired
+    private ClosePullRequestTask closePullRequestTask;
 
     @Autowired
     private CleanWorkspaceTask cleanWorkspaceTask;
 
     private String baseBranch;
     private String targetBranch;
+    private int prNum = -1;
 
     @Override
     protected void onInit() {
@@ -39,6 +39,10 @@ public class MergeJob extends Job {
         addTask(cloneTask);
         addTask(mergeTask);
         addTask(pushTask);
+        if (0 < prNum) {
+            closePullRequestTask.setPrNum(prNum);
+            addTask(closePullRequestTask);
+        }
         addTask(cleanWorkspaceTask);
     }
 
@@ -48,5 +52,9 @@ public class MergeJob extends Job {
 
     public void setTargetBranch(String targetBranch) {
         this.targetBranch = targetBranch;
+    }
+
+    public void setClosePullRequestNum(int num) {
+        prNum = num;
     }
 }

@@ -9,8 +9,9 @@ public class PullRequestModel {
     private String baseBranch;
     private String targetBranch;
     private boolean conflict;
+    private boolean closed;
 
-    public PullRequestModel(int number, String title, String description, String reviewer, String proponent, String baseBranch, String targetBranch) {
+    public PullRequestModel(int number, String title, String description, String reviewer, String proponent, String baseBranch, String targetBranch, boolean closed) {
         this.number = number;
         this.title = title;
         this.description = description;
@@ -18,6 +19,7 @@ public class PullRequestModel {
         this.proponent = proponent;
         this.baseBranch = baseBranch;
         this.targetBranch = targetBranch;
+        this.closed = closed;
     }
 
     public int getNumber() {
@@ -52,6 +54,10 @@ public class PullRequestModel {
         return conflict;
     }
 
+    public boolean isClosed() {
+        return closed;
+    }
+
     @Override
     public String toString() {
         return "PullRequestModel{" +
@@ -62,6 +68,8 @@ public class PullRequestModel {
             ", proponent='" + proponent + '\'' +
             ", baseBranch='" + baseBranch + '\'' +
             ", targetBranch='" + targetBranch + '\'' +
+            ", conflict=" + conflict +
+            ", closed=" + closed +
             '}';
     }
 }

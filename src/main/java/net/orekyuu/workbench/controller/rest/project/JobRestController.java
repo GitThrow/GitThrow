@@ -35,6 +35,7 @@ public class JobRestController {
     public SseEmitter merge(@RequestParam("projectId") String projectId,
                             @RequestParam("base") String base,
                             @RequestParam("target") String target,
+                            @RequestParam("prNum") int prNum,
                             @AuthenticationPrincipal WorkbenchUserDetails principal) {
 
         if (!projectService.isJoined(projectId, principal.getUser().id)) {
@@ -44,6 +45,7 @@ public class JobRestController {
         MergeJob job = mergeJob();
         job.setTargetBranch(target);
         job.setBaseBranch(base);
+        job.setClosePullRequestNum(prNum);
         job.start(emitter, projectId, principal.getUser());
         return emitter;
     }

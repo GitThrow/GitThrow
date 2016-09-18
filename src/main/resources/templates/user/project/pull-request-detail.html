@@ -35,7 +35,9 @@
             <!--/* 情報表示用のカラム */-->
             <div class="col-sm-4">
               <div class="form-group">
-                <button id="merge" class="btn btn-primary" style="width: 100%" th:disabled="${pullRequest.conflict}">マージ</button>
+                <button id="merge" class="btn btn-primary" style="width: 100%" th:if="${!(pullRequest.conflict||pullRequest.closed)}">マージ</button>
+                <button class="btn" style="width: 100%" disabled th:if="${pullRequest.closed}">マージ済み</button>
+                <button class="btn" style="width: 100%" disabled th:if="${pullRequest.conflict}">コンフリクト</button>
               </div>
               <hr>
               <div class="form-group">
@@ -49,12 +51,12 @@
               </div>
 
               <div class="form-group">
-                <label class="control-label">ベースブランチ</label>
+                <label class="control-label">ベース</label>
                 <div th:text="${pullRequest.baseBranch}">admin</div>
               </div>
 
               <div class="form-group">
-                <label class="control-label">ターゲットブランチ</label>
+                <label class="control-label">対象</label>
                 <div th:text="${pullRequest.targetBranch}">admin</div>
               </div>
 
@@ -85,6 +87,7 @@
     var projectId = [[${projectId}]];
     var baseBranch = [[${pullRequest.baseBranch}]];
     var targetBranch = [[${pullRequest.targetBranch}]];
+    var prNum = [[${pullRequest.number}]];
 
     var source = new EventSource("/rest/pull-request/diff?projectId=" + projectId + "&base=" + baseBranch + "&target=" + targetBranch, { withCredentials: true });
     source.onmessage = function(event) {
@@ -141,7 +144,7 @@
     $('#merge').click(function (e) {
       $('#merge').prop('disabled', true);
 
-      var mergeEeventSource = new EventSource("/rest/job/merge?projectId=" + projectId + "&base=" + baseBranch + "&target=" + targetBranch, { withCredentials: true });
+      var mergeEeventSource = new EventSource("/rest/job/merge?projectId=" + projectId + "&base=" + baseBranch + "&target=" + targetBranch + '&prNum=' + prNum, { withCredentials: true });
       mergeEeventSource.onerror = function (e) {
         mergeEeventSource.close();
       };

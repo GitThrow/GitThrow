@@ -7,6 +7,7 @@ import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeCommand;
 import org.eclipse.jgit.api.MergeResult;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class MergeTask implements Task {
 
     private String targetBranch;
     private String baseBranch;
+
+    public static final String BASE_COMMIT_HASH_KEY = "MergeTask.baseCommitHash";
+    public static final String TARGET_COMMIT_HASH_KEY = "MergeTask.targetCommitHash";
 
     @Override
     public boolean process(JobMessenger messenger, TaskArguments args) throws Exception {
@@ -48,6 +52,9 @@ public class MergeTask implements Task {
                 return false;
             }
 
+            ObjectId[] mergedCommits = result.getMergedCommits();
+            args.putData(BASE_COMMIT_HASH_KEY, mergedCommits[0].name());
+            args.putData(TARGET_COMMIT_HASH_KEY, mergedCommits[1].name());
         }
         return true;
     }
