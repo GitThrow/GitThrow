@@ -87,15 +87,14 @@
           <h3 class="box-title">メンバー設定</h3>
 
           <div class="box-tools pull-right">
-            <form action="">
-              <select class="form-control select2" title="member" id="member" style="width: 200px;">
-                <option selected="selected" >hoge</option>
+            <form th:action="|@{/project/}${projectId}/admin-settings/member/new|" method="post">
+              <select class="form-control select2" title="users" id="users" name="newMemberId" style="width: 200px;">
               </select>
               <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i><span>追加</span></button>
             </form>
           </div>
         </div>
-        <form action="" class="form-horizontal">
+        <form th:action="|@{/project/}${projectId}/admin-settings/member/delete|" method="post" class="form-horizontal">
           <div class="box-body">
 
             <table class="table table-hover">
@@ -105,12 +104,14 @@
                 <th>ID</th>
                 <th></th>
               </tr>
-              <tr>
-                <td><img src="../../../static/img/user2-160x160.jpg" th:src="|@{/user/icon/}${#authentication.principal.user.id}|" alt="" class="img-circle" width="24"></td>
-                <td>おれきゅう</td>
-                <td>orekyuu</td>
+              <tr th:each="user : ${projectMember}">
+                <!--/*@thymesVar id="user" type="net.orekyuu.workbench.entity.User"*/-->
+                <td><img src="../../../static/img/user2-160x160.jpg" th:src="|@{/user/icon/}${user.id}|" alt="" class="img-circle" width="24"></td>
+                <td th:text="${user.name}">おれきゅう</td>
+                <td th:text="${user.id}">orekyuu</td>
                 <!--管理者は削除できないようにする-->
-                <td><button type="submit" class="btn btn-danger">削除</button></td>　
+                <td><!--/*@thymesVar id="project" type="net.orekyuu.workbench.entity.Project"*/-->
+                <button type="submit" class="btn btn-danger" name="delete" th:value="${user.id}" th:unless="${project.ownerUserId.equals(user.id)}">削除</button></td>　
               </tr>
             </table>
           </div>
@@ -136,7 +137,27 @@
     //select2
     $(".select2").select2();
 
+    var projectMember = /*[[${projectMember}]]*/ [];
+    var projectMemberIds = _.map(projectMember, function (u) {
+      return u.id;
+    });
 
+    //users
+    var $users = $("#users");
+    fetchAllUser().then(function (response) {
+      var rejected = _.reject(response.data, function (user) {
+        return _.contains(projectMemberIds, user.id);
+      });
+
+      var first = false;
+      _.forEach(rejected, function (user) {
+        var selected = first ? 'selected="selected"' : '';
+        first = false;
+
+        var tag = '<option ' + selected + ' value="' + user.id + '">' + user.id + '</option>';
+        $users.append(tag);
+      });
+    });
   });
 </script>
 </body>

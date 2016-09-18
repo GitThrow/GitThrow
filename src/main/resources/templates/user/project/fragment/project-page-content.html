@@ -88,7 +88,10 @@
         <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/settings.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/settings|">
           <i class="fa fa-gear"></i> <span>設定</span>
         </a></li>
-        <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/admin-settings.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/admin-settings|">
+        <li class=""
+            th:if="${project.ownerUserId.equals(#authentication.principal.user.id)}"
+            th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/admin-settings.*$')} ? 'active'">
+          <a href="" th:href="|@{/project/}${project.id}/admin-settings|">
           <i class="fa fa-wrench"></i> <span>管理者設定</span>
         </a></li>
       </ul>
@@ -180,6 +183,7 @@
 
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="../../../../static/js/js.cookie.js" th:src="@{/js/js.cookie.js}"></script>
+  <script src="../../../../static/js/underscore-min.js" th:src="@{/js/underscore-min.js}"></script>
   <script src="../../../../static/js/workbench-rest-api.js" th:src="@{/js/workbench-rest-api.js}"></script>
   <script src="../../../../static/plugins/clipboard/clipboard.min.js" th:src="@{/plugins/clipboard/clipboard.min.js}"></script>
   <script>

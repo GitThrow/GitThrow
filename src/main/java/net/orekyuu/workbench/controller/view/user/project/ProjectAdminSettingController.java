@@ -1,35 +1,49 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
 import net.orekyuu.workbench.entity.BuildSettings;
+import net.orekyuu.workbench.entity.Project;
 import net.orekyuu.workbench.entity.TestSettings;
-import net.orekyuu.workbench.infra.ProjectMemberOnly;
+import net.orekyuu.workbench.entity.User;
 import net.orekyuu.workbench.infra.ProjectName;
+import net.orekyuu.workbench.infra.ProjectOwnerOnly;
+import net.orekyuu.workbench.service.ProjectService;
 import net.orekyuu.workbench.service.ProjectSettingService;
+import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.List;
 
 @Controller
 public class ProjectAdminSettingController {
 
     @Autowired
     private ProjectSettingService projectSettingService;
+    @Autowired
+    private ProjectService projectService;
 
-    @ProjectMemberOnly
+    private static final Logger logger = LoggerFactory.getLogger(ProjectAdminSettingController.class);
+    @ModelAttribute("projectMember")
+    public List<User> projectMember(@PathVariable String projectId) throws ProjectNotFoundException {
+        List<User> projectMember = projectService.findProjectMember(projectId);
+        return projectMember;
+    }
+
+    @ProjectOwnerOnly
     @GetMapping("/project/{projectId}/admin-settings")
     public String show(@ProjectName @PathVariable String projectId) {
         return "user/project/admin-setting";
     }
 
-    @ProjectMemberOnly
+    @ProjectOwnerOnly
     @PostMapping("/project/{projectId}/admin-settings/build-settings")
     public String updateBuildSettings(@ProjectName @PathVariable String projectId,
                                       @Valid BuildSettingsForm form, BindingResult result,
@@ -66,6 +80,44 @@ public class ProjectAdminSettingController {
         form.setTestCommand(testSettings.testCommand);
         form.setXmlPath(testSettings.xmlPath);
         return form;
+    }
+
+    //メンバーの削除
+    @ProjectOwnerOnly
+    @PostMapping(value = "/project/{projectId}/admin-settings/member/delete", params = "delete")
+    public String deleteMember(@ProjectName @PathVariable String projectId, @RequestParam String delete) throws ProjectNotFoundException {
+        Project project = projectService.findById(projectId).get();
+        if (project.ownerUserId.equals(delete)) {
+            logger.info("プロジェクト管理者を削除しようとしたのでスキップ");
+        } else {
+            projectService.withdrawProject(projectId, delete);
+        }
+        return "redirect:/project/" + projectId + "/admin-settings";
+    }
+
+    @PostMapping(value = "/project/{projectId}/admin-settings/member/new")
+    @ProjectOwnerOnly
+    public String newMember(@ProjectName @PathVariable String projectId, @RequestParam("newMemberId") String newMemberId) {
+        if (projectService.isJoined(projectId, newMemberId)) {
+            logger.info("すでに参加済み");
+        } else {
+            projectService.joinToProject(projectId, newMemberId);
+        }
+        return "redirect:/project/" + projectId + "/admin-settings";
+    }
+
+    public static class NewMemberForm {
+        @NotNull
+        @Size(min = 3, max = 32)
+        private String member;
+
+        public String getMember() {
+            return member;
+        }
+
+        public void setMember(String member) {
+            this.member = member;
+        }
     }
 
     public static class BuildSettingsForm {

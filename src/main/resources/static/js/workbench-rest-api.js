@@ -9,3 +9,10 @@ function updateTicket(ticket) {
         }
     });
 }
+
+/**
+ * すべてのユーザーを取得する
+ */
+function fetchAllUser() {
+    return axios.get('/rest/user/all');
+}
