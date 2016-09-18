@@ -15,6 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
@@ -95,6 +97,7 @@ public class PullRequestServiceTest {
     public void testDelete() {
         createPullRequest("test1");
         createPullRequest("test2");
+        pullRequestService.close("project1", 1, "hoge", "hoge");
 
         Assertions.assertThat(pullRequestService.findByProject("project1")).hasSize(2);
 
@@ -108,5 +111,27 @@ public class PullRequestServiceTest {
         createPullRequest("test1");
         createPullRequest("test2");
         Assertions.assertThat(pullRequestService.findByProject("project1")).hasSize(2);
+
+        pullRequestService.close("project1", 1, "hoge", "hoge");
+        Assertions.assertThat(pullRequestService.findByProject("project1")).hasSize(2);
+    }
+
+    @Test
+    public void testClose() {
+        createPullRequest("test1");
+        createPullRequest("test2");
+
+        List<PullRequestModel> list = pullRequestService.findByProject("project1");
+
+        Assertions.assertThat(list)
+            .hasSize(2)
+            .allMatch(model -> !model.isClosed());
+
+        pullRequestService.close("project1", 1, "hoge", "hoge");
+
+        list = pullRequestService.findByProject("project1");
+        Assertions.assertThat(list).hasSize(2);
+        Assertions.assertThat(list.stream().filter(PullRequestModel::isClosed)).hasSize(1);
+
     }
 }
