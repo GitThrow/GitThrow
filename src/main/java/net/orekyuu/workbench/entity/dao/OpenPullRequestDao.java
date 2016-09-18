@@ -20,6 +20,9 @@ public interface OpenPullRequestDao {
     @Delete(sqlFile = true)
     int deleteByProject(String projectId);
 
+    @Delete(sqlFile = true)
+    int delete(String projectId, int prNum);
+
     @Select
     Optional<OpenPullRequest> findByProjectAndNum(String projectId, int prNum);
 

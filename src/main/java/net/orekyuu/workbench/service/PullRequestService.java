@@ -33,4 +33,13 @@ public interface PullRequestService {
      * @param projectId プロジェクトID
      */
     void deleteByProject(String projectId);
+
+    /**
+     * プルリクエストをクローズする
+     * @param projectId プロジェクトID
+     * @param prNum 番号
+     * @param baseCommit ベースブランチのヘッド
+     * @param targetCommit ターゲットブランチのヘッド
+     */
+    void close(String projectId, int prNum, String baseCommit, String targetCommit);
 }
