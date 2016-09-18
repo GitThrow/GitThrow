@@ -94,21 +94,21 @@
     // 外部URL？
     var isCrossOrigin=function(href){
       return /https?:\/\//.test(href);
-    }
+    };
     // 外部URLじゃなければリポジトリのファイル参照する。とりあえずmaster
     var url=function(href){
       if(isCrossOrigin(href)){
     	  return href;
       }
       var _href=href.startsWith('/')?href:'/'+href;
-      var _context=context.endsWith('/')?context:context+'/'
+      var _context=context.endsWith('/')?context:context+'/';
       return _context+'raw/master'+_href;
-    }
+    };
     
     renderer.link=function(href,title,text){
       var markup='<p><a href="'+url(href)+'" title="'+(title||text)+'">'+text+'</a></p>';
       return markup;
-    }
+    };
     renderer.image=function(href,title,text){
         var markup='<img src="'+url(href)+'" alt="'+text+'" title="'+(title||text)+'"/>';
         return markup;
