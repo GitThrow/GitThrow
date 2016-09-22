@@ -107,35 +107,8 @@
           </div>
           <hr>
           <!--コメント-->
-              <!-- Message. Default to the left -->
-              <div class="direct-chat-msg">
-                <div class="direct-chat-info clearfix">
-                  <span class="direct-chat-name pull-left">Alexander Pierce</span>
-                  <span class="direct-chat-timestamp pull-right">23 Jan 2:00 pm</span>
-                </div>
-                <!-- /.direct-chat-info -->
-                <img class="direct-chat-img" src="../dist/img/user1-128x128.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
-                <div class="direct-chat-text">
-                  Is this template really for free? That's unbelievable!
-                </div>
-                <!-- /.direct-chat-text -->
-              </div>
-              <!-- /.direct-chat-msg -->
-
-              <!-- Message to the right -->
-              <div class="direct-chat-msg right">
-                <div class="direct-chat-info clearfix">
-                  <span class="direct-chat-name pull-right">Sarah Bullock</span>
-                  <span class="direct-chat-timestamp pull-left">23 Jan 2:05 pm</span>
-                </div>
-                <!-- /.direct-chat-info -->
-                <img class="direct-chat-img" src="../dist/img/user3-128x128.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
-                <div class="direct-chat-text">
-                  You better believe it!
-                </div>
-                <!-- /.direct-chat-text -->
-              </div>
-              <!-- /.direct-chat-msg -->
+          <div id="comments">
+          </div>
           <!--コメント-->
           <hr>
 
@@ -232,6 +205,31 @@
       updateTicket(ticket);
     }
 
+    var $comments = $('#comments');
+    fetchTicketComment([[${project.id}]], [[${ticket.number}]])
+      .then(function (response) {
+        _.chain(response.data).map(function (comment) {
+          comment.text = marked(comment.text);
+          comment.isSelf = comment.userId === /*[[${#authentication.principal.user.id}]]*/"hoge";
+          return comment;
+        }).map(function (comment) {
+          var str = '<div class="direct-chat-msg ' + (comment.isSelf ? '' : 'right') + '">';
+          str += '<div class="direct-chat-info clearfix">';
+          str += '<span class="direct-chat-name pull-left">' + comment.userName + '(id: ' + comment.userId + ')</span>';
+          str += '<span class="direct-chat-timestamp pull-right">' + comment.createdAt + '</span>';
+          str += '</div>';
+          str += '<img class="direct-chat-img" src="/user/icon/' + comment.userId + '">';
+          str += '<div class="direct-chat-text">';
+          str += comment.text;
+          str += '</div>';
+          str += '</div>';
+          return str;
+        }).each(function (comment) {
+          $comments.append(comment);
+        })
+      }).catch(function (e) {
+        console.log(e);
+      });
   });
 </script>
 </body>
