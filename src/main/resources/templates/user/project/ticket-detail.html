@@ -5,7 +5,8 @@
   <title>Workbench</title>
   <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css"/>
   <!-- Select2 -->
-  <link rel="stylesheet" href="../../../static/plugins/select2/select2.min.css" th:href="@{/plugins/select2/select2.min.css}">
+  <link rel="stylesheet" href="../../../static/plugins/select2/select2.min.css"
+        th:href="@{/plugins/select2/select2.min.css}">
   <link rel="stylesheet" href="../../../static/css/github-markdown.css" th:href="@{/css/github-markdown.css}">
   <link rel="stylesheet" href="../../../static/css/highlight/default.css" th:href="@{/css/highlight/default.css}">
 </head>
@@ -31,9 +32,10 @@
       <!-- コンテンツ1 -->
       <div class="box">
         <div class="box-header with-border">
-            <h3 class="box-title" th:text="${ticket.title}" id="title">チケットタイトル</h3>
-          </div>
-          <div class="box-body">
+          <h3 class="box-title" th:text="${ticket.title}" id="title">チケットタイトル</h3>
+        </div>
+        <div class="box-body">
+          <div class="row">
             <div class="col-sm-8 markdown-body" id="desc">
 
             </div>
@@ -50,7 +52,8 @@
                   <select class="form-control select2" title="assign" id="assign" th:remove="all-but-first">
                     <!--/*@thymesVar id="u" type="net.orekyuu.workbench.entity.User"*/-->
                     <option selected="selected" th:each="u : ${member}" th:text="${u.name}"
-                            th:selected="${u.id.equals(ticket.assignUserId)}" th:value="${u.id}">hoge</option>
+                            th:selected="${u.id.equals(ticket.assignUserId)}" th:value="${u.id}">hoge
+                    </option>
                   </select>
                 </div>
               </div>
@@ -60,7 +63,8 @@
                   <select class="form-control" title="type" id="type">
                     <!--/*@thymesVar id="type" type="net.orekyuu.workbench.entity.TicketType"*/-->
                     <option th:each="type : ${typeList}" th:text="${type.type}"
-                            th:value="${type.id}" th:selected="${type.type.equals(ticket.type)}">hoge</option>
+                            th:value="${type.id}" th:selected="${type.type.equals(ticket.type)}">hoge
+                    </option>
                   </select>
                 </div>
               </div>
@@ -70,7 +74,8 @@
                   <select class="form-control" title="priority" id="priority">
                     <!--/*@thymesVar id="priority" type="net.orekyuu.workbench.entity.TicketPriority"*/-->
                     <option th:each="priority : ${priorityList}" th:text="${priority.priority}"
-                            th:value="${priority.id}" th:selected="${priority.priority.equals(ticket.priority)}">hoge</option>
+                            th:value="${priority.id}" th:selected="${priority.priority.equals(ticket.priority)}">hoge
+                    </option>
                   </select>
                 </div>
               </div>
@@ -81,7 +86,8 @@
                   <select class="form-control" title="status" id="status">
                     <!--/*@thymesVar id="status" type="net.orekyuu.workbench.entity.TicketStatus"*/-->
                     <option th:each="status : ${statusList}" th:text="${status.status}"
-                            th:value="${status.id}" th:selected="${status.status.equals(ticket.status)}">hoge</option>
+                            th:value="${status.id}" th:selected="${status.status.equals(ticket.status)}">hoge
+                    </option>
                   </select>
                 </div>
               </div>
@@ -92,16 +98,61 @@
                     <div class="input-group-addon">
                       <i class="fa fa-calendar"></i>
                     </div>
-                    <input type="text" class="form-control" id="limit" th:value="${ticket.limit == '無し' ? null : ticket.limit}">
+                    <input type="text" class="form-control" id="limit"
+                           th:value="${ticket.limit == '無し' ? null : ticket.limit}">
                   </div>
                 </div>
               </div>
+            </div>
           </div>
+          <hr>
+          <!--コメント-->
+              <!-- Message. Default to the left -->
+              <div class="direct-chat-msg">
+                <div class="direct-chat-info clearfix">
+                  <span class="direct-chat-name pull-left">Alexander Pierce</span>
+                  <span class="direct-chat-timestamp pull-right">23 Jan 2:00 pm</span>
+                </div>
+                <!-- /.direct-chat-info -->
+                <img class="direct-chat-img" src="../dist/img/user1-128x128.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
+                <div class="direct-chat-text">
+                  Is this template really for free? That's unbelievable!
+                </div>
+                <!-- /.direct-chat-text -->
+              </div>
+              <!-- /.direct-chat-msg -->
+
+              <!-- Message to the right -->
+              <div class="direct-chat-msg right">
+                <div class="direct-chat-info clearfix">
+                  <span class="direct-chat-name pull-right">Sarah Bullock</span>
+                  <span class="direct-chat-timestamp pull-left">23 Jan 2:05 pm</span>
+                </div>
+                <!-- /.direct-chat-info -->
+                <img class="direct-chat-img" src="../dist/img/user3-128x128.jpg" alt="Message User Image"><!-- /.direct-chat-img -->
+                <div class="direct-chat-text">
+                  You better believe it!
+                </div>
+                <!-- /.direct-chat-text -->
+              </div>
+              <!-- /.direct-chat-msg -->
+          <!--コメント-->
+          <hr>
+
+          <!--コメント送信フォーム-->
+          <div class="row">
+            <form action="" class="col-sm-12">
+              <div class="form-group">
+                <textarea class="form-control" rows="3" placeholder="コメントを入力 ..."></textarea>
+              </div>
+              <div class="form-group">
+                <button class="btn btn-success pull-right">送信</button>
+              </div>
+            </form>
           </div>
-          <div class="box-footer">
-            <button type="submit" class="btn btn-danger pull-right"><i class="fa fa-close"></i><span>クローズ</span></button>
-          </div>
+          <!--コメント送信フォーム-->
         </div>
+      </div>
     </section>
   </div><!-- end content -->
 
@@ -112,9 +163,11 @@
 </div><!-- end wrapper -->
 <div th:replace="user/project/fragment/project-page-content :: project-page-script"></div>
 <!-- Select2 -->
-<script src="../../../static/plugins/select2/select2.full.min.js" th:src="@{/plugins/select2/select2.full.min.js}"></script>
+<script src="../../../static/plugins/select2/select2.full.min.js"
+        th:src="@{/plugins/select2/select2.full.min.js}"></script>
 <!-- bootstrap datepicker -->
-<script src="../../../static/plugins/datepicker/bootstrap-datepicker.js" th:src="@{/plugins/datepicker/bootstrap-datepicker.js}"></script>
+<script src="../../../static/plugins/datepicker/bootstrap-datepicker.js"
+        th:src="@{/plugins/datepicker/bootstrap-datepicker.js}"></script>
 <!-- marked.js -->
 <script src="../../../static/plugins/marked/marked.min.js" th:src="@{/plugins/marked/marked.min.js}"></script>
 <script src="../../../static/js/highlight.pack.js" th:src="@{/js/highlight.pack.js}"></script>
@@ -134,8 +187,8 @@
 
     //marked.js
     marked.setOptions({
-      sanitize:true,
-      highlight: function(code, lang) {
+      sanitize: true,
+      highlight: function (code, lang) {
         return hljs.highlightAuto(code, [lang]).value;
       }
     });
@@ -168,7 +221,7 @@
       var ticket = {
         project: [[${project.id}]],
         ticketNum: [[${ticket.number}]],
-        title:  $('#title').text(),
+        title: $('#title').text(),
         description: [[${ticket.desc}]],
         assignee: $('#assign').val(),
         type: $('#type').val(),
