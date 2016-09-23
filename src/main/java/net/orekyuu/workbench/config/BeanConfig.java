@@ -9,6 +9,8 @@ import net.orekyuu.workbench.service.impl.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.thymeleaf.dialect.IDialect;
+import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 
 @Configuration
 public class BeanConfig {
@@ -76,6 +78,16 @@ public class BeanConfig {
     @Bean
     public WorkbenchConfigService workbenchConfigService() {
         return new WorkbenchConfigServiceImpl();
+    }
+
+    @Bean
+    public TestLogService testLogService() {
+        return new TestLogServiceImpl();
+    }
+
+    @Bean
+    public IDialect java8TimeDialect() {
+        return new Java8TimeDialect();
     }
 
     @Bean

@@ -1,21 +1,21 @@
 package net.orekyuu.workbench.job;
 
-import net.orekyuu.workbench.job.task.BuildTask;
 import net.orekyuu.workbench.job.task.CleanWorkspaceTask;
 import net.orekyuu.workbench.job.task.GitCloneTask;
-import net.orekyuu.workbench.job.task.SaveArtifactTask;
+import net.orekyuu.workbench.job.task.SaveTestLogTask;
+import net.orekyuu.workbench.job.task.TestTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
 @Scope("prototype")
-public class BuildJob extends Job {
+public class TestJob extends Job {
 
     @Autowired
-    private BuildTask buildTask;
+    private TestTask testTask;
     @Autowired
-    private SaveArtifactTask artifactTask;
+    private SaveTestLogTask saveTestLogTask;
     @Autowired
     private GitCloneTask cloneTask;
     @Autowired
@@ -27,8 +27,8 @@ public class BuildJob extends Job {
     protected void onInit() {
         cloneTask.setBranch(hash);
         addTask(cloneTask);
-        addTask(buildTask);
-        addTask(artifactTask);
+        addTask(testTask);
+        addTask(saveTestLogTask);
         addTask(cleanWorkspaceTask);
     }
 
@@ -39,4 +39,5 @@ public class BuildJob extends Job {
     public void setHash(String hash) {
         this.hash = hash;
     }
+
 }

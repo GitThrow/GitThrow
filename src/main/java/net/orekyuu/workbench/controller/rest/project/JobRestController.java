@@ -4,6 +4,7 @@ import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
 import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
 import net.orekyuu.workbench.job.BuildJob;
 import net.orekyuu.workbench.job.MergeJob;
+import net.orekyuu.workbench.job.TestJob;
 import net.orekyuu.workbench.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
@@ -26,7 +27,19 @@ public class JobRestController {
         }
         SseEmitter emitter = new SseEmitter(-1L);
         BuildJob job = buildJob();
-        job.setBranch("master");
+        job.setHash("master");
+        job.start(emitter, projectId, principal.getUser());
+        return emitter;
+    }
+
+    @GetMapping("/rest/job/test")
+    public SseEmitter test(@RequestParam("projectId") String projectId, @AuthenticationPrincipal WorkbenchUserDetails principal) {
+        if (!projectService.isJoined(projectId, principal.getUser().id)) {
+            throw new NotMemberException();
+        }
+        SseEmitter emitter = new SseEmitter(-1L);
+        TestJob job = testJob();
+        job.setHash("master");
         job.start(emitter, projectId, principal.getUser());
         return emitter;
     }
@@ -52,6 +65,11 @@ public class JobRestController {
 
     @Lookup
     BuildJob buildJob() {
+        return null;
+    }
+
+    @Lookup
+    TestJob testJob() {
         return null;
     }
 
