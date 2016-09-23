@@ -15,12 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -59,7 +62,7 @@ public class SaveArtifactTask implements Task {
         List<Path> files = artifactPathList.stream()
             .flatMap(s -> {
                 try {
-                    return findFiles(workspacePath, s).stream();
+                    return findFiles(workspacePath, s, args.getJobId().toString()).stream();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -90,17 +93,15 @@ public class SaveArtifactTask implements Task {
      * @return 正規表現に一致するファイルのリスト
      * @throws IOException
      */
-    private List<Path> findFiles(Path dir, String reg) throws IOException {
-        String separator = File.separator;
-        //Winなら正規表現のマッチングに使うためにエスケープ
-        if (separator.equals("\\")) {
-            separator += File.separator;
-        }
-        String regStr = Matcher.quoteReplacement(dir.toString()) + separator + reg;
+    private List<Path> findFiles(Path dir, String reg, String jobId) throws IOException {
+        PathMatcher pathMatcher = dir.getFileSystem().getPathMatcher("glob:job/" + jobId + "/" + reg);
 
         return Files.walk(dir)
             .filter(child -> Files.isRegularFile(child))
-            .filter(child -> child.toString().matches(regStr))
+            .filter(child -> {
+                boolean matches = pathMatcher.matches(child);
+                return matches;
+            })
             .collect(Collectors.toList());
     }
 
