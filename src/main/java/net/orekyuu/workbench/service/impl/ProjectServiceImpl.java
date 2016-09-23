@@ -2,7 +2,10 @@ package net.orekyuu.workbench.service.impl;
 
 import net.orekyuu.workbench.entity.*;
 import net.orekyuu.workbench.entity.dao.*;
-import net.orekyuu.workbench.service.*;
+import net.orekyuu.workbench.service.ArtifactService;
+import net.orekyuu.workbench.service.ProjectService;
+import net.orekyuu.workbench.service.RemoteRepositoryService;
+import net.orekyuu.workbench.service.TicketCommentService;
 import net.orekyuu.workbench.service.exceptions.NotProjectMemberException;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
@@ -34,8 +37,6 @@ public class ProjectServiceImpl implements ProjectService {
     private OpenTicketDao ticketDao;
     @Autowired
     private RemoteRepositoryService remoteRepositoryService;
-    @Autowired
-    private ProjectSettingService projectSettingService;
     @Autowired
     private ArtifactService artifactService;
     @Autowired
@@ -81,7 +82,6 @@ public class ProjectServiceImpl implements ProjectService {
                 return type;
             }).forEach(t -> ticketTypeDao.insert(t));
 
-            projectSettingService.setupProjectSetting(projectId);
         } catch (DuplicateKeyException e) {
             e.printStackTrace();
             throw new ProjectExistsException(projectId);
@@ -164,7 +164,6 @@ public class ProjectServiceImpl implements ProjectService {
         ticketTypeDao.deleteByProject(projectId);
         ticketPriorityDao.deleteByProject(projectId);
         ticketNumDao.deleteByProject(projectId);
-        projectSettingService.deleteProjectSetting(projectId);
         artifactService.deleteByProject(projectId);
         ticketCommentService.deleteByProject(projectId);
 

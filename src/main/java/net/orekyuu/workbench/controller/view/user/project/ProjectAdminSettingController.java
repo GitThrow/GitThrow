@@ -1,23 +1,17 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
-import net.orekyuu.workbench.entity.BuildSettings;
 import net.orekyuu.workbench.entity.Project;
-import net.orekyuu.workbench.entity.TestSettings;
 import net.orekyuu.workbench.entity.User;
 import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.infra.ProjectOwnerOnly;
 import net.orekyuu.workbench.service.ProjectService;
-import net.orekyuu.workbench.service.ProjectSettingService;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -25,8 +19,6 @@ import java.util.List;
 @Controller
 public class ProjectAdminSettingController {
 
-    @Autowired
-    private ProjectSettingService projectSettingService;
     @Autowired
     private ProjectService projectService;
 
@@ -41,45 +33,6 @@ public class ProjectAdminSettingController {
     @GetMapping("/project/{projectId}/admin-settings")
     public String show(@ProjectName @PathVariable String projectId) {
         return "user/project/admin-setting";
-    }
-
-    @ProjectOwnerOnly
-    @PostMapping("/project/{projectId}/admin-settings/build-settings")
-    public String updateBuildSettings(@ProjectName @PathVariable String projectId,
-                                      @Valid BuildSettingsForm form, BindingResult result,
-                                      RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            //↓なんかこれまずい気がする・・・ちゃんとした方法が別であるのかな？
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.buildSettingsForm", result);
-            redirectAttributes.addFlashAttribute("buildSettingsForm", form);
-            return "redirect:/project/" + projectId + "/admin-settings#build-settings";
-        }
-
-        BuildSettings buildSettings = new BuildSettings();
-        buildSettings.projectId = projectId;
-        buildSettings.buildCommand = form.getBuildCommand();
-        buildSettings.artifactPath = form.getArtifactPath();
-        projectSettingService.updateBuildSettings(buildSettings);
-
-        TestSettings testSettings = new TestSettings();
-        testSettings.projectId = projectId;
-        testSettings.testCommand = form.getTestCommand();
-        testSettings.xmlPath = form.getXmlPath();
-        projectSettingService.updateTestSettings(testSettings);
-
-        return "redirect:/project/" + projectId + "/admin-settings";
-    }
-
-    @ModelAttribute
-    public BuildSettingsForm buildSettingsForm(@PathVariable String projectId) {
-        BuildSettings buildSettings = projectSettingService.findBuildSettings(projectId).orElseThrow(IllegalArgumentException::new);
-        TestSettings testSettings = projectSettingService.findTestSettings(projectId).orElseThrow(IllegalArgumentException::new);
-        BuildSettingsForm form = new BuildSettingsForm();
-        form.setBuildCommand(buildSettings.buildCommand);
-        form.setArtifactPath(buildSettings.artifactPath);
-        form.setTestCommand(testSettings.testCommand);
-        form.setXmlPath(testSettings.xmlPath);
-        return form;
     }
 
     //メンバーの削除

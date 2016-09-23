@@ -139,22 +139,6 @@ CREATE TABLE IF NOT EXISTS `closed_pull_request` (
   PRIMARY KEY (`project`, `pr_num`)
 );
 
-/* ビルドの設定 */
-CREATE TABLE IF NOT EXISTS `build_settings` (
-  `project`       VARCHAR(32) PRIMARY KEY,
-  `build_command` TEXT NOT NULL,
-  `artifact_path` TEXT NOT NULL,
-  CONSTRAINT `build_config_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`)
-);
-
-/* テストの設定 */
-CREATE TABLE IF NOT EXISTS `test_settings` (
-  `project`      VARCHAR(32) PRIMARY KEY,
-  `test_command` TEXT NOT NULL,
-  `xml_path`     TEXT NOT NULL,
-  CONSTRAINT `test_config_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`)
-);
-
 /* 成果物 */
 CREATE TABLE IF NOT EXISTS `artifact` (
   `id`        INT AUTO_INCREMENT PRIMARY KEY,

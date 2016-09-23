@@ -4,7 +4,8 @@ import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
 import net.orekyuu.workbench.job.message.LogMessage;
 import net.orekyuu.workbench.service.ArtifactService;
-import net.orekyuu.workbench.service.ProjectSettingService;
+import net.orekyuu.workbench.service.WorkbenchConfig;
+import net.orekyuu.workbench.service.WorkbenchConfigService;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -18,8 +19,10 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -32,7 +35,7 @@ public class SaveArtifactTask implements Task {
     @Autowired
     private ArtifactService artifactService;
     @Autowired
-    private ProjectSettingService projectSettingService;
+    private WorkbenchConfigService workbenchConfigService;
     @Autowired
     private JobWorkspaceService jobWorkspaceService;
 
@@ -40,15 +43,29 @@ public class SaveArtifactTask implements Task {
     public boolean process(JobMessenger messenger, TaskArguments args) throws Exception {
 
         String projectId = args.getProjectId();
-        String artifactPath = projectSettingService.findBuildSettings(projectId).map(s -> s.artifactPath).orElse("");
+        Optional<WorkbenchConfig> configOpt = workbenchConfigService.find(projectId, "HEAD");
+        if (!configOpt.isPresent()) {
+            return true;
+        }
+        WorkbenchConfig config = configOpt.get();
+        List<String> artifactPathList = config.getBuildSettings().getArtifactPath();
         //空なら保存対象無し
-        if (artifactPath.isEmpty()) {
+        if (artifactPathList == null || artifactPathList.isEmpty()) {
             return true;
         }
 
         Path workspacePath = jobWorkspaceService.getWorkspacePath(args.getJobId());
 
-        List<Path> files = findFiles(workspacePath, artifactPath);
+        List<Path> files = artifactPathList.stream()
+            .flatMap(s -> {
+                try {
+                    return findFiles(workspacePath, s).stream();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return Stream.empty();
+            }).collect(Collectors.toList());
+
         if (files.isEmpty()) {
             return true;
         }
