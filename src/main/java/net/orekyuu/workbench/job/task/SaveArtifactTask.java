@@ -98,10 +98,7 @@ public class SaveArtifactTask implements Task {
 
         return Files.walk(dir)
             .filter(child -> Files.isRegularFile(child))
-            .filter(child -> {
-                boolean matches = pathMatcher.matches(child);
-                return matches;
-            })
+            .filter(pathMatcher::matches)
             .collect(Collectors.toList());
     }
 
