@@ -74,6 +74,11 @@ public class BeanConfig {
     }
 
     @Bean
+    public TicketCommentService ticketCommentService() {
+        return new TicketCommentServiceImpl();
+    }
+
+    @Bean
     @Primary
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();

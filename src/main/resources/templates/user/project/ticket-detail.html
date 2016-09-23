@@ -5,7 +5,8 @@
   <title>Workbench</title>
   <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css"/>
   <!-- Select2 -->
-  <link rel="stylesheet" href="../../../static/plugins/select2/select2.min.css" th:href="@{/plugins/select2/select2.min.css}">
+  <link rel="stylesheet" href="../../../static/plugins/select2/select2.min.css"
+        th:href="@{/plugins/select2/select2.min.css}">
   <link rel="stylesheet" href="../../../static/css/github-markdown.css" th:href="@{/css/github-markdown.css}">
   <link rel="stylesheet" href="../../../static/css/highlight/default.css" th:href="@{/css/highlight/default.css}">
 </head>
@@ -31,9 +32,10 @@
       <!-- コンテンツ1 -->
       <div class="box">
         <div class="box-header with-border">
-            <h3 class="box-title" th:text="${ticket.title}" id="title">チケットタイトル</h3>
-          </div>
-          <div class="box-body">
+          <h3 class="box-title" th:text="${ticket.title}" id="title">チケットタイトル</h3>
+        </div>
+        <div class="box-body">
+          <div class="row">
             <div class="col-sm-8 markdown-body" id="desc">
 
             </div>
@@ -50,7 +52,8 @@
                   <select class="form-control select2" title="assign" id="assign" th:remove="all-but-first">
                     <!--/*@thymesVar id="u" type="net.orekyuu.workbench.entity.User"*/-->
                     <option selected="selected" th:each="u : ${member}" th:text="${u.name}"
-                            th:selected="${u.id.equals(ticket.assignUserId)}" th:value="${u.id}">hoge</option>
+                            th:selected="${u.id.equals(ticket.assignUserId)}" th:value="${u.id}">hoge
+                    </option>
                   </select>
                 </div>
               </div>
@@ -60,7 +63,8 @@
                   <select class="form-control" title="type" id="type">
                     <!--/*@thymesVar id="type" type="net.orekyuu.workbench.entity.TicketType"*/-->
                     <option th:each="type : ${typeList}" th:text="${type.type}"
-                            th:value="${type.id}" th:selected="${type.type.equals(ticket.type)}">hoge</option>
+                            th:value="${type.id}" th:selected="${type.type.equals(ticket.type)}">hoge
+                    </option>
                   </select>
                 </div>
               </div>
@@ -70,7 +74,8 @@
                   <select class="form-control" title="priority" id="priority">
                     <!--/*@thymesVar id="priority" type="net.orekyuu.workbench.entity.TicketPriority"*/-->
                     <option th:each="priority : ${priorityList}" th:text="${priority.priority}"
-                            th:value="${priority.id}" th:selected="${priority.priority.equals(ticket.priority)}">hoge</option>
+                            th:value="${priority.id}" th:selected="${priority.priority.equals(ticket.priority)}">hoge
+                    </option>
                   </select>
                 </div>
               </div>
@@ -81,7 +86,8 @@
                   <select class="form-control" title="status" id="status">
                     <!--/*@thymesVar id="status" type="net.orekyuu.workbench.entity.TicketStatus"*/-->
                     <option th:each="status : ${statusList}" th:text="${status.status}"
-                            th:value="${status.id}" th:selected="${status.status.equals(ticket.status)}">hoge</option>
+                            th:value="${status.id}" th:selected="${status.status.equals(ticket.status)}">hoge
+                    </option>
                   </select>
                 </div>
               </div>
@@ -92,16 +98,34 @@
                     <div class="input-group-addon">
                       <i class="fa fa-calendar"></i>
                     </div>
-                    <input type="text" class="form-control" id="limit" th:value="${ticket.limit == '無し' ? null : ticket.limit}">
+                    <input type="text" class="form-control" id="limit"
+                           th:value="${ticket.limit == '無し' ? null : ticket.limit}">
                   </div>
                 </div>
               </div>
+            </div>
           </div>
+          <hr>
+          <!--コメント-->
+          <div id="comments">
           </div>
-          <div class="box-footer">
-            <button type="submit" class="btn btn-danger pull-right"><i class="fa fa-close"></i><span>クローズ</span></button>
+          <!--コメント-->
+          <hr>
+
+          <!--コメント送信フォーム-->
+          <div class="row">
+            <form action="" class="col-sm-12">
+              <div class="form-group">
+                <textarea class="form-control" rows="3" placeholder="コメントを入力 ..." id="comment-text"></textarea>
+              </div>
+              <div class="form-group">
+                <button class="btn btn-success pull-right" id="comment-submit">送信</button>
+              </div>
+            </form>
           </div>
+          <!--コメント送信フォーム-->
         </div>
+      </div>
     </section>
   </div><!-- end content -->
 
@@ -112,9 +136,11 @@
 </div><!-- end wrapper -->
 <div th:replace="user/project/fragment/project-page-content :: project-page-script"></div>
 <!-- Select2 -->
-<script src="../../../static/plugins/select2/select2.full.min.js" th:src="@{/plugins/select2/select2.full.min.js}"></script>
+<script src="../../../static/plugins/select2/select2.full.min.js"
+        th:src="@{/plugins/select2/select2.full.min.js}"></script>
 <!-- bootstrap datepicker -->
-<script src="../../../static/plugins/datepicker/bootstrap-datepicker.js" th:src="@{/plugins/datepicker/bootstrap-datepicker.js}"></script>
+<script src="../../../static/plugins/datepicker/bootstrap-datepicker.js"
+        th:src="@{/plugins/datepicker/bootstrap-datepicker.js}"></script>
 <!-- marked.js -->
 <script src="../../../static/plugins/marked/marked.min.js" th:src="@{/plugins/marked/marked.min.js}"></script>
 <script src="../../../static/js/highlight.pack.js" th:src="@{/js/highlight.pack.js}"></script>
@@ -134,8 +160,8 @@
 
     //marked.js
     marked.setOptions({
-      sanitize:true,
-      highlight: function(code, lang) {
+      sanitize: true,
+      highlight: function (code, lang) {
         return hljs.highlightAuto(code, [lang]).value;
       }
     });
@@ -168,7 +194,7 @@
       var ticket = {
         project: [[${project.id}]],
         ticketNum: [[${ticket.number}]],
-        title:  $('#title').text(),
+        title: $('#title').text(),
         description: [[${ticket.desc}]],
         assignee: $('#assign').val(),
         type: $('#type').val(),
@@ -179,6 +205,57 @@
       updateTicket(ticket);
     }
 
+    //コメント取得
+    function updateComments() {
+      var $comments = $('#comments');
+      $comments.empty();
+      fetchTicketComment([[${project.id}]], [[${ticket.number}]])
+        .then(function (response) {
+          _.chain(response.data).map(function (comment) {
+            comment.text = marked(comment.text);
+            comment.isSelf = comment.userId === /*[[${#authentication.principal.user.id}]]*/"hoge";
+            return comment;
+          }).map(function (comment) {
+            var str = '<div class="direct-chat-msg ' + (comment.isSelf ? '' : 'right') + '">';
+            str += '<div class="direct-chat-info clearfix">';
+            str += '<span class="direct-chat-name pull-left">' + comment.userName + '(id: ' + comment.userId + ')</span>';
+            str += '<span class="direct-chat-timestamp pull-right">' + comment.createdAt + '</span>';
+            str += '</div>';
+            str += '<img class="direct-chat-img" src="/user/icon/' + comment.userId + '">';
+            str += '<div class="direct-chat-text">';
+            str += comment.text;
+            str += '</div>';
+            str += '</div>';
+            return str;
+          }).each(function (comment) {
+            $comments.append(comment);
+          })
+        }).catch(function (e) {
+        console.log(e);
+      });
+    }
+
+    updateComments();
+
+    //コメント送信
+    var $commentBtn = $('#comment-submit');
+    var $commentText = $('#comment-text');
+    $commentBtn.click(function () {
+      $commentBtn.prop("disabled", true);
+      $commentText.prop("disabled", true);
+
+      createTicketComment([[${project.id}]], [[${ticket.number}]], $commentText.val())
+        .then(function () {
+          $commentBtn.prop("disabled", false);
+          $commentText.prop("disabled", false);
+          $commentText.val('');
+          updateComments();
+        }).catch(function (e) {
+          $commentBtn.prop("disabled", false);
+          $commentText.prop("disabled", false);
+          console.log(e);
+        });
+    });
   });
 </script>
 </body>

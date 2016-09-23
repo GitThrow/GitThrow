@@ -92,38 +92,16 @@ CREATE TABLE IF NOT EXISTS `open_tickets` (
   PRIMARY KEY (`project`, `ticket_num`)
 );
 
-/* クローズしているチケット */
-CREATE TABLE IF NOT EXISTS `closed_tickets` (
-  `project`     VARCHAR(32)  NOT NULL,
-  `ticket_num`  INT          NOT NULL, /* チケット番号 */
-  `title`       VARCHAR(128) NOT NULL,
-  `description` TEXT         NOT NULL, /* TEXTにデフォルト値を設定できないので、コード側で対応 */
-  `assignee`    VARCHAR(32), /* 担当者 */
-  `proponent`   VARCHAR(32)  NOT NULL, /* 提案者 */
-  `limit`       DATETIME, /* 期日 */
-  `type`        INT          NOT NULL, /*タイプ*/
-  `status`      INT          NOT NULL, /*状態*/
-  `priority`    INT          NOT NULL, /*優先度*/
-  CONSTRAINT `closed_tickets_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`),
-  CONSTRAINT `closed_tickets_assignee_fk` FOREIGN KEY (`assignee`) REFERENCES `users` (`id`),
-  CONSTRAINT `closed_tickets_proponent_fk` FOREIGN KEY (`proponent`) REFERENCES `users` (`id`),
-  CONSTRAINT `closed_tickets_type_fk` FOREIGN KEY (`type`) REFERENCES `ticket_type` (`id`),
-  CONSTRAINT `closed_tickets_status_fk` FOREIGN KEY (`status`) REFERENCES `ticket_status` (`id`),
-  CONSTRAINT `closed_tickets_priority_fk` FOREIGN KEY (`priority`) REFERENCES `ticket_priority` (`id`),
-  PRIMARY KEY (`project`, `ticket_num`)
-);
-
 /* チケットのコメント */
 CREATE TABLE IF NOT EXISTS `ticket_comment` (
   `id`         INT PRIMARY KEY AUTO_INCREMENT,
   `project`    VARCHAR(32) NOT NULL,
+  `ticket_num` INT         NOT NULL,
   `text`       TEXT        NOT NULL,
   `created_at` DATETIME    NOT NULL,
   `user`       VARCHAR(32) NOT NULL,
-  `reply_to`   INT,
   CONSTRAINT `ticket_comment_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`),
-  CONSTRAINT `ticket_comment_user_fk` FOREIGN KEY (`user`) REFERENCES `users` (`id`),
-  CONSTRAINT `ticket_comment_reply_to_fk` FOREIGN KEY (`reply_to`) REFERENCES `ticket_comment` (`id`)
+  CONSTRAINT `ticket_comment_user_fk` FOREIGN KEY (`user`) REFERENCES `users` (`id`)
 );
 
 /* チケットの個数を数えるためのテーブル */
@@ -135,28 +113,28 @@ CREATE TABLE IF NOT EXISTS `ticket_number` (
 
 /*開いているプルリクエスト*/
 CREATE TABLE IF NOT EXISTS `open_pull_request` (
-  `project`     VARCHAR(32)  NOT NULL,
-  `pr_num`      INT          NOT NULL,
-  `title`       VARCHAR(128) NOT NULL,
-  `description` TEXT         NOT NULL, /* TEXTにデフォルト値を設定できないので、コード側で対応 */
-  `reviewer`    VARCHAR(32)  NOT NULL,
-  `proponent`   VARCHAR(32)  NOT NULL,
-  `base_branch`   VARCHAR(256)  NOT NULL,
-  `target_branch`   VARCHAR(256)  NOT NULL,
+  `project`       VARCHAR(32)  NOT NULL,
+  `pr_num`        INT          NOT NULL,
+  `title`         VARCHAR(128) NOT NULL,
+  `description`   TEXT         NOT NULL, /* TEXTにデフォルト値を設定できないので、コード側で対応 */
+  `reviewer`      VARCHAR(32)  NOT NULL,
+  `proponent`     VARCHAR(32)  NOT NULL,
+  `base_branch`   VARCHAR(256) NOT NULL,
+  `target_branch` VARCHAR(256) NOT NULL,
   CONSTRAINT `open_pull_request_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`),
   PRIMARY KEY (`project`, `pr_num`)
 );
 
 /*閉じているプルリクエスト*/
 CREATE TABLE IF NOT EXISTS `closed_pull_request` (
-  `project`     VARCHAR(32)  NOT NULL,
-  `pr_num`      INT          NOT NULL,
-  `title`       VARCHAR(128) NOT NULL,
-  `description` TEXT         NOT NULL, /* TEXTにデフォルト値を設定できないので、コード側で対応 */
-  `reviewer`    VARCHAR(32)  NOT NULL,
-  `proponent`   VARCHAR(32)  NOT NULL,
-  `base_commit`   VARCHAR(256)  NOT NULL,
-  `target_commit`   VARCHAR(256)  NOT NULL,
+  `project`       VARCHAR(32)  NOT NULL,
+  `pr_num`        INT          NOT NULL,
+  `title`         VARCHAR(128) NOT NULL,
+  `description`   TEXT         NOT NULL, /* TEXTにデフォルト値を設定できないので、コード側で対応 */
+  `reviewer`      VARCHAR(32)  NOT NULL,
+  `proponent`     VARCHAR(32)  NOT NULL,
+  `base_commit`   VARCHAR(256) NOT NULL,
+  `target_commit` VARCHAR(256) NOT NULL,
   CONSTRAINT `closed_pull_request_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`),
   PRIMARY KEY (`project`, `pr_num`)
 );
