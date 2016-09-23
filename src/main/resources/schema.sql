@@ -156,5 +156,5 @@ CREATE TABLE IF NOT EXISTS `test_log` (
   `status`     VARCHAR(128) NOT NULL,
   `commit`     VARCHAR(128) NOT NULL,
   CONSTRAINT `test_log_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`),
-  INDEX artifact_project(project)
+  INDEX test_log_project(project)
 );
