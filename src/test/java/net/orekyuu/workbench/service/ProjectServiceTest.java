@@ -26,8 +26,6 @@ public class ProjectServiceTest {
     private ProjectService projectService;
     @Autowired
     private UserService userService;
-    @Autowired
-    private ProjectSettingService projectSettingService;
 
     private User user1;
     private User user2;
@@ -50,7 +48,6 @@ public class ProjectServiceTest {
     @Test
     public void testCreateProject() throws ProjectExistsException {
         projectService.createProject("project1", "project1", user1);
-        Assertions.assertThat(projectSettingService.findBuildSettings("project1").isPresent()).isTrue();
     }
 
     @Test(expected = ProjectExistsException.class)

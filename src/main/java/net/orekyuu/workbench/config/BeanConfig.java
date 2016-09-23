@@ -54,11 +54,6 @@ public class BeanConfig {
     }
 
     @Bean
-    public ProjectSettingService projectSettingService() {
-        return new ProjectSettingServiceImpl();
-    }
-
-    @Bean
     public JobWorkspaceService jobWorkspaceService() {
         return new JobWorkspaceServiceImpl();
     }
@@ -76,6 +71,11 @@ public class BeanConfig {
     @Bean
     public TicketCommentService ticketCommentService() {
         return new TicketCommentServiceImpl();
+    }
+
+    @Bean
+    public WorkbenchConfigService workbenchConfigService() {
+        return new WorkbenchConfigServiceImpl();
     }
 
     @Bean
