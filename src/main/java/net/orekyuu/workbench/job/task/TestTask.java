@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.job.task;
 
+import net.orekyuu.workbench.entity.TestStatus;
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
 import net.orekyuu.workbench.job.TestLogModel;
@@ -34,6 +35,7 @@ public class TestTask implements Task {
     private static final Logger logger = LoggerFactory.getLogger(TestTask.class);
 
     public static final String TEST_LOG_KEY = "testlog";
+    public static final String TEST_STATUS_KEY = "teststatus";
 
     @Autowired
     private JobWorkspaceService jobWorkspaceService;
@@ -114,7 +116,9 @@ public class TestTask implements Task {
 
             //次のタスクで使うためにテストログを保存
             TestLogModel testLogModel = new TestLogModel(lines);
+
             args.putData(TEST_LOG_KEY, testLogModel);
+            args.putData(TEST_STATUS_KEY, waitFor == 0 ? TestStatus.PASSING : TestStatus.FAILED);
 
             return waitFor;
         } catch (IOException | InterruptedException e) {

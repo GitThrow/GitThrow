@@ -1,11 +1,13 @@
 package net.orekyuu.workbench.service.impl;
 
 import net.orekyuu.workbench.entity.TestLog;
+import net.orekyuu.workbench.entity.TestStatus;
 import net.orekyuu.workbench.entity.dao.TestLogDao;
 import net.orekyuu.workbench.service.TestLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +29,8 @@ public class TestLogServiceImpl implements TestLogService {
 
     @Transactional(readOnly = false)
     @Override
-    public void create(String projectId, String testLogJson) {
-        testLogDao.insert(new TestLog(projectId, testLogJson));
+    public void create(String projectId, String testLogJson, TestStatus testStatus, String commit) {
+        testLogDao.insert(new TestLog(projectId, testLogJson, LocalDateTime.now(), testStatus, commit));
     }
 
     @Transactional(readOnly = false)
