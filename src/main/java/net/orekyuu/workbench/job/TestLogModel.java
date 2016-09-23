@@ -1,6 +1,7 @@
 package net.orekyuu.workbench.job;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
@@ -9,7 +10,7 @@ public class TestLogModel {
     private final List<Line> lines;
 
     @JsonCreator
-    public TestLogModel(List<Line> lines) {
+    public TestLogModel(@JsonProperty("lines") List<Line> lines) {
         this.lines = lines;
     }
 
@@ -25,7 +26,7 @@ public class TestLogModel {
         private final OutputType type;
 
         @JsonCreator
-        public Line(String content, OutputType type) {
+        public Line(@JsonProperty("content") String content, @JsonProperty("type") OutputType type) {
             this.content = content;
             this.type = type;
         }
