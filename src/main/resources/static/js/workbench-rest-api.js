@@ -17,6 +17,26 @@ function fetchTicketComment(projectId, ticketNum) {
 }
 
 /**
+ * チケットにコメントする
+ * @param projectId プロジェクト
+ * @param ticketNum チケット番号
+ * @param text コメントの内容
+ * @return {*}
+ */
+function createTicketComment(projectId, ticketNum, text) {
+    var req = {
+        project: projectId,
+        id: ticketNum,
+        text: text
+    };
+    return axios.post('/rest/ticket/comment', req, {
+        headers: {
+            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+        }
+    });
+}
+
+/**
  * チケットを更新する
  * @param ticket チケット
  */

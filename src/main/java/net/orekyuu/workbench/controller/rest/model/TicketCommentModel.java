@@ -11,11 +11,11 @@ public class TicketCommentModel {
     private String text;
     private LocalDateTime createdAt;
 
-    public TicketCommentModel(String userId, String userName, String text) {
+    public TicketCommentModel(String userId, String userName, String text, LocalDateTime createdAt) {
         this.userId = userId;
         this.userName = userName;
         this.text = text;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = createdAt;
     }
 
     public String getUserId() {

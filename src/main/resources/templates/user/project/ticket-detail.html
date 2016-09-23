@@ -116,10 +116,10 @@
           <div class="row">
             <form action="" class="col-sm-12">
               <div class="form-group">
-                <textarea class="form-control" rows="3" placeholder="コメントを入力 ..."></textarea>
+                <textarea class="form-control" rows="3" placeholder="コメントを入力 ..." id="comment-text"></textarea>
               </div>
               <div class="form-group">
-                <button class="btn btn-success pull-right">送信</button>
+                <button class="btn btn-success pull-right" id="comment-submit">送信</button>
               </div>
             </form>
           </div>
@@ -205,31 +205,57 @@
       updateTicket(ticket);
     }
 
-    var $comments = $('#comments');
-    fetchTicketComment([[${project.id}]], [[${ticket.number}]])
-      .then(function (response) {
-        _.chain(response.data).map(function (comment) {
-          comment.text = marked(comment.text);
-          comment.isSelf = comment.userId === /*[[${#authentication.principal.user.id}]]*/"hoge";
-          return comment;
-        }).map(function (comment) {
-          var str = '<div class="direct-chat-msg ' + (comment.isSelf ? '' : 'right') + '">';
-          str += '<div class="direct-chat-info clearfix">';
-          str += '<span class="direct-chat-name pull-left">' + comment.userName + '(id: ' + comment.userId + ')</span>';
-          str += '<span class="direct-chat-timestamp pull-right">' + comment.createdAt + '</span>';
-          str += '</div>';
-          str += '<img class="direct-chat-img" src="/user/icon/' + comment.userId + '">';
-          str += '<div class="direct-chat-text">';
-          str += comment.text;
-          str += '</div>';
-          str += '</div>';
-          return str;
-        }).each(function (comment) {
-          $comments.append(comment);
-        })
-      }).catch(function (e) {
+    //コメント取得
+    function updateComments() {
+      var $comments = $('#comments');
+      $comments.empty();
+      fetchTicketComment([[${project.id}]], [[${ticket.number}]])
+        .then(function (response) {
+          _.chain(response.data).map(function (comment) {
+            comment.text = marked(comment.text);
+            comment.isSelf = comment.userId === /*[[${#authentication.principal.user.id}]]*/"hoge";
+            return comment;
+          }).map(function (comment) {
+            var str = '<div class="direct-chat-msg ' + (comment.isSelf ? '' : 'right') + '">';
+            str += '<div class="direct-chat-info clearfix">';
+            str += '<span class="direct-chat-name pull-left">' + comment.userName + '(id: ' + comment.userId + ')</span>';
+            str += '<span class="direct-chat-timestamp pull-right">' + comment.createdAt + '</span>';
+            str += '</div>';
+            str += '<img class="direct-chat-img" src="/user/icon/' + comment.userId + '">';
+            str += '<div class="direct-chat-text">';
+            str += comment.text;
+            str += '</div>';
+            str += '</div>';
+            return str;
+          }).each(function (comment) {
+            $comments.append(comment);
+          })
+        }).catch(function (e) {
         console.log(e);
       });
+    }
+
+    updateComments();
+
+    //コメント送信
+    var $commentBtn = $('#comment-submit');
+    var $commentText = $('#comment-text');
+    $commentBtn.click(function () {
+      $commentBtn.prop("disabled", true);
+      $commentText.prop("disabled", true);
+
+      createTicketComment([[${project.id}]], [[${ticket.number}]], $commentText.val())
+        .then(function () {
+          $commentBtn.prop("disabled", false);
+          $commentText.prop("disabled", false);
+          $commentText.val('');
+          updateComments();
+        }).catch(function (e) {
+          $commentBtn.prop("disabled", false);
+          $commentText.prop("disabled", false);
+          console.log(e);
+        });
+    });
   });
 </script>
 </body>
