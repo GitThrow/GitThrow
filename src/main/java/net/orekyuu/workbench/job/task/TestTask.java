@@ -2,6 +2,7 @@ package net.orekyuu.workbench.job.task;
 
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
+import net.orekyuu.workbench.job.TestLogModel;
 import net.orekyuu.workbench.job.message.LogMessage;
 import net.orekyuu.workbench.job.message.TestResult;
 import net.orekyuu.workbench.job.message.TestResultMessage;
@@ -31,6 +32,8 @@ import java.util.stream.Stream;
 public class TestTask implements Task {
 
     private static final Logger logger = LoggerFactory.getLogger(TestTask.class);
+
+    public static final String TEST_LOG_KEY = "testlog";
 
     @Autowired
     private JobWorkspaceService jobWorkspaceService;
@@ -75,12 +78,15 @@ public class TestTask implements Task {
 
         String charset = "UTF-8";
 
+        List<TestLogModel.Line> lines = new ArrayList<>();
         try {
             Process start = processBuilder.start();
             Thread infoThread = new Thread(() -> {
                 //コマンド実行後の標準出力をログに吐き出す
                 try (Stream<LogMessage> in = new BufferedReader(new InputStreamReader(start.getInputStream(), charset))
-                    .lines().map(LogMessage::new)) {
+                    .lines()
+                    .peek(line -> lines.add(new TestLogModel.Line(line, TestLogModel.OutputType.DEFAULT)))
+                    .map(LogMessage::new)) {
                     in.forEach(jobMessenger::send);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -91,7 +97,9 @@ public class TestTask implements Task {
             Thread errorThread = new Thread(() -> {
                 //コマンド実行時のエラー出力をログに吐き出す
                 try (Stream<LogMessage> in = new BufferedReader(new InputStreamReader(start.getErrorStream(), charset))
-                    .lines().map(LogMessage::new)) {
+                    .lines()
+                    .peek(line -> lines.add(new TestLogModel.Line(line, TestLogModel.OutputType.ERROR)))
+                    .map(LogMessage::new)) {
                     in.forEach(jobMessenger::send);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -102,7 +110,13 @@ public class TestTask implements Task {
             infoThread.start();
             errorThread.start();
             //コマンドの実行が終了するまでここでThreadをブロックする
-            return start.waitFor();
+            int waitFor = start.waitFor();
+
+            //次のタスクで使うためにテストログを保存
+            TestLogModel testLogModel = new TestLogModel(lines);
+            args.putData(TEST_LOG_KEY, testLogModel);
+
+            return waitFor;
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return 1;

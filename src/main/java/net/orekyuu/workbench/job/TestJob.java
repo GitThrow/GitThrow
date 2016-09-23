@@ -2,7 +2,7 @@ package net.orekyuu.workbench.job;
 
 import net.orekyuu.workbench.job.task.CleanWorkspaceTask;
 import net.orekyuu.workbench.job.task.GitCloneTask;
-import net.orekyuu.workbench.job.task.SaveArtifactTask;
+import net.orekyuu.workbench.job.task.SaveTestLogTask;
 import net.orekyuu.workbench.job.task.TestTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -15,7 +15,7 @@ public class TestJob extends Job {
     @Autowired
     private TestTask testTask;
     @Autowired
-    private SaveArtifactTask artifactTask;
+    private SaveTestLogTask saveTestLogTask;
     @Autowired
     private GitCloneTask cloneTask;
     @Autowired
@@ -28,6 +28,7 @@ public class TestJob extends Job {
         cloneTask.setBranch(hash);
         addTask(cloneTask);
         addTask(testTask);
+        addTask(saveTestLogTask);
         addTask(cleanWorkspaceTask);
     }
 

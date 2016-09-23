@@ -79,6 +79,11 @@ public class BeanConfig {
     }
 
     @Bean
+    public TestLogService testLogService() {
+        return new TestLogServiceImpl();
+    }
+
+    @Bean
     @Primary
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();

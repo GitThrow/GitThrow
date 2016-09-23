@@ -147,3 +147,11 @@ CREATE TABLE IF NOT EXISTS `artifact` (
   CONSTRAINT `artifact_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`),
   INDEX artifact_project(project)
 );
+
+CREATE TABLE IF NOT EXISTS `test_log` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `project`   VARCHAR(32)  NOT NULL,
+  `log` TEXT NOT NULL ,
+  CONSTRAINT `test_log_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`),
+  INDEX artifact_project(project)
+);
