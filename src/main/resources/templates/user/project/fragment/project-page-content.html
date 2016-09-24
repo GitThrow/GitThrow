@@ -76,9 +76,6 @@
         <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/ticket.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/ticket|">
           <i class="fa fa-tasks"></i> <span>チケット</span>
         </a></li>
-        <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/ticketboard.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/ticketboard|">
-          <i class="fa fa-edit"></i> <span>チケットボード</span>
-        </a></li>
         <li class="" th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/test.*$')} ? 'active'"><a href="" th:href="|@{/project/}${project.id}/test|">
           <i class="fa fa-flask"></i> <span>テスト</span>
         </a></li>
