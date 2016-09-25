@@ -38,7 +38,7 @@ public interface ProjectService {
     void withdrawProject(String projectId, String userId);
 
     /**
-     * プロジェクトメンバーを検索します
+     * プロジェクトメンバーを検索します(botを含みません)
      * @param projectId プロジェクトID
      * @return プロジェクトに参加しているメンバー
      */

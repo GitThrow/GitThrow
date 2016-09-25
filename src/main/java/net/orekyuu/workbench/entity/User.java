@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.entity;
 
+import net.orekyuu.workbench.util.BotUserUtil;
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
 import org.seasar.doma.Id;
@@ -32,6 +33,10 @@ public class User {
         this.password = password;
         this.email="";
         this.admin = admin;
+    }
+
+    public boolean isBotUser() {
+        return BotUserUtil.isBotUserId(id);
     }
 
     @Override

@@ -25,7 +25,7 @@ public class AdminSettingController {
     @GetMapping("admin/user-setting")
     @AdminOnly
     public String showAdminSetting(Model model) {
-        model.addAttribute("users", userService.findAll());
+        model.addAttribute("users", userService.findAll(false));
         return "user/user-management";
     }
 

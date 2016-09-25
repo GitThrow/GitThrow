@@ -19,7 +19,7 @@ public class UserRestController {
 
     @GetMapping("all")
     public List<UserModel> allUser() {
-        return userService.findAll().stream()
+        return userService.findAll(false).stream()
             .map(UserModel::new)
             .collect(Collectors.toList());
     }

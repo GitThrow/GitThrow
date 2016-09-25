@@ -5,6 +5,7 @@ import net.orekyuu.workbench.service.exceptions.NotProjectMemberException;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
+import net.orekyuu.workbench.util.BotUserUtil;
 import net.orekyuu.workbench.util.TestRepositoryUtil;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
@@ -63,12 +64,20 @@ public class ProjectServiceTest {
     @Test
     public void testJoin() throws ProjectExistsException, ProjectNotFoundException {
         projectService.createProject("project1", "project1", user1);
+        projectService.createProject("project2", "project2", user1);
+
         Assertions.assertThat(projectService.findProjectMember("project1")).hasSize(1);
         projectService.joinToProject("project1", user2.id);
         Assertions.assertThat(projectService.findProjectMember("project1")).hasSize(2);
 
         projectService.joinToProject("project1", user2.id);
         Assertions.assertThat(projectService.findProjectMember("project1")).hasSize(2);
+
+        //他のプロジェクトのbotユーザーを追加できない
+        Assertions.assertThatThrownBy(() -> projectService.withdrawProject("project2", BotUserUtil.toBotUserId("project1")))
+            .isInstanceOf(IllegalArgumentException.class);
+
+
     }
 
     @Test
@@ -82,6 +91,10 @@ public class ProjectServiceTest {
 
         projectService.withdrawProject("project1", user2.id);
         Assertions.assertThat(projectService.findProjectMember("project1")).hasSize(1);
+
+        //botユーザーは脱退できない
+        Assertions.assertThatThrownBy(() -> projectService.withdrawProject("project1", BotUserUtil.toBotUserId("project1")))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -93,7 +106,7 @@ public class ProjectServiceTest {
     @Test
     public void testFindMember() throws ProjectExistsException, ProjectNotFoundException {
         projectService.createProject("project1", "project1", user1);
-        Assertions.assertThat(projectService.findProjectMember("project1")).hasSize(1);
+        Assertions.assertThat(projectService.findProjectMember("project1")).hasSize(1); //botユーザーはカウントされない
         projectService.joinToProject("project1", user2.id);
         Assertions.assertThat(projectService.findProjectMember("project1")).hasSize(2);
     }
@@ -124,6 +137,10 @@ public class ProjectServiceTest {
 
         projectService.changeProjectOwner("project1", user2.id);
         Assertions.assertThat(projectService.findById("project1").map(p -> p.ownerUserId)).isNotEmpty().containsSame(user2.id);
+
+        //botユーザーはオーナーになれない
+        Assertions.assertThatThrownBy(() -> projectService.changeProjectOwner("project1", BotUserUtil.toBotUserId("project1")))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -147,6 +164,7 @@ public class ProjectServiceTest {
         Assertions.assertThat(projectService.isJoined("project1", user2.id)).isFalse();
         Assertions.assertThat(projectService.isJoined("hoge", user1.id)).isFalse();
         Assertions.assertThat(projectService.isJoined("project1", "hoge")).isFalse();
+        Assertions.assertThat(projectService.isJoined("project1", BotUserUtil.toBotUserId("project1"))).isTrue();
 
     }
 }

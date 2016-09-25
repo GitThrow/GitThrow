@@ -8,6 +8,7 @@ import net.orekyuu.workbench.entity.dao.UserDao;
 import net.orekyuu.workbench.entity.dao.UserSettingDao;
 import net.orekyuu.workbench.service.UserService;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
+import net.orekyuu.workbench.util.BotUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,6 +38,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void createUser(String id, String name, String rawPassword, boolean admin) throws UserExistsException {
         User user = new User(id, name, passwordEncoder.encode(rawPassword), admin);
+        if (user.isBotUser()) {
+            throw new IllegalArgumentException("botユーザーは作成できません");
+        }
+
         try {
             userDao.insert(user);
         } catch (DuplicateKeyException e) {
@@ -74,6 +79,48 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Transactional(readOnly = false)
+    @Override
+    public void createBot(String projectId) throws UserExistsException {
+        String botId = BotUserUtil.toBotUserId(projectId);
+        User bot = new User(botId, "ボット", passwordEncoder.encode("password"), false);
+
+        try {
+            userDao.insert(bot);
+        } catch (DuplicateKeyException e) {
+            //ユーザーが存在してるので失敗
+            throw new UserExistsException(botId, e);
+        }
+
+        //アバター
+        UserAvatar avatar = new UserAvatar();
+        avatar.id = bot.id;
+        try(InputStream in = getClass().getClassLoader().getResourceAsStream("default-user-icon.png")) {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            FileCopyUtils.copy(in, outputStream);
+            avatar.avatar = outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            userAvatarDao.insert(avatar);
+        } catch (DuplicateKeyException e) {
+            //ユーザーが存在してるので失敗
+            throw new UserExistsException(bot.id, e);
+        }
+
+        //設定
+        UserSetting setting = new UserSetting();
+        setting.id = bot.id;
+        try {
+            userSettingDao.insert(setting);
+        } catch (DuplicateKeyException e) {
+            //ユーザーが存在してるので失敗
+            throw new UserExistsException(bot.id, e);
+        }
+    }
+
     @Override
     public Optional<User> findById(String id) {
         return userDao.findById(id);
@@ -108,8 +155,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAll() {
-        return userDao.selectAll(Collectors.toList());
+    public List<User> findAll(boolean includeBot) {
+        return userDao.selectAll(stream -> stream
+            .filter(user -> includeBot || !user.isBotUser())
+            .collect(Collectors.toList()));
     }
 
 
