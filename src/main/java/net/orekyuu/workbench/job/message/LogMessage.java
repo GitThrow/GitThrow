@@ -37,4 +37,12 @@ public class LogMessage implements JobMessage {
     public String getMessage() {
         return message;
     }
+
+    @Override
+    public String toString() {
+        return "LogMessage{" +
+            "jobId='" + jobId + '\'' +
+            ", message='" + message + '\'' +
+            '}';
+    }
 }

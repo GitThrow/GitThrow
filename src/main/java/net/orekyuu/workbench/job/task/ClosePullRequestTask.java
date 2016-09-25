@@ -28,7 +28,7 @@ public class ClosePullRequestTask implements Task {
 
         pullRequestService.close(args.getProjectId(), prNum, baseCommit, targetCommit);
 
-        return false;
+        return true;
     }
 
     public void setPrNum(int prNum) {

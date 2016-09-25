@@ -21,13 +21,18 @@ public class JobRestController {
     private ProjectService projectService;
 
     @GetMapping("/rest/job/build")
-    public SseEmitter build(@RequestParam("projectId") String projectId, @AuthenticationPrincipal WorkbenchUserDetails principal) {
+    public SseEmitter build(@RequestParam("projectId") String projectId,
+                            @RequestParam(value = "prNum", required = false) Integer prNum,
+                            @AuthenticationPrincipal WorkbenchUserDetails principal) {
         if (!projectService.isJoined(projectId, principal.getUser().id)) {
             throw new NotMemberException();
         }
         SseEmitter emitter = new SseEmitter(-1L);
         BuildJob job = buildJob();
         job.setHash("master");
+        if (prNum != null) {
+            job.setCommentTarget(prNum);
+        }
         job.start(emitter, projectId, principal.getUser());
         return emitter;
     }

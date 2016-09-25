@@ -26,6 +26,7 @@ public class MergeTask implements Task {
 
     public static final String BASE_COMMIT_HASH_KEY = "MergeTask.baseCommitHash";
     public static final String TARGET_COMMIT_HASH_KEY = "MergeTask.targetCommitHash";
+    public static final String NEW_HEAD_HASH_KEY = "MergeTask.newHeadHash";
 
     @Override
     public boolean process(JobMessenger messenger, TaskArguments args) throws Exception {
@@ -52,6 +53,7 @@ public class MergeTask implements Task {
                 return false;
             }
 
+            args.putData(NEW_HEAD_HASH_KEY, result.getNewHead().name());
             ObjectId[] mergedCommits = result.getMergedCommits();
             args.putData(BASE_COMMIT_HASH_KEY, mergedCommits[0].name());
             args.putData(TARGET_COMMIT_HASH_KEY, mergedCommits[1].name());

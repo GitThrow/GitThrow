@@ -40,6 +40,6 @@ public class SaveTestLogTask implements Task {
             }).ifPresent(json -> testLogService.create(args.getProjectId(), json, status, head));
         }
 
-        return false;
+        return true;
     }
 }

@@ -1,26 +1,21 @@
 package net.orekyuu.workbench.service.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import net.orekyuu.workbench.entity.Artifact;
+import net.orekyuu.workbench.entity.dao.ArtifactDao;
+import net.orekyuu.workbench.service.ArtifactService;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
-import net.orekyuu.workbench.entity.Artifact;
-import net.orekyuu.workbench.entity.dao.ArtifactDao;
-import net.orekyuu.workbench.service.ArtifactService;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.file.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
 public class ArtifactServiceImpl implements ArtifactService {
@@ -33,7 +28,7 @@ public class ArtifactServiceImpl implements ArtifactService {
 
     @Transactional(readOnly = false)
     @Override
-    public void save(String projectId, byte[] data, String fileName) {
+    public Artifact save(String projectId, byte[] data, String fileName) {
         Artifact artifact = new Artifact(projectId, fileName);
         artifact = artifactDao.insert(artifact).getEntity();
 
@@ -48,11 +43,12 @@ public class ArtifactServiceImpl implements ArtifactService {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+        return artifact;
     }
 
     @Transactional(readOnly = false)
     @Override
-    public void save(String projectId, InputStream in, String fileName) {
+    public Artifact save(String projectId, InputStream in, String fileName) {
         Artifact artifact = new Artifact(projectId, fileName);
         artifact = artifactDao.insert(artifact).getEntity();
 
@@ -67,6 +63,7 @@ public class ArtifactServiceImpl implements ArtifactService {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+        return artifact;
     }
 
     private Path getArtifactFilePath(Artifact artifact) {
