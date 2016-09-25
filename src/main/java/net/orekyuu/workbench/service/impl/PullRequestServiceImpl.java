@@ -42,8 +42,8 @@ public class PullRequestServiceImpl implements PullRequestService {
             throw new NotMemberException();
         }
 
-        openPullRequestDao.insert(pullRequest);
         ticketNumDao.increment(pullRequest.project);
+        openPullRequestDao.insert(pullRequest);
     }
 
     @Override
