@@ -1,7 +1,8 @@
-package net.orekyuu.workbench.service;
+package net.orekyuu.workbench.service.impl;
 
 import net.orekyuu.workbench.entity.TicketComment;
 import net.orekyuu.workbench.entity.dao.TicketCommentDao;
+import net.orekyuu.workbench.service.TicketCommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
