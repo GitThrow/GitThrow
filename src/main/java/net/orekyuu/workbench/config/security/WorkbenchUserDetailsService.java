@@ -16,6 +16,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userService.findById(username)
+            .filter(user -> !user.isBotUser()) //botユーザーはログインさせない
             .map(WorkbenchUserDetails::new)
             .orElseThrow(() -> new UsernameNotFoundException(username));
     }

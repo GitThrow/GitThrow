@@ -6,14 +6,15 @@ import org.seasar.doma.boot.ConfigAutowireable;
 import org.springframework.dao.DuplicateKeyException;
 
 import java.util.Optional;
-import java.util.stream.Collector;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 @ConfigAutowireable
 @Dao
 public interface UserDao {
 
-    @Select(strategy = SelectType.COLLECT)
-    <RESULT> RESULT selectAll(Collector<User, ?, RESULT> collector);
+    @Select(strategy = SelectType.STREAM)
+    <RESULT> RESULT selectAll(Function<Stream<User>, RESULT> collector);
 
     @Select
     Optional<User> findById(String id);

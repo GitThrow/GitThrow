@@ -32,6 +32,13 @@ public interface UserService {
     }
 
     /**
+     * botを作成する
+     * @param projectId プロジェクトID
+     * @throws UserExistsException ユーザーがすでに存在する時
+     */
+    void createBot(String projectId) throws UserExistsException;
+
+    /**
      * ユーザーを検索
      * @param id id
      * @return ユーザー
@@ -71,7 +78,9 @@ public interface UserService {
     void updateSetting(UserSetting setting);
 
     /**
+     * @param include botを含むならtrue
      * @return すべてのユーザー
      */
-    List<User> findAll();
+    List<User> findAll(boolean include);
+
 }

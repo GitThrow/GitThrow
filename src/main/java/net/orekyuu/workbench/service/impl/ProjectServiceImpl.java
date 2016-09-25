@@ -6,6 +6,8 @@ import net.orekyuu.workbench.service.*;
 import net.orekyuu.workbench.service.exceptions.NotProjectMemberException;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
+import net.orekyuu.workbench.service.exceptions.UserExistsException;
+import net.orekyuu.workbench.util.BotUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +42,8 @@ public class ProjectServiceImpl implements ProjectService {
     private TicketCommentService ticketCommentService;
     @Autowired
     private TestLogService testLogService;
+    @Autowired
+    private UserService userService;
 
     private static final List<String> defaultTicketStatus = Arrays.asList("新規", "進行中", "完了", "保留");
     private static final List<String> defaultTicketPriority = Arrays.asList("低", "中", "高");
@@ -81,9 +85,15 @@ public class ProjectServiceImpl implements ProjectService {
                 return type;
             }).forEach(t -> ticketTypeDao.insert(t));
 
+            userService.createBot(projectId);
+            joinToProject(projectId, BotUserUtil.toBotUserId(projectId));
+
         } catch (DuplicateKeyException e) {
             e.printStackTrace();
             throw new ProjectExistsException(projectId);
+        } catch (UserExistsException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -91,7 +101,13 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void joinToProject(String projectId, String userId) {
         try {
-            projectUserDao.insert(new ProjectUser(projectId, userId));
+            //botではない、もしくはプロジェクトに属することが出来るidのbotなら追加可能
+            if (!BotUserUtil.isBotUserId(userId) || BotUserUtil.isProjectBot(projectId, userId)) {
+                projectUserDao.insert(new ProjectUser(projectId, userId));
+            } else {
+                throw new IllegalArgumentException(projectId + ":" + userId);
+            }
+
         } catch (DuplicateKeyException e) {
             //すでに存在している場合は何もしない
         }
@@ -100,6 +116,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = false)
     @Override
     public void withdrawProject(String projectId, String userId) {
+        if (BotUserUtil.isBotUserId(userId)) {
+            throw new IllegalArgumentException(userId);
+        }
+
         Optional<Project> optional = projectDao.findById(projectId);
         if (!optional.isPresent()) {
             return;
@@ -114,7 +134,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<User> findProjectMember(String projectId) throws ProjectNotFoundException {
-        return projectDao.findProjectMember(projectId, Collectors.toList());
+        return projectDao.findProjectMember(projectId, stream -> stream
+            .filter(user -> !user.isBotUser())
+            .collect(Collectors.toList()));
     }
 
     @Override
@@ -134,6 +156,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = false)
     @Override
     public void changeProjectOwner(String projectId, String newProjectOwnerId) throws ProjectNotFoundException, NotProjectMemberException {
+        if (BotUserUtil.isBotUserId(newProjectOwnerId)) {
+            throw new IllegalArgumentException("botユーザーをプロジェクト管理者にはできません: " + newProjectOwnerId);
+        }
+
         List<User> projectMember = findProjectMember(projectId);
         User newOwner = projectMember.stream()
             .filter(user -> user.id.equals(newProjectOwnerId))
@@ -158,6 +184,7 @@ public class ProjectServiceImpl implements ProjectService {
             .map(user -> new ProjectUser(projectId, user.id))
             .collect(Collectors.toList())
         );
+        projectUserDao.delete(new ProjectUser(projectId, BotUserUtil.toBotUserId(projectId)));
         ticketDao.deleteByProject(projectId);
         ticketStatusDao.deleteByProject(projectId);
         ticketTypeDao.deleteByProject(projectId);

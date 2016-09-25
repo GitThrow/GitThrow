@@ -54,7 +54,7 @@ public class NewProjectController {
     }
 
     public static class CreateProjectForm {
-        @Pattern(regexp = "^[a-zA-Z0-9]{3,32}$")
+        @Pattern(regexp = "^[a-zA-Z0-9]{3,16}$")
         private String id;
         @Size(min = 3, max = 16)
         private String name;
