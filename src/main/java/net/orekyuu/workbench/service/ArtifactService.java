@@ -15,9 +15,9 @@ public interface ArtifactService {
      * @param projectId プロジェクトID
      * @param data データ
      */
-    void save(String projectId, byte[] data, String fileName);
+    Artifact save(String projectId, byte[] data, String fileName);
 
-    void save(String projectId, InputStream in, String fileName);
+    Artifact save(String projectId, InputStream in, String fileName);
 
     Optional<Artifact> findById(int id);
 

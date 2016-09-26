@@ -19,6 +19,17 @@ public class MergeJob extends Job {
     private PushTask pushTask;
     @Autowired
     private ClosePullRequestTask closePullRequestTask;
+    @Autowired
+    private BuildTask buildTask;
+    @Autowired
+    private SaveArtifactTask artifactTask;
+    @Autowired
+    private TestTask testTask;
+    @Autowired
+    private SaveTestLogTask testLogTask;
+
+    @Autowired
+    private MergeJobCommentTask commentTask;
 
     @Autowired
     private CleanWorkspaceTask cleanWorkspaceTask;
@@ -26,6 +37,9 @@ public class MergeJob extends Job {
     private String baseBranch;
     private String targetBranch;
     private int prNum = -1;
+
+    private boolean enableBuild = true;
+    private boolean enableTest = true;
 
     @Override
     protected void onInit() {
@@ -42,6 +56,21 @@ public class MergeJob extends Job {
         if (0 < prNum) {
             closePullRequestTask.setPrNum(prNum);
             addTask(closePullRequestTask);
+
+            if (enableBuild) {
+                addTask(buildTask);
+                addTask(artifactTask);
+            }
+
+            if (enableTest) {
+                addTask(testTask);
+                addTask(testLogTask);
+            }
+
+            if (enableBuild || enableTest) {
+                commentTask.setCommentTarget(prNum);
+                addTask(commentTask);
+            }
         }
         addTask(cleanWorkspaceTask);
     }
@@ -56,5 +85,13 @@ public class MergeJob extends Job {
 
     public void setClosePullRequestNum(int num) {
         prNum = num;
+    }
+
+    public void setEnableBuild(boolean enableBuild) {
+        this.enableBuild = enableBuild;
+    }
+
+    public void setEnableTest(boolean enableTest) {
+        this.enableTest = enableTest;
     }
 }

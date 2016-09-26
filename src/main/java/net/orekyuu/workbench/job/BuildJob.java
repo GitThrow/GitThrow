@@ -1,12 +1,11 @@
 package net.orekyuu.workbench.job;
 
-import net.orekyuu.workbench.job.task.BuildTask;
-import net.orekyuu.workbench.job.task.CleanWorkspaceTask;
-import net.orekyuu.workbench.job.task.GitCloneTask;
-import net.orekyuu.workbench.job.task.SaveArtifactTask;
+import net.orekyuu.workbench.job.task.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.OptionalInt;
 
 @Component
 @Scope("prototype")
@@ -20,8 +19,11 @@ public class BuildJob extends Job {
     private GitCloneTask cloneTask;
     @Autowired
     private CleanWorkspaceTask cleanWorkspaceTask;
+    @Autowired
+    private BuildJobCommentTask commentTask;
 
     private String hash = "master";
+    private OptionalInt pullRequestNum = OptionalInt.empty();
 
     @Override
     protected void onInit() {
@@ -29,6 +31,10 @@ public class BuildJob extends Job {
         addTask(cloneTask);
         addTask(buildTask);
         addTask(artifactTask);
+        pullRequestNum.ifPresent(it -> {
+            commentTask.setCommentTarget(it);
+            addTask(commentTask);
+        });
         addTask(cleanWorkspaceTask);
     }
 
@@ -38,5 +44,13 @@ public class BuildJob extends Job {
      */
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    /**
+     * ビルド完了時のコメント先を設定します
+     * @param taskNum pullRequestNum
+     */
+    public void setCommentTarget(int taskNum) {
+        pullRequestNum = OptionalInt.of(taskNum);
     }
 }

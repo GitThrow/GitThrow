@@ -2,10 +2,12 @@ package net.orekyuu.workbench.job.task;
 
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
+import net.orekyuu.workbench.job.message.BuildResult;
 import net.orekyuu.workbench.job.message.LogMessage;
 import net.orekyuu.workbench.service.BuildSettings;
 import net.orekyuu.workbench.service.WorkbenchConfig;
 import net.orekyuu.workbench.service.WorkbenchConfigService;
+import org.eclipse.jgit.lib.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,9 @@ public class BuildTask implements Task {
 
     private static final Logger logger = LoggerFactory.getLogger(BuildTask.class);
 
+    public static final String BUILD_RESULT_KEY = "BuildTask.result";
+    public static final String TARGET_COMMIT_KEY = "BuildTask.commit";
+
     @Autowired
     private JobWorkspaceService jobWorkspaceService;
     @Autowired
@@ -38,6 +43,11 @@ public class BuildTask implements Task {
     @Override
     public boolean process(JobMessenger messenger, TaskArguments args) throws Exception {
         logger.info("Start BuildTask");
+        try (Repository repository = jobWorkspaceService.getRepository(args.getJobId())) {
+            String head = repository.resolve("HEAD").name();
+            args.putData(TARGET_COMMIT_KEY, head);
+        }
+
         Path workspacePath = jobWorkspaceService.getWorkspacePath(args.getJobId());
         List<String> command = command(args.getProjectId());
         if (command.isEmpty()) {
@@ -45,9 +55,16 @@ public class BuildTask implements Task {
             return false;
         }
 
+        boolean success = true;
         for (String s : command) {
-            exec(messenger, args, workspacePath, s);
+            int code = exec(messenger, args, workspacePath, s);
+            if (code != 0) {
+                success = false;
+            }
         }
+        args.putData(BUILD_RESULT_KEY, success ? BuildResult.SUCCESS : BuildResult.FAILED);
+
+
         logger.info("End BuildTask");
         return true;
     }
@@ -59,7 +76,7 @@ public class BuildTask implements Task {
             .orElseGet(ArrayList::new);
     }
 
-    private void exec(JobMessenger jobMessenger, TaskArguments args, Path workspacePath, String command) {
+    private int exec(JobMessenger jobMessenger, TaskArguments args, Path workspacePath, String command) {
         //ここOSとか環境によって動作が怪しい
         ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", command);
         processBuilder.directory(workspacePath.toFile());
@@ -93,9 +110,10 @@ public class BuildTask implements Task {
             infoThread.start();
             errorThread.start();
             //コマンドの実行が終了するまでここでThreadをブロックする
-            start.waitFor();
+            return start.waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+        return 1;
     }
 }

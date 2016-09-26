@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.job.task;
 
+import net.orekyuu.workbench.entity.Artifact;
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
 import net.orekyuu.workbench.job.message.LogMessage;
@@ -34,6 +35,8 @@ import java.util.zip.ZipOutputStream;
 public class SaveArtifactTask implements Task {
 
     private static final Logger logger = LoggerFactory.getLogger(SaveArtifactTask.class);
+
+    public static final String ARTIFACT_KEY = "SaveArtifactTask.artifact";
 
     @Autowired
     private ArtifactService artifactService;
@@ -79,7 +82,8 @@ public class SaveArtifactTask implements Task {
 
         Pair<String, byte[]> pair = toByteArray(files);
         if (pair != null) {
-            artifactService.save(projectId, pair.getRight(), pair.getLeft());
+            Artifact save = artifactService.save(projectId, pair.getRight(), pair.getLeft());
+            args.putData(ARTIFACT_KEY, save);
         }
 
         return true;
