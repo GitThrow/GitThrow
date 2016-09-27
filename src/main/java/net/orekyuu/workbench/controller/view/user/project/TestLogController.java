@@ -6,6 +6,7 @@ import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.job.TestLogModel;
 import net.orekyuu.workbench.service.TestLogService;
+import net.orekyuu.workbench.service.exceptions.ContentNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,7 +33,9 @@ public class TestLogController {
     @ProjectMemberOnly
     @GetMapping("/project/{projectId}/test/{id}")
     public String showTestLogDetail(@ProjectName @PathVariable String projectId, @PathVariable int id, Model model) throws IOException {
-        TestLog testLog = testLogService.findById(id).filter(log -> log.projectId.equals(projectId)).orElseThrow(RuntimeException::new);
+        TestLog testLog = testLogService.findById(id)
+            .filter(log -> log.projectId.equals(projectId))
+            .orElseThrow(() -> new ContentNotFoundException(projectId));
 
         ObjectMapper mapper = new ObjectMapper();
         TestLogModel logModel = mapper.readValue(testLog.log, TestLogModel.class);

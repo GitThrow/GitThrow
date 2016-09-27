@@ -96,7 +96,8 @@ public class PullRequestController {
     @GetMapping("/project/{projectId}/pull-request/{num}")
     @ProjectMemberOnly
     public String showDetail(@ProjectName @PathVariable String projectId, @PathVariable int num, Model model) {
-        PullRequestModel pullRequestModel = pullRequestService.findByProjectAndNum(projectId, num).orElseThrow(PullRequestNotFoundException::new);
+        PullRequestModel pullRequestModel = pullRequestService.findByProjectAndNum(projectId, num)
+            .orElseThrow(() -> new PullRequestNotFoundException(projectId));
         model.addAttribute("pullRequest", pullRequestModel);
         return "user/project/pull-request-detail";
     }

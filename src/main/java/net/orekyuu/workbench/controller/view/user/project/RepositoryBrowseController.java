@@ -1,15 +1,10 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-
+import net.orekyuu.workbench.infra.ProjectMemberOnly;
+import net.orekyuu.workbench.infra.ProjectName;
+import net.orekyuu.workbench.service.RemoteRepositoryService;
+import net.orekyuu.workbench.service.exceptions.ContentNotFoundException;
+import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -21,10 +16,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.HandlerMapping;
 
-import net.orekyuu.workbench.infra.ProjectMemberOnly;
-import net.orekyuu.workbench.infra.ProjectName;
-import net.orekyuu.workbench.service.RemoteRepositoryService;
-import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
+import javax.servlet.http.HttpServletRequest;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 public class RepositoryBrowseController {
@@ -41,8 +40,9 @@ public class RepositoryBrowseController {
         String[] pathArray = requestPath.split("/");
         // URL Mappingに対して固定の処理になっている
         String relativePath = Arrays.stream(pathArray).skip(5).collect(Collectors.joining("/"));
-        // TODO エラーハンドリング
-        byte[] bytes = remoteRepositoryService.getRepositoryFile(projectId, hash, relativePath).get().toByteArray();
+        byte[] bytes = remoteRepositoryService.getRepositoryFile(projectId, hash, relativePath)
+            .orElseThrow(() -> new ContentNotFoundException(projectId))
+            .toByteArray();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(ContentTypeMapping.findType(relativePath));
         ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(bytes, headers, HttpStatus.OK);
@@ -61,7 +61,7 @@ public class RepositoryBrowseController {
         MediaType type;
         List<String> extensions=new ArrayList<>();
         
-        private ContentTypeMapping(MediaType type,String... extensions){
+        ContentTypeMapping(MediaType type, String... extensions){
             this.type=type;
             this.extensions.add(this.name().toLowerCase());
             this.extensions.addAll(Stream.of(extensions).map(String::toLowerCase).collect(Collectors.toList()));

@@ -32,7 +32,8 @@ public class TicketDetailController {
     @ProjectMemberOnly
     @GetMapping("/project/{projectId}/ticket/{ticketNum}")
     public String showDetail(@ProjectName @PathVariable String projectId, @PathVariable int ticketNum, Model model) throws ProjectNotFoundException {
-        OpenTicket ticket = ticketService.findByProjectAndNum(projectId, ticketNum).orElseThrow(TicketNotFoundException::new);
+        OpenTicket ticket = ticketService.findByProjectAndNum(projectId, ticketNum)
+            .orElseThrow(() -> new TicketNotFoundException(projectId));
 
         TicketModel ticketModel = toTicketModel(ticket, model);
         model.addAttribute("ticket", ticketModel);

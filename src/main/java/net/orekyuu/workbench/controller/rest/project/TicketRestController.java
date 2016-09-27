@@ -28,7 +28,8 @@ public class TicketRestController {
             throw new NotMemberException();
         }
 
-        OpenTicket ticket = ticketService.findByProjectAndNum(req.getProject(), req.getTicketNum()).orElseThrow(TicketNotFoundException::new);
+        OpenTicket ticket = ticketService.findByProjectAndNum(req.getProject(), req.getTicketNum())
+            .orElseThrow(() -> new TicketNotFoundException(req.getProject()));
         ticket.title = req.getTitle();
         ticket.description = req.getDescription();
         ticket.limit = req.getLimit() == null ? null : req.getLimit().atStartOfDay();
