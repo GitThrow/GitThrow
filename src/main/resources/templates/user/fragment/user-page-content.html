@@ -95,7 +95,8 @@
         <li class="" th:class="${#httpServletRequest.requestURI.equals('/user-setting')}?'active'"><a href="" th:href="@{/user-setting}">
           <i class="fa fa-gear"></i> <span th:text="#{html.user.fragment.user_page_content.configuration}">設定</span>
         </a></li>
-        <li class="treeview" th:classappend="${#httpServletRequest.requestURI.startsWith('/admin')}?'active'">
+        <li class="treeview" th:classappend="${#httpServletRequest.requestURI.startsWith('/admin')}?'active'"
+            th:if="${#authentication.principal.user.admin}">
           <a href="#">
             <i class="fa fa-wrench"></i>
             <span th:text="#{html.user.fragment.user_page_content.administrator_settings}">管理者設定</span>
