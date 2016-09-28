@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.service.impl;
 
+import net.orekyuu.workbench.controller.rest.model.PullRequestModel;
 import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
 import net.orekyuu.workbench.entity.ClosedPullRequest;
 import net.orekyuu.workbench.entity.OpenPullRequest;
@@ -7,7 +8,6 @@ import net.orekyuu.workbench.entity.dao.ClosedPullRequestDao;
 import net.orekyuu.workbench.entity.dao.OpenPullRequestDao;
 import net.orekyuu.workbench.entity.dao.TicketNumDao;
 import net.orekyuu.workbench.service.ProjectService;
-import net.orekyuu.workbench.service.PullRequestModel;
 import net.orekyuu.workbench.service.PullRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;

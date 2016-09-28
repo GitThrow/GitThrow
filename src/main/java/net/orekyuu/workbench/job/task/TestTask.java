@@ -1,14 +1,10 @@
 package net.orekyuu.workbench.job.task;
 
 import net.orekyuu.workbench.entity.TestStatus;
-import net.orekyuu.workbench.job.JobMessenger;
-import net.orekyuu.workbench.job.JobWorkspaceService;
-import net.orekyuu.workbench.job.TestLogModel;
+import net.orekyuu.workbench.job.*;
 import net.orekyuu.workbench.job.message.LogMessage;
 import net.orekyuu.workbench.job.message.TestResult;
 import net.orekyuu.workbench.job.message.TestResultMessage;
-import net.orekyuu.workbench.service.TestSettings;
-import net.orekyuu.workbench.service.WorkbenchConfig;
 import net.orekyuu.workbench.service.WorkbenchConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

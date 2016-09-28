@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.service;
 
+import net.orekyuu.workbench.controller.rest.model.TicketModel;
 import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
 import net.orekyuu.workbench.entity.*;
 import net.orekyuu.workbench.entity.dao.TicketPriorityDao;

@@ -38,7 +38,7 @@
               <th>タイトル</th>
             </tr>
             <tr th:each="pr : ${pullRequestList}">
-              <!--/*@thymesVar id="pr" type="net.orekyuu.workbench.service.PullRequestModel"*/-->
+              <!--/*@thymesVar id="pr" type="net.orekyuu.workbench.controller.rest.model.PullRequestModel"*/-->
               <td th:text="${pr.number}">1</td>
               <td><a href="" th:href="|@{/project/}${project.id}/pull-request/${pr.number}|" th:text="${pr.title}">タイトル</a></td>
             </tr>

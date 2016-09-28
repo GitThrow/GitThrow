@@ -7,7 +7,6 @@ import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.service.ProjectService;
 import net.orekyuu.workbench.service.RemoteRepositoryService;
 import net.orekyuu.workbench.service.UserService;
-import net.orekyuu.workbench.service.WorkspaceService;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +26,6 @@ public class ProjectDashboardController {
     private ProjectService projectService;
     @Autowired
     private UserService userService;
-    @Autowired
-    private WorkspaceService workspaceService;
     @Autowired
     private RemoteRepositoryService remoteRepositoryService;
 

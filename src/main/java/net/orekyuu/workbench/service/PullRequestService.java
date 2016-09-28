@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.service;
 
+import net.orekyuu.workbench.controller.rest.model.PullRequestModel;
 import net.orekyuu.workbench.entity.OpenPullRequest;
 
 import java.util.List;

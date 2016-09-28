@@ -1,8 +1,8 @@
 package net.orekyuu.workbench.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.orekyuu.workbench.job.WorkbenchConfig;
 import net.orekyuu.workbench.service.RemoteRepositoryService;
-import net.orekyuu.workbench.service.WorkbenchConfig;
 import net.orekyuu.workbench.service.WorkbenchConfigService;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import org.eclipse.jgit.api.errors.GitAPIException;

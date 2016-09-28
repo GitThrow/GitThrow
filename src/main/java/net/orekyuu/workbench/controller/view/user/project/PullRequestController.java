@@ -1,12 +1,12 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
 import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
+import net.orekyuu.workbench.controller.rest.model.PullRequestModel;
 import net.orekyuu.workbench.entity.OpenPullRequest;
 import net.orekyuu.workbench.entity.User;
 import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.service.ProjectService;
-import net.orekyuu.workbench.service.PullRequestModel;
 import net.orekyuu.workbench.service.PullRequestService;
 import net.orekyuu.workbench.service.RemoteRepositoryService;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;

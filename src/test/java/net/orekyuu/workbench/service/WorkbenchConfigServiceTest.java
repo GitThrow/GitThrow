@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.service;
 
+import net.orekyuu.workbench.job.WorkbenchConfig;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;

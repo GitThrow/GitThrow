@@ -1,8 +1,8 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
+import net.orekyuu.workbench.controller.rest.model.TicketModel;
 import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
-import net.orekyuu.workbench.service.TicketModel;
 import net.orekyuu.workbench.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

@@ -41,7 +41,7 @@
               <th>ステータス</th>
             </tr>
             <tr th:each="ticket : ${ticketList}">
-              <!--/*@thymesVar id="ticket" type="net.orekyuu.workbench.service.TicketModel"*/-->
+              <!--/*@thymesVar id="ticket" type="net.orekyuu.workbench.controller.rest.model.TicketModel"*/-->
               <td th:text="${ticket.number}">1</td>
               <td><a href="" th:href="|@{/project/}${project.id}/ticket/${ticket.number}|" th:text="${ticket.title}">タイトル</a></td>
               <td th:text="${ticket.type}">バグ</td>

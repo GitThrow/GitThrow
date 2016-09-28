@@ -1,11 +1,11 @@
 package net.orekyuu.workbench.job.task;
 
+import net.orekyuu.workbench.job.BuildSettings;
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
+import net.orekyuu.workbench.job.WorkbenchConfig;
 import net.orekyuu.workbench.job.message.BuildResult;
 import net.orekyuu.workbench.job.message.LogMessage;
-import net.orekyuu.workbench.service.BuildSettings;
-import net.orekyuu.workbench.service.WorkbenchConfig;
 import net.orekyuu.workbench.service.WorkbenchConfigService;
 import org.eclipse.jgit.lib.Repository;
 import org.slf4j.Logger;
