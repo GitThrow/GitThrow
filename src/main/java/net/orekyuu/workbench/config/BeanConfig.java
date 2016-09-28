@@ -46,11 +46,6 @@ public class BeanConfig {
     }
 
     @Bean
-    public WorkspaceService workspaceService() {
-        return new WorkspaceServiceImpl();
-    }
-
-    @Bean
     public RemoteRepositoryService gitService() {
         return new RemoteRepositoryServiceImpl();
     }

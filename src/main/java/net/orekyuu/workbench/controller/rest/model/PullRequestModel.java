@@ -1,4 +1,4 @@
-package net.orekyuu.workbench.service;
+package net.orekyuu.workbench.controller.rest.model;
 
 public class PullRequestModel {
     private int number;

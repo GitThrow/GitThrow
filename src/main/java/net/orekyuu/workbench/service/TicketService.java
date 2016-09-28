@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.service;
 
+import net.orekyuu.workbench.controller.rest.model.TicketModel;
 import net.orekyuu.workbench.entity.OpenTicket;
 import org.springframework.stereotype.Service;
 

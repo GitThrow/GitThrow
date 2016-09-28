@@ -1,12 +1,12 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
 import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
+import net.orekyuu.workbench.controller.rest.model.PullRequestModel;
 import net.orekyuu.workbench.entity.OpenPullRequest;
 import net.orekyuu.workbench.entity.User;
 import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.service.ProjectService;
-import net.orekyuu.workbench.service.PullRequestModel;
 import net.orekyuu.workbench.service.PullRequestService;
 import net.orekyuu.workbench.service.RemoteRepositoryService;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
@@ -96,7 +96,8 @@ public class PullRequestController {
     @GetMapping("/project/{projectId}/pull-request/{num}")
     @ProjectMemberOnly
     public String showDetail(@ProjectName @PathVariable String projectId, @PathVariable int num, Model model) {
-        PullRequestModel pullRequestModel = pullRequestService.findByProjectAndNum(projectId, num).orElseThrow(PullRequestNotFoundException::new);
+        PullRequestModel pullRequestModel = pullRequestService.findByProjectAndNum(projectId, num)
+            .orElseThrow(() -> new PullRequestNotFoundException(projectId));
         model.addAttribute("pullRequest", pullRequestModel);
         return "user/project/pull-request-detail";
     }

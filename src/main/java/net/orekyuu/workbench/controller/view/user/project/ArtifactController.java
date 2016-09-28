@@ -45,7 +45,7 @@ public class ArtifactController {
                                  HttpServletResponse res) {
         Artifact artifact = artifactService.findById(artifactId)
             .filter(a -> a.projectId.equals(projectId))
-            .orElseThrow(ContentNotFoundException::new);
+            .orElseThrow(() -> new ContentNotFoundException(projectId));
 
         try {
             InputStream inputStream = artifactService.openArtifactStreamByArtifact(artifact);
@@ -57,7 +57,7 @@ public class ArtifactController {
             IOUtils.copy(inputStream, outputStream);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new ContentNotFoundException();
+            throw new ContentNotFoundException(projectId);
         }
     }
 

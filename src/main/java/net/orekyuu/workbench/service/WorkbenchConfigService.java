@@ -1,5 +1,7 @@
 package net.orekyuu.workbench.service;
 
+import net.orekyuu.workbench.job.WorkbenchConfig;
+
 import java.util.Optional;
 
 public interface WorkbenchConfigService {

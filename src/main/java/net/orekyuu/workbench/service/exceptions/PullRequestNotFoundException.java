@@ -4,5 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class PullRequestNotFoundException extends RuntimeException {
+public class PullRequestNotFoundException extends ContentNotFoundException {
+    public PullRequestNotFoundException(String projectId) {
+        super(projectId);
+    }
 }

@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
+import net.orekyuu.workbench.controller.rest.model.TicketModel;
 import net.orekyuu.workbench.entity.*;
 import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
@@ -32,7 +33,8 @@ public class TicketDetailController {
     @ProjectMemberOnly
     @GetMapping("/project/{projectId}/ticket/{ticketNum}")
     public String showDetail(@ProjectName @PathVariable String projectId, @PathVariable int ticketNum, Model model) throws ProjectNotFoundException {
-        OpenTicket ticket = ticketService.findByProjectAndNum(projectId, ticketNum).orElseThrow(TicketNotFoundException::new);
+        OpenTicket ticket = ticketService.findByProjectAndNum(projectId, ticketNum)
+            .orElseThrow(() -> new TicketNotFoundException(projectId));
 
         TicketModel ticketModel = toTicketModel(ticket, model);
         model.addAttribute("ticket", ticketModel);

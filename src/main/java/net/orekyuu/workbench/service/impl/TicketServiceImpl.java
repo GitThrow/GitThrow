@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.service.impl;
 
+import net.orekyuu.workbench.controller.rest.model.TicketModel;
 import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
 import net.orekyuu.workbench.entity.OpenTicket;
 import net.orekyuu.workbench.entity.TicketPriority;
@@ -7,7 +8,6 @@ import net.orekyuu.workbench.entity.TicketStatus;
 import net.orekyuu.workbench.entity.TicketType;
 import net.orekyuu.workbench.entity.dao.*;
 import net.orekyuu.workbench.service.ProjectService;
-import net.orekyuu.workbench.service.TicketModel;
 import net.orekyuu.workbench.service.TicketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

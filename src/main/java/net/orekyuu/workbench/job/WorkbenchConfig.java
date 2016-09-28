@@ -1,4 +1,4 @@
-package net.orekyuu.workbench.service;
+package net.orekyuu.workbench.job;
 
 
 public class WorkbenchConfig {

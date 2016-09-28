@@ -7,7 +7,6 @@ import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.service.ProjectService;
 import net.orekyuu.workbench.service.RemoteRepositoryService;
 import net.orekyuu.workbench.service.UserService;
-import net.orekyuu.workbench.service.WorkspaceService;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +27,6 @@ public class ProjectDashboardController {
     @Autowired
     private UserService userService;
     @Autowired
-    private WorkspaceService workspaceService;
-    @Autowired
     private RemoteRepositoryService remoteRepositoryService;
 
     @ProjectMemberOnly
@@ -37,7 +34,7 @@ public class ProjectDashboardController {
     public String show(@ProjectName @PathVariable String projectId, Model model) throws ProjectNotFoundException, GitAPIException {
         Object project = model.asMap().get("project");
         if (project == null || !(project instanceof Project)) {
-            throw new RuntimeException("project not found");
+            throw new ProjectNotFoundException(projectId);
         }
 
         Project prj = ((Project) project);

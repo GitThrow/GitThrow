@@ -101,7 +101,9 @@ CREATE TABLE IF NOT EXISTS `ticket_comment` (
   `created_at` DATETIME    NOT NULL,
   `user`       VARCHAR(32) NOT NULL,
   CONSTRAINT `ticket_comment_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`),
-  CONSTRAINT `ticket_comment_user_fk` FOREIGN KEY (`user`) REFERENCES `users` (`id`)
+  CONSTRAINT `ticket_comment_user_fk` FOREIGN KEY (`user`) REFERENCES `users` (`id`),
+  INDEX ticket_comment_project(project),
+  INDEX ticket_comment_ticket_num(ticket_num)
 );
 
 /* チケットの個数を数えるためのテーブル */

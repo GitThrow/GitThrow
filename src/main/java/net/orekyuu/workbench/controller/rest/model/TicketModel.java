@@ -1,4 +1,4 @@
-package net.orekyuu.workbench.service;
+package net.orekyuu.workbench.controller.rest.model;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
