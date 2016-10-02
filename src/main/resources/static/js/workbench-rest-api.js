@@ -17,6 +17,22 @@ function fetchTicketComment(projectId, ticketNum) {
 }
 
 /**
+ * 自身が担当者になっているチケットを検索する
+ * @param projectId プロジェクトID
+ * @return {*}
+ */
+function fetchAssigneeTickets(projectId) {
+    return axios.get('/rest/ticket/assignee', {
+        params: {
+            project: projectId
+        },
+        headers: {
+            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+        }
+    });
+}
+
+/**
  * チケットにコメントする
  * @param projectId プロジェクト
  * @param ticketNum チケット番号

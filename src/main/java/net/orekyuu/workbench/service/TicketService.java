@@ -32,4 +32,12 @@ public interface TicketService {
     List<OpenTicket> findOpenTicketByProject(String projectId);
 
     List<TicketModel> findOpenTicketModelByProject(String projectId);
+
+    /**
+     * 指定のプロジェクト内のチケットから担当者で検索します
+     * @param projectId プロジェクトID
+     * @param assignee 担当者
+     * @return 担当者にマッチするチケット
+     */
+    List<OpenTicket> findTicketByProjectAndAssignee(String projectId, String assignee);
 }

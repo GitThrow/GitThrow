@@ -90,6 +90,11 @@ public class TicketServiceImpl implements TicketService {
         return modelList;
     }
 
+    @Override
+    public List<OpenTicket> findTicketByProjectAndAssignee(String projectId, String assignee) {
+        return openTicketDao.findByAssignee(projectId, assignee, Collectors.toList());
+    }
+
     private void check(OpenTicket ticket) {
         if (!typeDao.findById(ticket.type).map(t -> t.project.equals(ticket.project)).orElse(false)) {
             logger.warn(String.format("不正なTicketTypeのID: type_id=%d, project_id=%s", ticket.type, ticket.project));

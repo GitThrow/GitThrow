@@ -48,4 +48,12 @@ public class TicketRestController {
         }
         return ticketService.findOpenTicketByProject(projectId);
     }
+
+    @GetMapping("/assignee")
+    public List<OpenTicket> showRelated(@RequestParam("project") String projectId, @AuthenticationPrincipal WorkbenchUserDetails principal) {
+        if (!projectService.isJoined(projectId, principal.getUser().id)) {
+            throw new NotMemberException();
+        }
+        return ticketService.findTicketByProjectAndAssignee(projectId, principal.getUser().id);
+    }
 }
