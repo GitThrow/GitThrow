@@ -1,23 +1,29 @@
 package net.orekyuu.workbench.config.security;
 
-import net.orekyuu.workbench.service.UserService;
+import net.orekyuu.workbench.user.port.table.UserDao;
+import net.orekyuu.workbench.user.port.table.UserTable;
+import net.orekyuu.workbench.user.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class WorkbenchUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UserService userService;
+    private UserDao userDao;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userService.findById(username)
-            .filter(user -> !user.isBotUser()) //botユーザーはログインさせない
-            .map(WorkbenchUserDetails::new)
-            .orElseThrow(() -> new UsernameNotFoundException(username));
+        Optional<UserTable> optional = userDao.findById(username);
+        if (!optional.isPresent()) {
+            throw new UsernameNotFoundException(username);
+        }
+        UserTable table = optional.get();
+        return new WorkbenchUserDetails(UserUtil.fromTable(table), table.getPassword());
     }
 }

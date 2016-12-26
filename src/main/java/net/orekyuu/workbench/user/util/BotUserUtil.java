@@ -1,4 +1,4 @@
-package net.orekyuu.workbench.util;
+package net.orekyuu.workbench.user.util;
 
 public final class BotUserUtil {
     private BotUserUtil() {

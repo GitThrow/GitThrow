@@ -5,7 +5,7 @@ import net.orekyuu.workbench.service.exceptions.NotProjectMemberException;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
-import net.orekyuu.workbench.util.BotUserUtil;
+import net.orekyuu.workbench.user.util.BotUserUtil;
 import net.orekyuu.workbench.util.TestRepositoryUtil;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;

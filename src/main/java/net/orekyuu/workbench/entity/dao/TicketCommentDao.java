@@ -4,6 +4,7 @@ package net.orekyuu.workbench.entity.dao;
 import net.orekyuu.workbench.entity.TicketComment;
 import org.seasar.doma.*;
 import org.seasar.doma.boot.ConfigAutowireable;
+import org.seasar.doma.jdbc.Result;
 
 import java.util.stream.Collector;
 
@@ -12,7 +13,7 @@ import java.util.stream.Collector;
 public interface TicketCommentDao {
 
     @Insert
-    int insert(TicketComment comment);
+    Result<TicketComment> insert(TicketComment comment);
 
     @Select(strategy = SelectType.COLLECT)
     <RESULT> RESULT findByProjectAndTicketNum(String projectId, int ticketNum, Collector<TicketComment, ?, RESULT> collector);
@@ -21,5 +22,5 @@ public interface TicketCommentDao {
     int deleteByProject(String projectId);
 
     @Delete
-    int delete(TicketComment comment);
+    Result<TicketComment> delete(TicketComment comment);
 }

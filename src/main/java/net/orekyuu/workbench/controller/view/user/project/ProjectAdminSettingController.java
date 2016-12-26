@@ -1,17 +1,17 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
-import net.orekyuu.workbench.entity.Project;
-import net.orekyuu.workbench.entity.User;
-import net.orekyuu.workbench.entity.UserAvatar;
 import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.infra.ProjectOwnerOnly;
-import net.orekyuu.workbench.service.ProjectService;
-import net.orekyuu.workbench.service.UserService;
+import net.orekyuu.workbench.project.domain.model.Project;
+import net.orekyuu.workbench.project.usecase.ProjectUsecase;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
-import net.orekyuu.workbench.util.BotUserUtil;
+import net.orekyuu.workbench.user.domain.model.User;
+import net.orekyuu.workbench.user.usecase.UserUsecase;
+import net.orekyuu.workbench.user.util.BotUserUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -31,22 +31,23 @@ import java.util.Objects;
 public class ProjectAdminSettingController {
 
     @Autowired
-    private ProjectService projectService;
+    private ProjectUsecase projectUsecase;
     @Autowired
-    private UserService userService;
+    private UserUsecase userService;
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectAdminSettingController.class);
     @ModelAttribute("projectMember")
     public List<User> projectMember(@PathVariable String projectId) throws ProjectNotFoundException {
-        List<User> projectMember = projectService.findProjectMember(projectId);
-        return projectMember;
+        return projectUsecase.findById(projectId)
+            .orElseThrow(() -> new ProjectNotFoundException(projectId))
+            .getMember();
     }
 
     @ModelAttribute("botSettingsForm")
     public BotSettingsForm botSettingsForm(@PathVariable String projectId) {
         User botUser = userService.findById(BotUserUtil.toBotUserId(projectId)).orElseThrow(NullPointerException::new);
         BotSettingsForm form = new BotSettingsForm();
-        form.setName(botUser.name);
+        form.setName(botUser.getName());
         return form;
     }
 
@@ -73,18 +74,14 @@ public class ProjectAdminSettingController {
         }
 
         User botUser = userService.findById(BotUserUtil.toBotUserId(projectId)).orElseThrow(NullPointerException::new);
-        if (!Objects.equals(botUser.name, form.name)) {
-            botUser.name = form.name;
-            userService.update(botUser);
+        if (!Objects.equals(botUser.getName(), form.name)) {
+            botUser.changeName(form.name);
+            userService.save(botUser);
         }
 
         if (form.avatar != null && form.avatar.getSize() != 0) {
             try {
-                byte[] bytes = form.avatar.getBytes();
-                UserAvatar userAvatar = new UserAvatar();
-                userAvatar.id = botUser.id;
-                userAvatar.avatar = bytes;
-                userService.updateIcon(userAvatar);
+                userService.updateAvater(botUser, form.avatar.getBytes());
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
@@ -96,11 +93,11 @@ public class ProjectAdminSettingController {
     @ProjectOwnerOnly
     @PostMapping(value = "/project/{projectId}/admin-settings/member/delete", params = "delete")
     public String deleteMember(@ProjectName @PathVariable String projectId, @RequestParam String delete) throws ProjectNotFoundException {
-        Project project = projectService.findById(projectId).get();
-        if (project.ownerUserId.equals(delete)) {
+        Project project = projectUsecase.findById(projectId).get();
+        if (project.getOwner().getId().equals(delete)) {
             logger.info("プロジェクト管理者を削除しようとしたのでスキップ");
         } else {
-            projectService.withdrawProject(projectId, delete);
+            projectUsecase.withdraw(project, userService.findById(delete).orElseThrow(() -> new UsernameNotFoundException(delete)));
         }
         return "redirect:/project/" + projectId + "/admin-settings";
     }
@@ -108,11 +105,9 @@ public class ProjectAdminSettingController {
     @PostMapping(value = "/project/{projectId}/admin-settings/member/new")
     @ProjectOwnerOnly
     public String newMember(@ProjectName @PathVariable String projectId, @RequestParam("newMemberId") String newMemberId) {
-        if (projectService.isJoined(projectId, newMemberId)) {
-            logger.info("すでに参加済み");
-        } else {
-            projectService.joinToProject(projectId, newMemberId);
-        }
+        Project project = projectUsecase.findById(projectId).get();
+        User user = userService.findById(newMemberId).orElseThrow(() -> new UsernameNotFoundException(newMemberId));
+        projectUsecase.join(project, user);
         return "redirect:/project/" + projectId + "/admin-settings";
     }
 

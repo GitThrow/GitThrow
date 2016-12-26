@@ -1,4 +1,4 @@
-package net.orekyuu.workbench.service.impl;
+package net.orekyuu.workbench.git.domain;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -7,8 +7,6 @@ import difflib.Patch;
 import net.orekyuu.workbench.git.ChangeType;
 import net.orekyuu.workbench.git.FileDiff;
 import net.orekyuu.workbench.git.Line;
-import net.orekyuu.workbench.service.RemoteRepositoryService;
-import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -24,71 +22,85 @@ import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
+/**
+ * リモートリポジトリの抽象
+ */
+public class RemoteRepository {
 
     private static final String DEFAULT_BRANCH = "master";
-    @Autowired
-    private Properties applicationProperties;
+    private final String projectId;
+    private final Path repositoryDir;
 
-    @Value("${net.orekyuu.workbench.repository-dir}")
-    private String gitDir;
-
-    @Override
-    public Path getProjectGitRepositoryDir(String projectId) {
-        return Paths.get(gitDir, projectId);
+    RemoteRepository(String projectId, Path repositoryDir) {
+        this.projectId = projectId;
+        this.repositoryDir = repositoryDir;
     }
 
-    @Override
-    public void createRemoteRepository(String projectId) {
-        Path repositoryDir = getProjectGitRepositoryDir(projectId);
-        if (Files.exists(repositoryDir)) {
-            IOException exception = new IOException("すでに存在している: " + projectId);
-            throw new UncheckedIOException(exception);
-        }
-
-        try {
-            Files.createDirectories(repositoryDir);
-
-            Repository repo = new FileRepositoryBuilder()
-                .setGitDir(repositoryDir.toFile())
-                .setBare()
-                .build();
-            final boolean isBare = true;
-            repo.create(isBare);
-
-            StoredConfig config = repo.getConfig();
-            config.setBoolean("http", null, "receivepack", true);
-            config.save();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+    public String getProjectId() {
+        return projectId;
     }
 
-    private Repository getRepository(Path path) throws IOException {
+    public Path getRepositoryDir() {
+        return repositoryDir;
+    }
+
+    public Repository getRepository() throws IOException {
         Repository repo = new FileRepositoryBuilder()
-            .setGitDir(path.toFile())
+            .setGitDir(repositoryDir.toFile())
             .setBare()
             .build();
         repo.incrementOpen();
         return repo;
     }
 
-    @Override
-    public Optional<String> getReadmeFile(String projectId) throws ProjectNotFoundException, GitAPIException {
+    /**
+     * リモートリポジトリを初期化する
+     * @throws IOException
+     */
+    public void init() throws IOException {
+        if (Files.exists(repositoryDir)) {
+            throw new IOException("すでに存在している: " + projectId);
+        }
 
-        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId)); Git git = new Git(repository)) {
+        Files.createDirectories(repositoryDir);
+
+        Repository repo = new FileRepositoryBuilder()
+            .setGitDir(repositoryDir.toFile())
+            .setBare()
+            .build();
+        final boolean isBare = true;
+        repo.create(isBare);
+
+        StoredConfig config = repo.getConfig();
+        config.setBoolean("http", null, "receivepack", true);
+        config.save();
+    }
+
+    /**
+     * リモートリポジトリを削除する
+     * @throws IOException
+     */
+    public void delete() throws IOException {
+        Files.deleteIfExists(repositoryDir);
+    }
+
+    /**
+     * デフォルトブランチのREADME.mdを取得する
+     * @return README.mdの内容
+     * @throws GitAPIException
+     */
+    public Optional<String> getReadmeFile() throws GitAPIException {
+
+        try (Repository repository = getRepository(); Git git = new Git(repository)) {
             // ブランチの一覧を取得
             List<Ref> branchResult = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
 
@@ -98,16 +110,21 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
             if (branchResult.stream().noneMatch(ref -> ref.getName().equals(targetBranch))) {
                 return Optional.empty();
             }
-            return getRepositoryFile(projectId, targetBranch, "README.md").map((bytes) -> bytes.toString());
+            return getRepositoryFile(targetBranch, "README.md").map((bytes) -> bytes.toString());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    @Override
-    public Optional<ByteArrayOutputStream> getRepositoryFile(String projectId, String hash, String relativePath) throws ProjectNotFoundException,
-            GitAPIException {
-        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId))) {
+    /**
+     * リポジトリ内にあるファイルのByteArrayOutputStreamを返します
+     * @param hash 対象のハッシュ
+     * @param relativePath プロジェクトから見た相対パス
+     * @return 見つけたコンテンツのByteArrayOutputStream
+     * @throws GitAPIException
+     */
+    public Optional<ByteArrayOutputStream> getRepositoryFile(String hash, String relativePath) throws GitAPIException {
+        try (Repository repository = getRepository()) {
             // ハッシュかその他で分岐
             // タグとかブランチも食える模様
             ObjectId commitId = ObjectId.isId(hash)?ObjectId.fromString(hash):repository.resolve(hash);
@@ -143,12 +160,10 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-
     }
 
-    @Override
-    public List<DiffEntry> diff(String projectId, String baseBranch, String targetBranch) throws GitAPIException {
-        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId))) {
+    public List<DiffEntry> diff(String baseBranch, String targetBranch) throws GitAPIException {
+        try (Repository repository = getRepository()) {
             Git git = new Git(repository);
             AbstractTreeIterator baseTree = createTreeParser(repository, baseBranch);
             AbstractTreeIterator targetTree = createTreeParser(repository, targetBranch);
@@ -162,22 +177,8 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
         }
     }
 
-    @Override
-    public boolean checkConflict(String projectId, String baseBranch, String targetBranch) {
-        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId))) {
-            ObjectId base = repository.resolve(baseBranch);
-            ObjectId target = repository.resolve(targetBranch);
-
-            ThreeWayMerger merger = MergeStrategy.RECURSIVE.newMerger(repository, true);
-            return merger.merge(base, target);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    @Override
-    public FileDiff calcFileDiff(String projectId, DiffEntry entry) throws GitAPIException {
-        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId))) {
+    public FileDiff calcFileDiff(DiffEntry entry) throws GitAPIException {
+        try (Repository repository = getRepository()) {
 
             //ファイルの内容を持ってくる
             byte[] newContentBytes = entry.getNewPath().equals("/dev/null") ? null :readContentFromId(repository, entry.getNewId().toObjectId());
@@ -241,6 +242,17 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
         }
     }
 
+    public boolean checkConflict(String baseBranch, String targetBranch) {
+        try (Repository repository = getRepository()) {
+            ObjectId base = repository.resolve(baseBranch);
+            ObjectId target = repository.resolve(targetBranch);
+
+            ThreeWayMerger merger = MergeStrategy.RECURSIVE.newMerger(repository, true);
+            return merger.merge(base, target);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
     private boolean isText(byte[] bytes) {
         try {
@@ -280,13 +292,25 @@ public class RemoteRepositoryServiceImpl implements RemoteRepositoryService {
         }
     }
 
-    @Override
-    public List<String> findBranch(String projectId) {
-        try (Repository repository = getRepository(getProjectGitRepositoryDir(projectId))) {
+    public List<String> findBranch() {
+        try (Repository repository = getRepository()) {
             Git git = new Git(repository);
             return git.branchList().call().stream().map(Ref::getName).collect(Collectors.toList());
         } catch (IOException | GitAPIException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RemoteRepository that = (RemoteRepository) o;
+        return Objects.equals(projectId, that.projectId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(projectId);
     }
 }

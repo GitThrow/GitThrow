@@ -3,6 +3,7 @@ package net.orekyuu.workbench.entity.dao;
 import net.orekyuu.workbench.entity.TicketPriority;
 import org.seasar.doma.*;
 import org.seasar.doma.boot.ConfigAutowireable;
+import org.seasar.doma.jdbc.Result;
 
 import java.util.Optional;
 import java.util.stream.Collector;
@@ -12,13 +13,13 @@ import java.util.stream.Collector;
 public interface TicketPriorityDao {
 
     @Insert
-    int insert(TicketPriority type);
+    Result<TicketPriority> insert(TicketPriority type);
 
     @Update
-    int save(TicketPriority type);
+    Result<TicketPriority> save(TicketPriority type);
 
     @Delete
-    int delete(TicketPriority type);
+    Result<TicketPriority> delete(TicketPriority type);
 
     @Select
     Optional<TicketPriority> findById(int id);

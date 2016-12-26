@@ -2,16 +2,49 @@ package net.orekyuu.workbench.entity;
 
 import org.seasar.doma.*;
 
-@Entity
+import java.util.Objects;
+
+@Entity(immutable = true)
 @Table(name = "ticket_priority")
 public class TicketPriority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    public int id;
+    private final Long id;
     @Column(name = "project")
-    public String project;
+    private final String project;
     @Column(name = "priority")
-    public String priority;
+    private final String priority;
+
+    public TicketPriority(Long id, String project, String priority) {
+        this.id = id;
+        this.project = project;
+        this.priority = priority;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TicketPriority that = (TicketPriority) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

@@ -6,6 +6,7 @@ import org.seasar.doma.Delete;
 import org.seasar.doma.Insert;
 import org.seasar.doma.Select;
 import org.seasar.doma.boot.ConfigAutowireable;
+import org.seasar.doma.jdbc.Result;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,13 +19,13 @@ public interface TestLogDao {
     Optional<TestLog> findById(int id);
 
     @Insert
-    int insert(TestLog testLog);
+    Result<TestLog> insert(TestLog testLog);
 
     @Select
     List<TestLog> findByProject(String projectId);
 
     @Delete
-    int delete(TestLog testLog);
+    Result<TestLog> delete(TestLog testLog);
 
     @Delete(sqlFile = true)
     int deleteByProject(String projectId);

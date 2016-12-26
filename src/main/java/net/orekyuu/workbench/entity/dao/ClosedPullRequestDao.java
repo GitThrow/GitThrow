@@ -3,6 +3,7 @@ package net.orekyuu.workbench.entity.dao;
 import net.orekyuu.workbench.entity.ClosedPullRequest;
 import org.seasar.doma.*;
 import org.seasar.doma.boot.ConfigAutowireable;
+import org.seasar.doma.jdbc.Result;
 
 import java.util.Optional;
 import java.util.stream.Collector;
@@ -12,10 +13,10 @@ import java.util.stream.Collector;
 public interface ClosedPullRequestDao {
 
     @Insert
-    int insert(ClosedPullRequest pr);
+    Result<ClosedPullRequest> insert(ClosedPullRequest pr);
 
     @Update(sqlFile = true)
-    int update(ClosedPullRequest pr);
+    Result<ClosedPullRequest> update(ClosedPullRequest pr);
 
     @Delete(sqlFile = true)
     int deleteByProject(String projectId);

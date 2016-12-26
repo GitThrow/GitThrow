@@ -1,4 +1,4 @@
-package net.orekyuu.workbench.entity;
+package net.orekyuu.workbench.project.port.table;
 
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
@@ -7,33 +7,41 @@ import org.seasar.doma.Table;
 
 import java.util.Objects;
 
-@Entity
+@Entity(immutable = true)
 @Table(name = "projects")
-public class Project {
-
+public class ProjectTable {
     @Id
     @Column(name = "project_id")
-    public String id;
+    private final String id;
     @Column(name = "project_name", updatable = true)
-    public String name;
+    private final String name;
     @Column(name = "owner")
-    public String ownerUserId;
+    private final String ownerUserId;
 
-    public Project(String id, String name, String ownerUserId) {
+    public ProjectTable(String id, String name, String ownerUserId) {
         this.id = id;
         this.name = name;
         this.ownerUserId = ownerUserId;
     }
 
-    public Project() {
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getOwnerUserId() {
+        return ownerUserId;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Project project = (Project) o;
-        return Objects.equals(id, project.id);
+        ProjectTable that = (ProjectTable) o;
+        return Objects.equals(id, that.id);
     }
 
     @Override

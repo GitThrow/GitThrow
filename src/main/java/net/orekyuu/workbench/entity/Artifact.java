@@ -2,6 +2,8 @@ package net.orekyuu.workbench.entity;
 
 import org.seasar.doma.*;
 
+import java.util.Objects;
+
 @Entity(immutable = true)
 @Table(name = "artifact")
 public class Artifact {
@@ -21,9 +23,28 @@ public class Artifact {
         this.fileName = fileName;
     }
 
-    public Artifact(String projectId, String fileName) {
-        this.id = null;
-        this.projectId = projectId;
-        this.fileName = fileName;
+    public Integer getId() {
+        return id;
+    }
+
+    public String getProjectId() {
+        return projectId;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Artifact artifact = (Artifact) o;
+        return Objects.equals(id, artifact.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

@@ -3,6 +3,7 @@ package net.orekyuu.workbench.entity.dao;
 import net.orekyuu.workbench.entity.OpenPullRequest;
 import org.seasar.doma.*;
 import org.seasar.doma.boot.ConfigAutowireable;
+import org.seasar.doma.jdbc.Result;
 
 import java.util.Optional;
 import java.util.stream.Collector;
@@ -12,16 +13,16 @@ import java.util.stream.Collector;
 public interface OpenPullRequestDao {
 
     @Insert(sqlFile = true)
-    int insert(OpenPullRequest pr);
+    Result<OpenPullRequest> insert(OpenPullRequest pr);
 
     @Update(sqlFile = true)
-    int update(OpenPullRequest pr);
+    Result<OpenPullRequest> update(OpenPullRequest pr);
 
     @Delete(sqlFile = true)
-    int deleteByProject(String projectId);
+    Result<OpenPullRequest> deleteByProject(String projectId);
 
     @Delete(sqlFile = true)
-    int delete(String projectId, int prNum);
+    Result<OpenPullRequest> delete(String projectId, int prNum);
 
     @Select
     Optional<OpenPullRequest> findByProjectAndNum(String projectId, int prNum);

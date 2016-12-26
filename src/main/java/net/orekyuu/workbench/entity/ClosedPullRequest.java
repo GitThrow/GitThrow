@@ -4,23 +4,82 @@ import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
 import org.seasar.doma.Table;
 
-@Entity
+import java.util.Objects;
+
+@Entity(immutable = true)
 @Table(name = "closed_pull_request")
 public class ClosedPullRequest {
     @Column(name = "project")
-    public String project;
+    private final String project;
     @Column(name = "pr_num")
-    public int prNum;
+    private final Long prNum;
     @Column(name = "title")
-    public String title;
+    private final String title;
     @Column(name = "description")
-    public String description;
+    private final String description;
     @Column(name = "reviewer")
-    public String reviewer;
+    private final String reviewer;
     @Column(name = "proponent")
-    public String proponent;
+    private final String proponent;
     @Column(name = "base_commit")
-    public String baseCommit;
+    private final String baseCommit;
     @Column(name = "target_commit")
-    public String targetCommit;
+    private final String targetCommit;
+
+    public ClosedPullRequest(String project, Long prNum, String title, String description, String reviewer, String proponent, String baseCommit, String targetCommit) {
+        this.project = project;
+        this.prNum = prNum;
+        this.title = title;
+        this.description = description;
+        this.reviewer = reviewer;
+        this.proponent = proponent;
+        this.baseCommit = baseCommit;
+        this.targetCommit = targetCommit;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public Long getPrNum() {
+        return prNum;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getReviewer() {
+        return reviewer;
+    }
+
+    public String getProponent() {
+        return proponent;
+    }
+
+    public String getBaseCommit() {
+        return baseCommit;
+    }
+
+    public String getTargetCommit() {
+        return targetCommit;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClosedPullRequest that = (ClosedPullRequest) o;
+        return Objects.equals(project, that.project) &&
+            Objects.equals(prNum, that.prNum);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(project, prNum);
+    }
 }

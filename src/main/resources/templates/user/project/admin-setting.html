@@ -56,7 +56,7 @@
                 <td th:text="${user.name}">おれきゅう</td>
                 <td th:text="${user.id}">orekyuu</td>
                 <!--管理者は削除できないようにする-->
-                <td><!--/*@thymesVar id="project" type="net.orekyuu.workbench.entity.Project"*/-->
+                <td><!--/*@thymesVar id="project" type="net.orekyuu.workbench.project.domain.model.Project"*/-->
                 <button type="submit" class="btn btn-danger" name="delete" th:value="${user.id}" th:unless="${project.ownerUserId.equals(user.id)}">削除</button></td>　
               </tr>
             </table>

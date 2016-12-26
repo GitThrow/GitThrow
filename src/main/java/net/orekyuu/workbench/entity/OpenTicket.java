@@ -6,28 +6,96 @@ import org.seasar.doma.Entity;
 import org.seasar.doma.Table;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Entity
+@Entity(immutable = true)
 @Table(name = "open_tickets")
 public class OpenTicket {
     @Column(name = "project")
-    public String project;
+    private final String project;
     @Column(name = "ticket_num")
-    public int ticketNum;
+    private final int ticketNum;
     @Column(name = "title")
-    public String title;
+    private final String title;
     @Column(name = "description")
-    public String description;
+    private final String description;
     @Column(name = "assignee")
-    public String assignee;
+    private final String assignee;
     @Column(name = "proponent")
-    public String proponent;
+    private final String proponent;
     @Column(name = "limit")
-    public LocalDateTime limit;
+    private final LocalDateTime limit;
     @Column(name = "type")
-    public int type;
+    private final int type;
     @Column(name = "status")
-    public int status;
+    private final int status;
     @Column(name = "priority")
-    public int priority;
+    private final int priority;
+
+    public OpenTicket(String project, int ticketNum, String title, String description, String assignee, String proponent, LocalDateTime limit, int type, int status, int priority) {
+        this.project = project;
+        this.ticketNum = ticketNum;
+        this.title = title;
+        this.description = description;
+        this.assignee = assignee;
+        this.proponent = proponent;
+        this.limit = limit;
+        this.type = type;
+        this.status = status;
+        this.priority = priority;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public int getTicketNum() {
+        return ticketNum;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getAssignee() {
+        return assignee;
+    }
+
+    public String getProponent() {
+        return proponent;
+    }
+
+    public LocalDateTime getLimit() {
+        return limit;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OpenTicket that = (OpenTicket) o;
+        return ticketNum == that.ticketNum &&
+            Objects.equals(project, that.project);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(project, ticketNum);
+    }
 }

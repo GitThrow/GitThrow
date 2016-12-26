@@ -4,7 +4,7 @@ import net.orekyuu.workbench.entity.Artifact;
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.message.BuildResult;
 import net.orekyuu.workbench.service.TicketCommentService;
-import net.orekyuu.workbench.util.BotUserUtil;
+import net.orekyuu.workbench.user.util.BotUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

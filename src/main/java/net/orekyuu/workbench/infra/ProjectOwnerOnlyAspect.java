@@ -2,7 +2,7 @@ package net.orekyuu.workbench.infra;
 
 import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
 import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
-import net.orekyuu.workbench.entity.Project;
+import net.orekyuu.workbench.project.domain.model.Project;
 import net.orekyuu.workbench.service.ProjectService;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import org.aspectj.lang.ProceedingJoinPoint;

@@ -3,27 +3,29 @@ package net.orekyuu.workbench.entity;
 import org.seasar.doma.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Entity
+@Entity(immutable = true)
 @Table(name = "ticket_comment")
 public class TicketComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    public int id;
+    private final Long id;
     @Column(name = "project")
-    public String projectId;
+    private final String projectId;
     @Column(name = "ticket_num")
-    public int ticketNum;
+    private final Long ticketNum;
     @Column(name = "text")
-    public String text;
+    private final String text;
     @Column(name = "created_at")
-    public LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
     @Column(name = "user")
-    public String userId;
+    private final String userId;
 
-    public TicketComment(String projectId, int ticketNum, String text, LocalDateTime createdAt, String userId) {
+    public TicketComment(Long id, String projectId, Long ticketNum, String text, LocalDateTime createdAt, String userId) {
+        this.id = id;
         this.projectId = projectId;
         this.ticketNum = ticketNum;
         this.text = text;
@@ -31,6 +33,40 @@ public class TicketComment {
         this.userId = userId;
     }
 
-    public TicketComment() {
+    public Long getId() {
+        return id;
+    }
+
+    public String getProjectId() {
+        return projectId;
+    }
+
+    public Long getTicketNum() {
+        return ticketNum;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TicketComment that = (TicketComment) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
