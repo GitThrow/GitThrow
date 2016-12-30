@@ -2,14 +2,13 @@ package net.orekyuu.workbench.infra;
 
 import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
 import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
-import net.orekyuu.workbench.service.ProjectService;
+import net.orekyuu.workbench.project.usecase.ProjectUsecase;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -21,7 +20,7 @@ import java.util.Optional;
 public class ProjectMemberOnlyAspect {
 
     @Autowired
-    private ProjectService projectService;
+    private ProjectUsecase projectUsecase;
 
     @Around("@annotation(net.orekyuu.workbench.infra.ProjectMemberOnly)")
     public Object projectAuthAspect(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -30,7 +29,7 @@ public class ProjectMemberOnlyAspect {
         WorkbenchUserDetails userDetails = (WorkbenchUserDetails) SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
 
-        boolean joined = projectService.isJoined(projectName, userDetails.getUser().id);
+        boolean joined = projectUsecase.isJoined(projectName, userDetails.getUser().getId());
         if (!joined) {
             throw new NotMemberException();
         }

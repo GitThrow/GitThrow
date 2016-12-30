@@ -5,7 +5,6 @@ import net.orekyuu.workbench.git.domain.RemoteRepositoryFactory;
 import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.project.domain.model.Project;
-import net.orekyuu.workbench.project.usecase.ProjectUsecase;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import net.orekyuu.workbench.user.domain.model.User;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -21,22 +20,14 @@ import java.util.List;
 public class ProjectDashboardController {
 
     @Autowired
-    private ProjectUsecase projectUsecase;
-    @Autowired
     private RemoteRepositoryFactory repositoryFactory;
 
 
     @ProjectMemberOnly
     @GetMapping("/project/{projectId}")
-    public String show(@ProjectName @PathVariable String projectId, Model model) throws ProjectNotFoundException, GitAPIException {
-        Object project = model.asMap().get("project");
-        if (project == null || !(project instanceof Project)) {
-            throw new ProjectNotFoundException(projectId);
-        }
-
-        Project prj = ((Project) project);
-        List<User> member = prj.getMember();
-        User admin = prj.getOwner();
+    public String show(@ProjectName @PathVariable String projectId, Model model, Project project) throws ProjectNotFoundException, GitAPIException {
+        List<User> member = project.getMember();
+        User admin = project.getOwner();
 
         RemoteRepository repository = repositoryFactory.create(projectId);
         String readme = repository.getReadmeFile().orElse("");

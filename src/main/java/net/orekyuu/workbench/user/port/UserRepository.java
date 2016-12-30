@@ -55,10 +55,17 @@ public class UserRepository {
     }
 
     public Optional<User> findById(String id) {
+        return findById(id, false);
+    }
+
+    public Optional<User> findById(String id, boolean fetchSettings) {
         return userDao.findById(id).map(table -> {
-            UserSettingTable settingTable = userSettingDao.findById(table.getId())
-                .orElseThrow(() -> new RuntimeException("設定が見つからない"));
-            return UserUtil.fromTable(table, settingTable);
+            if (fetchSettings) {
+                UserSettingTable settingTable = userSettingDao.findById(table.getId())
+                    .orElseThrow(() -> new RuntimeException("設定が見つからない"));
+                return UserUtil.fromTable(table, settingTable);
+            }
+            return UserUtil.fromTable(table);
         });
     }
 

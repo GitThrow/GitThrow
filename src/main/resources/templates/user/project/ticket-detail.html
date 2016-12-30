@@ -61,7 +61,7 @@
                 <label for="type" class=" control-label">タイプ</label>
                 <div class="">
                   <select class="form-control" title="type" id="type">
-                    <!--/*@thymesVar id="type" type="net.orekyuu.workbench.entity.TicketType"*/-->
+                    <!--/*@thymesVar id="type" type="net.orekyuu.workbench.ticket.port.table.TicketTypeTable"*/-->
                     <option th:each="type : ${typeList}" th:text="${type.type}"
                             th:value="${type.id}" th:selected="${type.type.equals(ticket.type)}">hoge
                     </option>
@@ -72,7 +72,7 @@
                 <label for="priority" class=" control-label">優先度</label>
                 <div class="">
                   <select class="form-control" title="priority" id="priority">
-                    <!--/*@thymesVar id="priority" type="net.orekyuu.workbench.entity.TicketPriority"*/-->
+                    <!--/*@thymesVar id="priority" type="net.orekyuu.workbench.ticket.port.table.TicketPriorityTable"*/-->
                     <option th:each="priority : ${priorityList}" th:text="${priority.priority}"
                             th:value="${priority.id}" th:selected="${priority.priority.equals(ticket.priority)}">hoge
                     </option>
@@ -84,7 +84,7 @@
                 <label for="status" class=" control-label">ステータス</label>
                 <div class="">
                   <select class="form-control" title="status" id="status">
-                    <!--/*@thymesVar id="status" type="net.orekyuu.workbench.entity.TicketStatus"*/-->
+                    <!--/*@thymesVar id="status" type="net.orekyuu.workbench.ticket.port.table.TicketStatusTable"*/-->
                     <option th:each="status : ${statusList}" th:text="${status.status}"
                             th:value="${status.id}" th:selected="${status.status.equals(ticket.status)}">hoge
                     </option>
@@ -193,7 +193,7 @@
     function update() {
       var ticket = {
         project: [[${project.id}]],
-        ticketNum: [[${ticket.number}]],
+        ticketNumTable: [[${ticket.number}]],
         title: $('#title').text(),
         description: [[${ticket.desc}]],
         assignee: $('#assign').val(),

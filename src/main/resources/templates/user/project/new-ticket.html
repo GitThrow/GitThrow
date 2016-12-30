@@ -55,7 +55,7 @@
               <label for="type" class="col-sm-3 control-label">タイプ</label>
               <div class="col-sm-9">
                 <select class="form-control" title="type" id="type" th:field="*{type}">
-                  <!--/*@thymesVar id="type" type="net.orekyuu.workbench.entity.TicketType"*/-->
+                  <!--/*@thymesVar id="type" type="net.orekyuu.workbench.ticket.port.table.TicketTypeTable"*/-->
                   <option th:each="type : ${typeList}" th:text="${type.type}" th:value="${type.id}">hoge</option>
                 </select>
                 <p class="help-block" th:if="${#fields.hasErrors('type')}" th:errors="*{type}">エラーメッセージ</p>
@@ -66,7 +66,7 @@
               <label for="priority" class="col-sm-3 control-label">優先度</label>
               <div class="col-sm-9">
                 <select class="form-control" title="priority" id="priority" th:field="*{priority}">
-                  <!--/*@thymesVar id="priority" type="net.orekyuu.workbench.entity.TicketPriority"*/-->
+                  <!--/*@thymesVar id="priority" type="net.orekyuu.workbench.ticket.port.table.TicketPriorityTable"*/-->
                   <option th:each="priority : ${priorityList}" th:text="${priority.priority}" th:value="${priority.id}">hoge</option>
                 </select>
                 <p class="help-block" th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}">エラーメッセージ</p>
@@ -77,7 +77,7 @@
               <label for="status" class="col-sm-3 control-label">ステータス</label>
               <div class="col-sm-9">
                 <select class="form-control" title="status" id="status" th:field="*{status}">
-                  <!--/*@thymesVar id="status" type="net.orekyuu.workbench.entity.TicketStatus"*/-->
+                  <!--/*@thymesVar id="status" type="net.orekyuu.workbench.ticket.port.table.TicketStatusTable"*/-->
                   <option th:each="status : ${statusList}" th:text="${status.status}" th:value="${status.id}">hoge</option>
                 </select>
                 <p class="help-block" th:if="${#fields.hasErrors('status')}" th:errors="*{status}">エラーメッセージ</p>

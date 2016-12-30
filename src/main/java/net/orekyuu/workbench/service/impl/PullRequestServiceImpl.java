@@ -6,9 +6,9 @@ import net.orekyuu.workbench.entity.ClosedPullRequest;
 import net.orekyuu.workbench.entity.OpenPullRequest;
 import net.orekyuu.workbench.entity.dao.ClosedPullRequestDao;
 import net.orekyuu.workbench.entity.dao.OpenPullRequestDao;
-import net.orekyuu.workbench.entity.dao.TicketNumDao;
 import net.orekyuu.workbench.service.ProjectService;
 import net.orekyuu.workbench.service.PullRequestService;
+import net.orekyuu.workbench.ticket.port.table.TicketNumDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 

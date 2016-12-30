@@ -60,6 +60,10 @@ public class UserUsecase {
         return userRepository.findById(id);
     }
 
+    public Optional<User> findById(String id, boolean fetchSettings) {
+        return userRepository.findById(id, fetchSettings);
+    }
+
     public List<User> findAll(boolean includeBot) {
         return userRepository.findAll(includeBot);
     }

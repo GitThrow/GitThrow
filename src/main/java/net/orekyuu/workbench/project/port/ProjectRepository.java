@@ -1,13 +1,5 @@
 package net.orekyuu.workbench.project.port;
 
-import net.orekyuu.workbench.entity.TicketNum;
-import net.orekyuu.workbench.entity.TicketPriority;
-import net.orekyuu.workbench.entity.TicketStatus;
-import net.orekyuu.workbench.entity.TicketType;
-import net.orekyuu.workbench.entity.dao.TicketNumDao;
-import net.orekyuu.workbench.entity.dao.TicketPriorityDao;
-import net.orekyuu.workbench.entity.dao.TicketStatusDao;
-import net.orekyuu.workbench.entity.dao.TicketTypeDao;
 import net.orekyuu.workbench.git.domain.RemoteRepository;
 import net.orekyuu.workbench.git.domain.RemoteRepositoryFactory;
 import net.orekyuu.workbench.project.domain.model.Project;
@@ -16,6 +8,7 @@ import net.orekyuu.workbench.project.port.table.ProjectTable;
 import net.orekyuu.workbench.project.port.table.ProjectUserDao;
 import net.orekyuu.workbench.project.port.table.ProjectUserTable;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
+import net.orekyuu.workbench.ticket.port.table.*;
 import net.orekyuu.workbench.user.domain.model.User;
 import net.orekyuu.workbench.user.port.UserRepository;
 import net.orekyuu.workbench.user.port.table.*;
@@ -98,20 +91,20 @@ public class ProjectRepository {
         RemoteRepository repository = repositoryFactory.create(projectId);
         repository.init();
 
-        ticketNumDao.insert(new TicketNum(projectId, 0L));
+        ticketNumDao.insert(new TicketNumTable(projectId, 0L));
         //デフォルトの優先度一覧
         defaultTicketPriority.stream()
-            .map(str -> new TicketPriority(null, projectId, str))
+            .map(str -> new TicketPriorityTable(null, projectId, str))
             .forEach(ticketPriorityDao::insert);
 
         //デフォルトの状態一覧
         defaultTicketStatus.stream()
-            .map(str -> new TicketStatus(null, projectId, str))
+            .map(str -> new TicketStatusTable(null, projectId, str))
             .forEach(ticketStatusDao::insert);
 
         //デフォルトのタイプ一覧
         defaultTicketType.stream()
-            .map(str -> new TicketType(null, projectId, str))
+            .map(str -> new TicketTypeTable(null, projectId, str))
             .forEach(ticketTypeDao::insert);
 
         createBot(projectId);

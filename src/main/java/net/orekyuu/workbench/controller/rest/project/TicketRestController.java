@@ -3,10 +3,8 @@ package net.orekyuu.workbench.controller.rest.project;
 import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
 import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
 import net.orekyuu.workbench.controller.view.user.project.TicketNotFoundException;
-import net.orekyuu.workbench.entity.OpenTicket;
-import net.orekyuu.workbench.service.ProjectService;
-import net.orekyuu.workbench.service.TicketService;
-import org.springframework.beans.factory.annotation.Autowired;
+import net.orekyuu.workbench.ticket.domain.model.Ticket;
+import net.orekyuu.workbench.ticket.port.table.OpenTicketTable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,19 +14,14 @@ import java.util.List;
 @RequestMapping("/rest/ticket")
 public class TicketRestController {
 
-    @Autowired
-    private TicketService ticketService;
-    @Autowired
-    private ProjectService projectService;
-
     @PostMapping
     @ResponseBody
-    public OpenTicket updateTicket(@RequestBody TicketUpdateRequest req, @AuthenticationPrincipal WorkbenchUserDetails principal) {
+    public Ticket updateTicket(@RequestBody TicketUpdateRequest req, @AuthenticationPrincipal WorkbenchUserDetails principal) {
         if (!projectService.isJoined(req.getProject(), principal.getUser().id)) {
             throw new NotMemberException();
         }
 
-        OpenTicket ticket = ticketService.findByProjectAndNum(req.getProject(), req.getTicketNum())
+        OpenTicketTable ticket = ticketService.findByProjectAndNum(req.getProject(), req.getTicketNum())
             .orElseThrow(() -> new TicketNotFoundException(req.getProject()));
         ticket.title = req.getTitle();
         ticket.description = req.getDescription();
@@ -42,7 +35,7 @@ public class TicketRestController {
     }
 
     @GetMapping("/all")
-    public List<OpenTicket> showAll(@RequestParam("project") String projectId, @AuthenticationPrincipal WorkbenchUserDetails principal) {
+    public List<OpenTicketTable> showAll(@RequestParam("project") String projectId, @AuthenticationPrincipal WorkbenchUserDetails principal) {
         if (!projectService.isJoined(projectId, principal.getUser().id)) {
             throw new NotMemberException();
         }

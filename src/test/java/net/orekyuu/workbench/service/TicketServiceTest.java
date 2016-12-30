@@ -2,12 +2,9 @@ package net.orekyuu.workbench.service;
 
 import net.orekyuu.workbench.controller.rest.model.TicketModel;
 import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
-import net.orekyuu.workbench.entity.*;
-import net.orekyuu.workbench.entity.dao.TicketPriorityDao;
-import net.orekyuu.workbench.entity.dao.TicketStatusDao;
-import net.orekyuu.workbench.entity.dao.TicketTypeDao;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
+import net.orekyuu.workbench.ticket.port.table.*;
 import net.orekyuu.workbench.util.TestRepositoryUtil;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
@@ -44,13 +41,13 @@ public class TicketServiceTest {
 
     private User user1;
     private User user2;
-    private TicketStatus status1;
-    private TicketPriority priority1;
-    private TicketType type1;
+    private TicketStatusTable status1;
+    private TicketPriorityTable priority1;
+    private TicketTypeTable type1;
 
-    private TicketStatus status2;
-    private TicketPriority priority2;
-    private TicketType type2;
+    private TicketStatusTable status2;
+    private TicketPriorityTable priority2;
+    private TicketTypeTable type2;
 
     @Autowired
     private TestRepositoryUtil testRepositoryUtil;
@@ -79,7 +76,7 @@ public class TicketServiceTest {
     }
 
     private void createTicketToProject1(String title, String desc) {
-        OpenTicket ticket = new OpenTicket();
+        OpenTicketTable ticket = new OpenTicketTable();
         ticket.project = "project1";
         ticket.title = title;
         ticket.description = desc;
@@ -93,7 +90,7 @@ public class TicketServiceTest {
     }
 
     private void createTicketToProject2(String title, String desc) {
-        OpenTicket ticket = new OpenTicket();
+        OpenTicketTable ticket = new OpenTicketTable();
         ticket.project = "project2";
         ticket.title = title;
         ticket.description = desc;
@@ -115,7 +112,7 @@ public class TicketServiceTest {
     @Test
     public void testCreateException() {
         Assertions.assertThatThrownBy(() -> {
-            OpenTicket ticket = new OpenTicket();
+            OpenTicketTable ticket = new OpenTicketTable();
             ticket.project = "project1";
             ticket.title = "タスク1";
             ticket.description = "";
@@ -129,7 +126,7 @@ public class TicketServiceTest {
         }).isInstanceOf(IllegalArgumentException.class);
 
         Assertions.assertThatThrownBy(() -> {
-            OpenTicket ticket = new OpenTicket();
+            OpenTicketTable ticket = new OpenTicketTable();
             ticket.project = "project1";
             ticket.title = "タスク1";
             ticket.description = "";
@@ -143,7 +140,7 @@ public class TicketServiceTest {
         }).isInstanceOf(IllegalArgumentException.class);
 
         Assertions.assertThatThrownBy(() -> {
-            OpenTicket ticket = new OpenTicket();
+            OpenTicketTable ticket = new OpenTicketTable();
             ticket.project = "project1";
             ticket.title = "タスク1";
             ticket.description = "";
@@ -157,7 +154,7 @@ public class TicketServiceTest {
         }).isInstanceOf(IllegalArgumentException.class);
 
         Assertions.assertThatThrownBy(() -> {
-            OpenTicket ticket = new OpenTicket();
+            OpenTicketTable ticket = new OpenTicketTable();
             ticket.project = "project1";
             ticket.title = "タスク1";
             ticket.description = "";
@@ -171,7 +168,7 @@ public class TicketServiceTest {
         }).isInstanceOf(NotMemberException.class);
 
         Assertions.assertThatThrownBy(() -> {
-            OpenTicket ticket = new OpenTicket();
+            OpenTicketTable ticket = new OpenTicketTable();
             ticket.project = "project1";
             ticket.title = "タスク1";
             ticket.description = "";
@@ -191,7 +188,7 @@ public class TicketServiceTest {
         createTicketToProject1("タスク2", "テスト");
         createTicketToProject2("タスク3", "テスト");
 
-        List<OpenTicket> project = ticketService.findOpenTicketByProject("project1");
+        List<OpenTicketTable> project = ticketService.findOpenTicketByProject("project1");
         Assertions.assertThat(project).hasSize(2);
         Assertions.assertThat(project.get(0).title).isEqualTo("タスク1");
         Assertions.assertThat(project.get(0).ticketNum).isEqualTo(1);
@@ -224,9 +221,9 @@ public class TicketServiceTest {
 
         createTicketToProject1("hoge", "テスト");
 
-        List<OpenTicket> ticketList = ticketService.findOpenTicketByProject("project1");
+        List<OpenTicketTable> ticketList = ticketService.findOpenTicketByProject("project1");
 
-        OpenTicket ticket = ticketList.stream().filter(t -> t.title.equals("hoge")).findFirst().get();
+        OpenTicketTable ticket = ticketList.stream().filter(t -> t.title.equals("hoge")).findFirst().get();
 
         ticket.title = "fuga";
         ticket.description = "desc";
@@ -238,7 +235,7 @@ public class TicketServiceTest {
         ticket.type = newType;
         ticketService.update(ticket);
 
-        OpenTicket updatedTicket = ticketService.findByProjectAndNum("project1", ticket.ticketNum).get();
+        OpenTicketTable updatedTicket = ticketService.findByProjectAndNum("project1", ticket.ticketNum).get();
         Assertions.assertThat(updatedTicket.title).isEqualTo("fuga");
         Assertions.assertThat(updatedTicket.description).isEqualTo("desc");
         Assertions.assertThat(updatedTicket.limit).isEqualTo(LocalDate.of(2016, 8, 22).atStartOfDay());
@@ -252,8 +249,8 @@ public class TicketServiceTest {
     @Test
     public void testUpdateException() {
         createTicketToProject1("hoge", "テスト");
-        List<OpenTicket> ticketList = ticketService.findOpenTicketByProject("project1");
-        OpenTicket ticket = ticketList.stream().filter(t -> t.title.equals("hoge")).findFirst().get();
+        List<OpenTicketTable> ticketList = ticketService.findOpenTicketByProject("project1");
+        OpenTicketTable ticket = ticketList.stream().filter(t -> t.title.equals("hoge")).findFirst().get();
 
         Assertions.assertThatThrownBy(() -> {
             ticket.title = "タスク1";
