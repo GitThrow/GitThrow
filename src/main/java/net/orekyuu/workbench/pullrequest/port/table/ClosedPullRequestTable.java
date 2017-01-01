@@ -1,4 +1,4 @@
-package net.orekyuu.workbench.entity;
+package net.orekyuu.workbench.pullrequest.port.table;
 
 import org.seasar.doma.Column;
 import org.seasar.doma.Entity;
@@ -6,9 +6,9 @@ import org.seasar.doma.Table;
 
 import java.util.Objects;
 
-@Entity(immutable = false)
-@Table(name = "open_pull_request")
-public class OpenPullRequest {
+@Entity(immutable = true)
+@Table(name = "closed_pull_request")
+public class ClosedPullRequestTable {
     @Column(name = "project")
     private final String project;
     @Column(name = "pr_num")
@@ -21,20 +21,20 @@ public class OpenPullRequest {
     private final String reviewer;
     @Column(name = "proponent")
     private final String proponent;
-    @Column(name = "base_branch")
-    private final String baseBranch;
-    @Column(name = "target_branch")
-    private final String targetBranch;
+    @Column(name = "base_commit")
+    private final String baseCommit;
+    @Column(name = "target_commit")
+    private final String targetCommit;
 
-    public OpenPullRequest(String project, Long prNum, String title, String description, String reviewer, String proponent, String baseBranch, String targetBranch) {
+    public ClosedPullRequestTable(String project, Long prNum, String title, String description, String reviewer, String proponent, String baseCommit, String targetCommit) {
         this.project = project;
         this.prNum = prNum;
         this.title = title;
         this.description = description;
         this.reviewer = reviewer;
         this.proponent = proponent;
-        this.baseBranch = baseBranch;
-        this.targetBranch = targetBranch;
+        this.baseCommit = baseCommit;
+        this.targetCommit = targetCommit;
     }
 
     public String getProject() {
@@ -61,19 +61,19 @@ public class OpenPullRequest {
         return proponent;
     }
 
-    public String getBaseBranch() {
-        return baseBranch;
+    public String getBaseCommit() {
+        return baseCommit;
     }
 
-    public String getTargetBranch() {
-        return targetBranch;
+    public String getTargetCommit() {
+        return targetCommit;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        OpenPullRequest that = (OpenPullRequest) o;
+        ClosedPullRequestTable that = (ClosedPullRequestTable) o;
         return Objects.equals(project, that.project) &&
             Objects.equals(prNum, that.prNum);
     }

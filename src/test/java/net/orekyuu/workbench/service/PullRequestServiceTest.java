@@ -2,8 +2,8 @@ package net.orekyuu.workbench.service;
 
 import net.orekyuu.workbench.controller.rest.model.PullRequestModel;
 import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
-import net.orekyuu.workbench.entity.OpenPullRequest;
 import net.orekyuu.workbench.entity.User;
+import net.orekyuu.workbench.pullrequest.port.table.OpenPullRequestTable;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
 import net.orekyuu.workbench.util.TestRepositoryUtil;
@@ -50,7 +50,7 @@ public class PullRequestServiceTest {
     }
 
     private void createPullRequest(String title) {
-        OpenPullRequest pr = new OpenPullRequest();
+        OpenPullRequestTable pr = new OpenPullRequestTable();
         pr.title = title;
         pr.description = "";
         pr.project = "project1";
@@ -70,7 +70,7 @@ public class PullRequestServiceTest {
     @Test
     public void testCreateException() {
         Assertions.assertThatThrownBy(() -> {
-            OpenPullRequest pr = new OpenPullRequest();
+            OpenPullRequestTable pr = new OpenPullRequestTable();
             pr.title = "test1";
             pr.description = "";
             pr.project = "project1";
@@ -82,7 +82,7 @@ public class PullRequestServiceTest {
         }).isInstanceOf(NotMemberException.class);
 
         Assertions.assertThatThrownBy(() -> {
-            OpenPullRequest pr = new OpenPullRequest();
+            OpenPullRequestTable pr = new OpenPullRequestTable();
             pr.title = "test1";
             pr.description = "";
             pr.project = "project1";
