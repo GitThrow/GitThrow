@@ -1,6 +1,5 @@
-package net.orekyuu.workbench.entity.dao;
+package net.orekyuu.workbench.build.port.table;
 
-import net.orekyuu.workbench.entity.Artifact;
 import org.seasar.doma.*;
 import org.seasar.doma.boot.ConfigAutowireable;
 import org.seasar.doma.jdbc.Result;
@@ -13,16 +12,16 @@ import java.util.stream.Collector;
 public interface ArtifactDao {
 
     @Insert
-    Result<Artifact> insert(Artifact artifact);
+    Result<ArtifactTable> insert(ArtifactTable artifactTable);
 
     @Select(strategy = SelectType.COLLECT)
-    <RESULT> RESULT findByProject(String projectId, Collector<Artifact, ?, RESULT> collector);
+    <RESULT> RESULT findByProject(String projectId, Collector<ArtifactTable, ?, RESULT> collector);
 
     @Select
-    Optional<Artifact> findById(int id);
+    Optional<ArtifactTable> findById(int id);
 
     @Delete
-    Result<Artifact> delete(Artifact artifact);
+    Result<ArtifactTable> delete(ArtifactTable artifactTable);
 
     @Delete(sqlFile = true)
     int deleteByProject(String projectId);

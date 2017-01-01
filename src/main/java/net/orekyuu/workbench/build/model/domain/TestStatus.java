@@ -1,4 +1,4 @@
-package net.orekyuu.workbench.entity;
+package net.orekyuu.workbench.build.model.domain;
 
 public enum TestStatus {
     PASSING,

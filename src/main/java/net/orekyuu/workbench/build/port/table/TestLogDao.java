@@ -1,6 +1,5 @@
-package net.orekyuu.workbench.entity.dao;
+package net.orekyuu.workbench.build.port.table;
 
-import net.orekyuu.workbench.entity.TestLog;
 import org.seasar.doma.Dao;
 import org.seasar.doma.Delete;
 import org.seasar.doma.Insert;
@@ -16,16 +15,16 @@ import java.util.Optional;
 public interface TestLogDao {
 
     @Select
-    Optional<TestLog> findById(int id);
+    Optional<TestLogTable> findById(int id);
 
     @Insert
-    Result<TestLog> insert(TestLog testLog);
+    Result<TestLogTable> insert(TestLogTable testLog);
 
     @Select
-    List<TestLog> findByProject(String projectId);
+    List<TestLogTable> findByProject(String projectId);
 
     @Delete
-    Result<TestLog> delete(TestLog testLog);
+    Result<TestLogTable> delete(TestLogTable testLog);
 
     @Delete(sqlFile = true)
     int deleteByProject(String projectId);

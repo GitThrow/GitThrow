@@ -48,7 +48,7 @@
     #ジョブを実行するためのディレクトリ
     net.orekyuu.workbench.job-workspace-dir=job
     #成果物を保管するディレクトリ
-    net.orekyuu.workbench.artifact-dir=content/artifact
+    net.orekyuu.workbench.artifactTable-dir=content/artifactTable
     ```
 1. 指定したポートにnginxなどでリバースプロキシを設定
 1. 起動 `service workbench2 start`

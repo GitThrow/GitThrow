@@ -1,7 +1,7 @@
 package net.orekyuu.workbench.job.task;
 
-import net.orekyuu.workbench.entity.Artifact;
-import net.orekyuu.workbench.entity.TestStatus;
+import net.orekyuu.workbench.build.model.domain.TestStatus;
+import net.orekyuu.workbench.build.port.table.ArtifactTable;
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.message.BuildResult;
 import net.orekyuu.workbench.service.TicketCommentService;
@@ -41,7 +41,7 @@ public class MergeJobCommentTask implements Task {
         builder.append("  \n");
 
         //成果物のリンク
-        Optional<Artifact> artifact = args.getData(SaveArtifactTask.ARTIFACT_KEY);
+        Optional<ArtifactTable> artifact = args.getData(SaveArtifactTask.ARTIFACT_KEY);
         artifact.ifPresent(it -> {
             String link = "/project/" + projectId + "/artifact/" + it.id;
             String message = String.format("成果物: [%s](%s)", it.fileName, link);

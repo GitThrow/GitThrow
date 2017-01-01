@@ -1,6 +1,6 @@
 package net.orekyuu.workbench.job.task;
 
-import net.orekyuu.workbench.entity.TestStatus;
+import net.orekyuu.workbench.build.model.domain.TestStatus;
 import net.orekyuu.workbench.job.*;
 import net.orekyuu.workbench.job.message.LogMessage;
 import net.orekyuu.workbench.job.message.TestResult;

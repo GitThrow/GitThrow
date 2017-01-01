@@ -1,6 +1,6 @@
 package net.orekyuu.workbench.job.task;
 
-import net.orekyuu.workbench.entity.Artifact;
+import net.orekyuu.workbench.build.port.table.ArtifactTable;
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
 import net.orekyuu.workbench.job.WorkbenchConfig;
@@ -82,7 +82,7 @@ public class SaveArtifactTask implements Task {
 
         Pair<String, byte[]> pair = toByteArray(files);
         if (pair != null) {
-            Artifact save = artifactService.save(projectId, pair.getRight(), pair.getLeft());
+            ArtifactTable save = artifactService.save(projectId, pair.getRight(), pair.getLeft());
             args.putData(ARTIFACT_KEY, save);
         }
 

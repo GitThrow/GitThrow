@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS `closed_pull_request` (
 );
 
 /* 成果物 */
-CREATE TABLE IF NOT EXISTS `artifact` (
+CREATE TABLE IF NOT EXISTS `artifactTable` (
   `id`        INT AUTO_INCREMENT PRIMARY KEY,
   `project`   VARCHAR(32)  NOT NULL,
   `file_name` VARCHAR(512) NOT NULL,

@@ -2,7 +2,7 @@ package net.orekyuu.workbench.job.task;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.orekyuu.workbench.entity.TestStatus;
+import net.orekyuu.workbench.build.model.domain.TestStatus;
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
 import net.orekyuu.workbench.job.TestLogModel;

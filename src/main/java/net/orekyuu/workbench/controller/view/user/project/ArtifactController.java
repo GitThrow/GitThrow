@@ -1,6 +1,6 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
-import net.orekyuu.workbench.entity.Artifact;
+import net.orekyuu.workbench.build.port.table.ArtifactTable;
 import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
 import net.orekyuu.workbench.service.ArtifactService;
@@ -33,8 +33,8 @@ public class ArtifactController {
     @ProjectMemberOnly
     @GetMapping("/project/{projectId}/files")
     public String showArtifactList(@ProjectName @PathVariable String projectId, Model model) {
-        List<Artifact> artifacts = artifactService.findByProjectId(projectId);
-        model.addAttribute("artifacts", artifacts);
+        List<ArtifactTable> artifactTables = artifactService.findByProjectId(projectId);
+        model.addAttribute("artifactTables", artifactTables);
         return "user/project/artifact-list";
     }
 
@@ -43,14 +43,14 @@ public class ArtifactController {
     public void downloadArtifact(@ProjectName @PathVariable String projectId,
                                  @PathVariable int artifactId,
                                  HttpServletResponse res) {
-        Artifact artifact = artifactService.findById(artifactId)
+        ArtifactTable artifactTable = artifactService.findById(artifactId)
             .filter(a -> a.projectId.equals(projectId))
             .orElseThrow(() -> new ContentNotFoundException(projectId));
 
         try {
-            InputStream inputStream = artifactService.openArtifactStreamByArtifact(artifact);
+            InputStream inputStream = artifactService.openArtifactStreamByArtifact(artifactTable);
 
-            res.setHeader("Content-Disposition", "attachment; filename=" + artifact.fileName);
+            res.setHeader("Content-Disposition", "attachment; filename=" + artifactTable.fileName);
             res.setHeader("Content-Transfer-Encoding", "binary");
             res.setContentType("application/octet-stream;");
             ServletOutputStream outputStream = res.getOutputStream();
@@ -64,16 +64,16 @@ public class ArtifactController {
     @ProjectMemberOnly
     @PostMapping("/project/{projectId}/artifact/delete")
     public String deleteArtifact(@ProjectName @PathVariable String projectId, @RequestParam(value="artifactId") int artifactId) {
-        Optional<Artifact> artifactOpt = artifactService.findById(artifactId)
+        Optional<ArtifactTable> artifactOpt = artifactService.findById(artifactId)
             .filter(a -> a.projectId.equals(projectId));
 
         if (!artifactOpt.isPresent()) {
-            logger.warn("Artifact not found.");
+            logger.warn("ArtifactTable not found.");
             return String.format("redirect:/project/%s/files", projectId);
         }
 
-        Artifact artifact = artifactOpt.get();
-        artifactService.delete(artifact);
+        ArtifactTable artifactTable = artifactOpt.get();
+        artifactService.delete(artifactTable);
         return String.format("redirect:/project/%s/files", projectId);
     }
 }

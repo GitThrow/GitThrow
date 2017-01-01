@@ -1,5 +1,6 @@
-package net.orekyuu.workbench.entity;
+package net.orekyuu.workbench.build.port.table;
 
+import net.orekyuu.workbench.build.model.domain.TestStatus;
 import org.seasar.doma.*;
 
 import java.time.LocalDateTime;
@@ -7,7 +8,7 @@ import java.util.Objects;
 
 @Entity(immutable = true)
 @Table(name = "test_log")
-public class TestLog {
+public class TestLogTable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +25,7 @@ public class TestLog {
     @Column(name = "commit")
     private final String commit;
 
-    public TestLog(Long id, String projectId, String log, LocalDateTime createdAt, TestStatus status, String commit) {
+    public TestLogTable(Long id, String projectId, String log, LocalDateTime createdAt, TestStatus status, String commit) {
         this.id = id;
         this.projectId = projectId;
         this.log = log;
@@ -61,8 +62,8 @@ public class TestLog {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TestLog testLog = (TestLog) o;
-        return Objects.equals(id, testLog.id);
+        net.orekyuu.workbench.entity.TestLog testLog = (net.orekyuu.workbench.entity.TestLog) o;
+        return Objects.equals(id, testLog.getId());
     }
 
     @Override
