@@ -5,7 +5,9 @@ import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
 import net.orekyuu.workbench.job.BuildJob;
 import net.orekyuu.workbench.job.MergeJob;
 import net.orekyuu.workbench.job.TestJob;
-import net.orekyuu.workbench.service.ProjectService;
+import net.orekyuu.workbench.project.domain.model.Project;
+import net.orekyuu.workbench.project.usecase.ProjectUsecase;
+import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,13 +20,15 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class JobRestController {
 
     @Autowired
-    private ProjectService projectService;
+    private ProjectUsecase projectService;
 
     @GetMapping("/rest/job/build")
     public SseEmitter build(@RequestParam("projectId") String projectId,
                             @RequestParam(value = "prNum", required = false) Integer prNum,
                             @AuthenticationPrincipal WorkbenchUserDetails principal) {
-        if (!projectService.isJoined(projectId, principal.getUser().id)) {
+        Project project = projectService.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        if (!project.getMember().contains(principal.getUser())) {
             throw new NotMemberException();
         }
         SseEmitter emitter = new SseEmitter(-1L);
@@ -33,19 +37,21 @@ public class JobRestController {
         if (prNum != null) {
             job.setCommentTarget(prNum);
         }
-        job.start(emitter, projectId, principal.getUser());
+        job.start(emitter, project, principal.getUser());
         return emitter;
     }
 
     @GetMapping("/rest/job/test")
     public SseEmitter test(@RequestParam("projectId") String projectId, @AuthenticationPrincipal WorkbenchUserDetails principal) {
-        if (!projectService.isJoined(projectId, principal.getUser().id)) {
+        Project project = projectService.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        if (!project.getMember().contains(principal.getUser())) {
             throw new NotMemberException();
         }
         SseEmitter emitter = new SseEmitter(-1L);
         TestJob job = testJob();
         job.setHash("master");
-        job.start(emitter, projectId, principal.getUser());
+        job.start(emitter, project, principal.getUser());
         return emitter;
     }
 
@@ -56,7 +62,9 @@ public class JobRestController {
                             @RequestParam("prNum") int prNum,
                             @AuthenticationPrincipal WorkbenchUserDetails principal) {
 
-        if (!projectService.isJoined(projectId, principal.getUser().id)) {
+        Project project = projectService.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        if (!project.getMember().contains(principal.getUser())) {
             throw new NotMemberException();
         }
         SseEmitter emitter = new SseEmitter(-1L);
@@ -64,7 +72,7 @@ public class JobRestController {
         job.setTargetBranch(target);
         job.setBaseBranch(base);
         job.setClosePullRequestNum(prNum);
-        job.start(emitter, projectId, principal.getUser());
+        job.start(emitter, project, principal.getUser());
         return emitter;
     }
 

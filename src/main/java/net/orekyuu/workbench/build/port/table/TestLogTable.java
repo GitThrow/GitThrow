@@ -62,8 +62,8 @@ public class TestLogTable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        net.orekyuu.workbench.entity.TestLog testLog = (net.orekyuu.workbench.entity.TestLog) o;
-        return Objects.equals(id, testLog.getId());
+        TestLogTable that = (TestLogTable) o;
+        return Objects.equals(id, that.id);
     }
 
     @Override

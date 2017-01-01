@@ -1,10 +1,11 @@
 package net.orekyuu.workbench.job;
 
-import net.orekyuu.workbench.entity.User;
 import net.orekyuu.workbench.job.message.JobState;
 import net.orekyuu.workbench.job.message.JobStateMessage;
 import net.orekyuu.workbench.job.task.Task;
 import net.orekyuu.workbench.job.task.TaskArguments;
+import net.orekyuu.workbench.project.domain.model.Project;
+import net.orekyuu.workbench.user.domain.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -22,22 +23,22 @@ import java.util.concurrent.Future;
 public abstract class Job {
 
     private List<Task> taskList = new LinkedList<>();
-    private String projectId;
+    private Project project;
     private User user;
     private UUID jobId;
     private static final Logger logger = LoggerFactory.getLogger(Job.class);
 
     /**
      * ジョブの初期化。ジョブを開始する前にかならず呼び出す必要があります。
-     * @param projectId プロジェクトID
+     * @param project プロジェクト
      * @param user 実行するユーザー
      */
-    private final void init(String projectId, User user) {
-        if (this.projectId != null) {
+    private final void init(Project project, User user) {
+        if (this.project != null) {
             throw new IllegalStateException("すでに初期化済み");
         }
 
-        this.projectId = projectId;
+        this.project = project;
         this.user = user;
         this.jobId = UUID.randomUUID();
         onInit();
@@ -70,19 +71,19 @@ public abstract class Job {
     /**
      * ジョブを開始します。
      * @param emitter SseEmitter
-     * @param projectId プロジェクトID
+     * @param project プロジェクトID
      * @param user ジョブを実行するユーザー
      */
     @Async
-    public Future<Void> start(SseEmitter emitter, String projectId, User user) {
-        init(projectId, user);
+    public Future<Void> start(SseEmitter emitter, Project project, User user) {
+        init(project, user);
         emitter.onTimeout(() -> {
             System.out.println("timeout");
         });
         JobMessenger messenger = new JobMessenger(emitter, getJobId(), e -> {
             System.out.println(e);
         });
-        TaskArguments args = new TaskArguments(jobId, projectId, user);
+        TaskArguments args = new TaskArguments(jobId, project, user);
 
         messenger.send(new JobStateMessage(JobState.START));
 
@@ -113,10 +114,10 @@ public abstract class Job {
     }
 
     /**
-     * @return ジョブが実行されるプロジェクトID
+     * @return ジョブが実行されるプロジェクト
      */
-    protected final String getProjectId() {
-        return projectId;
+    protected final Project getProject() {
+        return project;
     }
 
     /**

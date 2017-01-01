@@ -85,11 +85,23 @@ public class TicketUsecase {
         return priorityRepository.findByProject(project.getId());
     }
 
+    public Optional<TicketPriority> findPriorityById(Project project, int id) {
+        return priorityRepository.findById(project, id);
+    }
+
     public List<TicketType> findTypeByProject(Project project) {
         return typeRepository.findByProject(project.getId());
     }
 
+    public Optional<TicketType> findTypeById(Project project, int id) {
+        return typeRepository.findById(project, id);
+    }
+
     public List<TicketStatus> findStatusByProject(Project project) {
         return statusRepository.findByProject(project.getId());
+    }
+
+    public Optional<TicketStatus> findStatusById(Project project, int id) {
+        return statusRepository.findById(project, id);
     }
 }

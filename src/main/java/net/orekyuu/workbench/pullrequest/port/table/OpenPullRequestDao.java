@@ -18,10 +18,10 @@ public interface OpenPullRequestDao {
     Result<OpenPullRequestTable> update(OpenPullRequestTable pr);
 
     @Delete(sqlFile = true)
-    Result<OpenPullRequestTable> deleteByProject(String projectId);
+    int deleteByProject(String projectId);
 
     @Delete(sqlFile = true)
-    Result<OpenPullRequestTable> delete(String projectId, int prNum);
+    int delete(String projectId, int prNum);
 
     @Select
     Optional<OpenPullRequestTable> findByProjectAndNum(String projectId, int prNum);

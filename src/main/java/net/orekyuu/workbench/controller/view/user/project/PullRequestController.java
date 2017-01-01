@@ -1,18 +1,20 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
 import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
-import net.orekyuu.workbench.controller.rest.model.PullRequestModel;
-import net.orekyuu.workbench.entity.User;
+import net.orekyuu.workbench.controller.exception.ResourceNotFoundException;
+import net.orekyuu.workbench.git.domain.RemoteRepository;
+import net.orekyuu.workbench.git.domain.RemoteRepositoryFactory;
 import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
-import net.orekyuu.workbench.pullrequest.port.table.OpenPullRequestTable;
-import net.orekyuu.workbench.service.ProjectService;
-import net.orekyuu.workbench.service.PullRequestService;
-import net.orekyuu.workbench.service.RemoteRepositoryService;
+import net.orekyuu.workbench.project.domain.model.Project;
+import net.orekyuu.workbench.pullrequest.domain.model.PullRequest;
+import net.orekyuu.workbench.pullrequest.usecase.PullRequestUsecase;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
-import net.orekyuu.workbench.service.exceptions.PullRequestNotFoundException;
+import net.orekyuu.workbench.user.domain.model.User;
+import net.orekyuu.workbench.user.usecase.UserUsecase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -33,16 +35,16 @@ import java.util.stream.Collectors;
 public class PullRequestController {
 
     @Autowired
-    private PullRequestService pullRequestService;
+    private PullRequestUsecase pullrequestUsecase;
     @Autowired
-    private ProjectService projectService;
+    private RemoteRepositoryFactory repositoryFactory;
     @Autowired
-    private RemoteRepositoryService remoteRepositoryService;
+    private UserUsecase userUsecase;
 
     @GetMapping("/project/{projectId}/pull-request")
     @ProjectMemberOnly
-    public String show(@ProjectName @PathVariable String projectId, Model model) {
-        model.addAttribute("pullRequestList", pullRequestService.findByProject(projectId));
+    public String show(@ProjectName @PathVariable String projectId, Model model, Project project) {
+        model.addAttribute("pullRequestList", pullrequestUsecase.findByProject(project));
         return "user/project/pull-request-list";
     }
 
@@ -53,11 +55,11 @@ public class PullRequestController {
 
     @GetMapping("/project/{projectId}/pull-request/create")
     @ProjectMemberOnly
-    public String showNewPullRequest(@ProjectName @PathVariable String projectId, Model model) throws ProjectNotFoundException {
-        List<User> projectMember = projectService.findProjectMember(projectId);
-        model.addAttribute("member", projectMember);
+    public String showNewPullRequest(@ProjectName @PathVariable String projectId, Model model, Project project) throws ProjectNotFoundException {
+        model.addAttribute("member", project.getMember());
 
-        List<String> branch = remoteRepositoryService.findBranch(projectId).stream()
+        RemoteRepository repository = repositoryFactory.create(projectId);
+        List<String> branch = repository.findBranch().stream()
             .map(str -> str.substring("refs/heads/".length()))
             .collect(Collectors.toList());
         model.addAttribute("branch", branch);
@@ -69,8 +71,11 @@ public class PullRequestController {
     public String createPullRequest(@ProjectName @PathVariable String projectId,
                                     @Valid NewPullRequestForm form, BindingResult result,
                                     RedirectAttributes redirectAttributes,
-                                    @AuthenticationPrincipal WorkbenchUserDetails principal) {
-        if (!projectService.isJoined(projectId, form.reviewer)) {
+                                    @AuthenticationPrincipal WorkbenchUserDetails principal,
+                                    Project project) {
+
+        User reviewer = userUsecase.findById(form.reviewer).orElseThrow(() -> new UsernameNotFoundException(form.reviewer));
+        if (!project.getMember().contains(reviewer)) {
             result.addError(new FieldError("newPullRequestForm", "reviewer", "プロジェクトメンバーでありません"));
         }
 
@@ -80,25 +85,16 @@ public class PullRequestController {
             return "redirect:/project/" + projectId + "/pull-request/create";
         }
 
-        OpenPullRequestTable pullRequest = new OpenPullRequestTable();
-        pullRequest.project = projectId;
-        pullRequest.title = form.title;
-        pullRequest.description = form.desc;
-        pullRequest.reviewer = form.reviewer;
-        pullRequest.baseBranch = form.baseBranch;
-        pullRequest.targetBranch = form.targetBranch;
-        pullRequest.proponent = principal.getUser().id;
-        pullRequestService.create(pullRequest);
+        PullRequest request = pullrequestUsecase.create(project, form.title, form.desc, reviewer, principal.getUser(), form.baseBranch, form.targetBranch);
 
-        return "redirect:/project/" + projectId + "/pull-request";
+        return "redirect:/project/" + projectId + "/pull-request/" + request.getPullrequestNum();
     }
 
     @GetMapping("/project/{projectId}/pull-request/{num}")
     @ProjectMemberOnly
-    public String showDetail(@ProjectName @PathVariable String projectId, @PathVariable int num, Model model) {
-        PullRequestModel pullRequestModel = pullRequestService.findByProjectAndNum(projectId, num)
-            .orElseThrow(() -> new PullRequestNotFoundException(projectId));
-        model.addAttribute("pullRequest", pullRequestModel);
+    public String showDetail(@ProjectName @PathVariable String projectId, @PathVariable int num, Model model, Project project) {
+        PullRequest pullRequest = pullrequestUsecase.findById(project, num).orElseThrow(ResourceNotFoundException::new);
+        model.addAttribute("pullRequest", pullRequest);
         return "user/project/pull-request-detail";
     }
 

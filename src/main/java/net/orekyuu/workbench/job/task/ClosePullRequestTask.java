@@ -1,7 +1,9 @@
 package net.orekyuu.workbench.job.task;
 
+import net.orekyuu.workbench.controller.exception.ResourceNotFoundException;
 import net.orekyuu.workbench.job.JobMessenger;
-import net.orekyuu.workbench.service.PullRequestService;
+import net.orekyuu.workbench.pullrequest.domain.model.PullRequest;
+import net.orekyuu.workbench.pullrequest.usecase.PullRequestUsecase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -11,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class ClosePullRequestTask implements Task {
 
     @Autowired
-    private PullRequestService pullRequestService;
+    private PullRequestUsecase pullRequestUsecase;
 
     private int prNum = -1;
 
@@ -26,8 +28,8 @@ public class ClosePullRequestTask implements Task {
         String targetCommit = args.<String>getData(MergeTask.TARGET_COMMIT_HASH_KEY)
             .orElseThrow(() -> new IllegalStateException("事前にMergeTaskが実行される必要があります。"));
 
-        pullRequestService.close(args.getProjectId(), prNum, baseCommit, targetCommit);
-
+        PullRequest pullRequest = pullRequestUsecase.findById(args.getProject(), prNum).orElseThrow(ResourceNotFoundException::new);
+        pullRequestUsecase.merge(pullRequest, baseCommit, targetCommit);
         return true;
     }
 

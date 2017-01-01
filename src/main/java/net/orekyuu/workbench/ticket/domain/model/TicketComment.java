@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.ticket.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import net.orekyuu.workbench.user.domain.model.User;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ public class TicketComment {
         return text;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

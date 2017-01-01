@@ -77,4 +77,10 @@ public class UserUsecase {
     public void updateAvater(User user, byte[] avater) {
         userAvatarDao.update(new UserAvatarTable(user.getId(), avater));
     }
+
+    public boolean matchPassword(User user, String password) {
+        UserTable table = userDao.findById(user.getId())
+            .orElseThrow(() -> new IllegalArgumentException("存在しないユーザーです: " + user.getId()));
+        return passwordEncoder.matches(table.getPassword(), password);
+    }
 }

@@ -5,4 +5,4 @@ FROM
 WHERE
   project = /*projectId*/''
 AND
-  ticket_num = /*ticketNumTable*/0
+  ticket_num = /*ticketNum*/0

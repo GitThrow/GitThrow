@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.ticket.port;
 
+import net.orekyuu.workbench.project.domain.model.Project;
 import net.orekyuu.workbench.ticket.domain.model.TicketPriority;
 import net.orekyuu.workbench.ticket.port.table.TicketPriorityDao;
 import org.springframework.stereotype.Repository;
@@ -19,8 +20,10 @@ public class TicketPriorityRepository {
         this.priorityDao = priorityDao;
     }
 
-    public Optional<TicketPriority> findById(int id) {
-        return priorityDao.findById(id).map(it -> new TicketPriority(it.getId().intValue(), it.getPriority()));
+    public Optional<TicketPriority> findById(Project project, int id) {
+        return priorityDao.findById(id)
+            .filter(table -> table.getProject().equals(project.getId()))
+            .map(it -> new TicketPriority(it.getId().intValue(), it.getPriority()));
     }
 
     public List<TicketPriority> findByProject(String projectId) {

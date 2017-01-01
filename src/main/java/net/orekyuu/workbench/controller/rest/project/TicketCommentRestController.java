@@ -1,60 +1,60 @@
 package net.orekyuu.workbench.controller.rest.project;
 
 import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
-import net.orekyuu.workbench.controller.rest.model.TicketCommentModel;
+import net.orekyuu.workbench.controller.exception.ResourceNotFoundException;
 import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
-import net.orekyuu.workbench.entity.User;
-import net.orekyuu.workbench.service.ProjectService;
-import net.orekyuu.workbench.service.TicketCommentService;
-import net.orekyuu.workbench.service.UserService;
+import net.orekyuu.workbench.project.domain.model.Project;
+import net.orekyuu.workbench.project.usecase.ProjectUsecase;
+import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
+import net.orekyuu.workbench.ticket.domain.model.Ticket;
+import net.orekyuu.workbench.ticket.domain.model.TicketComment;
+import net.orekyuu.workbench.ticket.usecase.TicketCommentUsecase;
+import net.orekyuu.workbench.ticket.usecase.TicketUsecase;
+import net.orekyuu.workbench.user.usecase.UserUsecase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/rest/ticket/comment")
 public class TicketCommentRestController {
 
     @Autowired
-    private ProjectService projectService;
+    private ProjectUsecase projectUsecase;
     @Autowired
-    private TicketCommentService commentService;
+    private TicketCommentUsecase commentUsecase;
     @Autowired
-    private UserService userService;
+    private TicketUsecase ticketUsecase;
+    @Autowired
+    private UserUsecase userService;
 
     @GetMapping
-    public List<TicketCommentModel> show(@RequestParam("project") String projectId,
-                                         @RequestParam("id") int id,
-                                         @AuthenticationPrincipal WorkbenchUserDetails principal) {
-        if (!projectService.isJoined(projectId, principal.getUser().id)) {
+    public List<TicketComment> show(@RequestParam("project") String projectId,
+                                    @RequestParam("id") int id,
+                                    @AuthenticationPrincipal WorkbenchUserDetails principal) {
+        Project project = projectUsecase.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        if (!project.getMember().contains(principal.getUser())) {
             throw new NotMemberException();
         }
 
-        Map<String, User> cache = new TreeMap<>();
-        return commentService.findByTicket(projectId, id).stream()
-            .map(comment -> {
-                User user = findUser(cache, comment.userId);
-                return new TicketCommentModel(user.id, user.name, comment.text, comment.createdAt);
-            })
-            .collect(Collectors.toList());
-    }
+        Ticket ticket = ticketUsecase.findById(project, id).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
 
-    private User findUser(Map<String, User> cache, String id) {
-        return cache.computeIfAbsent(id, key -> userService.findById(key).orElseThrow(() -> new RuntimeException(key)));
+        return commentUsecase.findByTicket(ticket);
     }
 
     @PostMapping
-    public void create(@RequestBody CommentCreateRequest req,
-                       @AuthenticationPrincipal WorkbenchUserDetails principal) {
-        if (!projectService.isJoined(req.getProject(), principal.getUser().id)) {
+    public TicketComment create(@RequestBody CommentCreateRequest req,
+                                @AuthenticationPrincipal WorkbenchUserDetails principal) {
+        Project project = projectUsecase.findById(req.getProject()).orElseThrow(() -> new ProjectNotFoundException(req.getProject()));
+
+        if (!project.getMember().contains(principal.getUser())) {
             throw new NotMemberException();
         }
 
-        commentService.createComment(req.getProject(), req.getId(), req.getText(), principal.getUser().id);
+        Ticket ticket = ticketUsecase.findById(project, req.getId()).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
+        return commentUsecase.create(ticket, req.getText(), principal.getUser());
     }
 }

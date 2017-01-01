@@ -2,6 +2,7 @@ package net.orekyuu.workbench.user.port.table;
 
 import org.seasar.doma.*;
 import org.seasar.doma.boot.ConfigAutowireable;
+import org.seasar.doma.jdbc.BatchResult;
 import org.seasar.doma.jdbc.Result;
 import org.springframework.dao.DuplicateKeyException;
 
@@ -18,7 +19,7 @@ public interface UserAvatarDao {
     Result<UserAvatarTable> delete(UserAvatarTable userAvatarTable);
 
     @BatchDelete
-    int[] delete(Iterable<UserAvatarTable> userAvatar);
+    BatchResult<UserAvatarTable> delete(Iterable<UserAvatarTable> userAvatar);
 
     @Update
     Result<UserAvatarTable> update(UserAvatarTable avatar);

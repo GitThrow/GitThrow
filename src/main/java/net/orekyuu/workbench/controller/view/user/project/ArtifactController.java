@@ -1,14 +1,17 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
-import net.orekyuu.workbench.build.port.table.ArtifactTable;
+import net.orekyuu.workbench.build.model.domain.Artifact;
+import net.orekyuu.workbench.build.usecase.ArtifactUsecase;
+import net.orekyuu.workbench.controller.exception.ResourceNotFoundException;
 import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
-import net.orekyuu.workbench.service.ArtifactService;
+import net.orekyuu.workbench.project.domain.model.Project;
 import net.orekyuu.workbench.service.exceptions.ContentNotFoundException;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,19 +24,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 public class ArtifactController {
 
     @Autowired
-    private ArtifactService artifactService;
+    private ArtifactUsecase artifactUsecase;
     private static final Logger logger = LoggerFactory.getLogger(ArtifactController.class);
 
     @ProjectMemberOnly
     @GetMapping("/project/{projectId}/files")
-    public String showArtifactList(@ProjectName @PathVariable String projectId, Model model) {
-        List<ArtifactTable> artifactTables = artifactService.findByProjectId(projectId);
+    public String showArtifactList(@ProjectName @PathVariable String projectId, Model model, Project project) {
+        List<Artifact> artifactTables = artifactUsecase.findByProject(project);
         model.addAttribute("artifactTables", artifactTables);
         return "user/project/artifact-list";
     }
@@ -43,14 +45,12 @@ public class ArtifactController {
     public void downloadArtifact(@ProjectName @PathVariable String projectId,
                                  @PathVariable int artifactId,
                                  HttpServletResponse res) {
-        ArtifactTable artifactTable = artifactService.findById(artifactId)
-            .filter(a -> a.projectId.equals(projectId))
-            .orElseThrow(() -> new ContentNotFoundException(projectId));
+        Pair<Artifact, InputStream> pair = artifactUsecase.findById(artifactId).orElseThrow(ResourceNotFoundException::new);
 
         try {
-            InputStream inputStream = artifactService.openArtifactStreamByArtifact(artifactTable);
+            InputStream inputStream = pair.getSecond();
 
-            res.setHeader("Content-Disposition", "attachment; filename=" + artifactTable.fileName);
+            res.setHeader("Content-Disposition", "attachment; filename=" + pair.getFirst().getFileName());
             res.setHeader("Content-Transfer-Encoding", "binary");
             res.setContentType("application/octet-stream;");
             ServletOutputStream outputStream = res.getOutputStream();
@@ -63,17 +63,8 @@ public class ArtifactController {
 
     @ProjectMemberOnly
     @PostMapping("/project/{projectId}/artifact/delete")
-    public String deleteArtifact(@ProjectName @PathVariable String projectId, @RequestParam(value="artifactId") int artifactId) {
-        Optional<ArtifactTable> artifactOpt = artifactService.findById(artifactId)
-            .filter(a -> a.projectId.equals(projectId));
-
-        if (!artifactOpt.isPresent()) {
-            logger.warn("ArtifactTable not found.");
-            return String.format("redirect:/project/%s/files", projectId);
-        }
-
-        ArtifactTable artifactTable = artifactOpt.get();
-        artifactService.delete(artifactTable);
+    public String deleteArtifact(@ProjectName @PathVariable String projectId, @RequestParam(value="artifactId") int artifactId, Project project) {
+        artifactUsecase.delete(artifactId, project);
         return String.format("redirect:/project/%s/files", projectId);
     }
 }

@@ -5,4 +5,4 @@ SET
   `email` = /* user.email */'',
   `admin` = /* user.admin */'',
 WHERE
-  `id` = /* pr.id */'user_id'
+  `id` = /* user.id */'user_id'

@@ -9,6 +9,6 @@ SET
   `status` = /* ticket.status */0,
   `priority` = /*ticket.priority */0
 WHERE
-  ticket_num = /* ticket.ticketNumTable */0
+  ticket_num = /* ticket.ticketNum */0
 AND
   project = /* ticket.project */''

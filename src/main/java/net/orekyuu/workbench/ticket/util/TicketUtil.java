@@ -49,7 +49,7 @@ public class TicketUtil {
     }
 
     public static TicketComment commentFromTable(TicketCommentTable table, User user) {
-        return new TicketComment(table.getId().intValue(), projectId, table.getText(), table.getCreatedAt(), user);
+        return new TicketComment(table.getId().intValue(), table.getProjectId(), table.getText(), table.getCreatedAt(), user);
     }
 
     public static TicketStatus ticketStatusFromTable(TicketStatusTable table) {

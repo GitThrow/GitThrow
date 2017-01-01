@@ -1,12 +1,13 @@
 package net.orekyuu.workbench.job.task;
 
+import net.orekyuu.workbench.build.usecase.WorkbenchConfigUsecase;
 import net.orekyuu.workbench.job.BuildSettings;
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
 import net.orekyuu.workbench.job.WorkbenchConfig;
 import net.orekyuu.workbench.job.message.BuildResult;
 import net.orekyuu.workbench.job.message.LogMessage;
-import net.orekyuu.workbench.service.WorkbenchConfigService;
+import net.orekyuu.workbench.project.domain.model.Project;
 import org.eclipse.jgit.lib.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public class BuildTask implements Task {
     @Autowired
     private JobWorkspaceService jobWorkspaceService;
     @Autowired
-    private WorkbenchConfigService configService;
+    private WorkbenchConfigUsecase configService;
 
     @Override
     public boolean process(JobMessenger messenger, TaskArguments args) throws Exception {
@@ -49,7 +50,7 @@ public class BuildTask implements Task {
         }
 
         Path workspacePath = jobWorkspaceService.getWorkspacePath(args.getJobId());
-        List<String> command = command(args.getProjectId());
+        List<String> command = command(args.getProject());
         if (command.isEmpty()) {
             messenger.send(new LogMessage("ビルド設定が有効化されていません"));
             return false;
@@ -69,8 +70,8 @@ public class BuildTask implements Task {
         return true;
     }
 
-    List<String> command(String projectId) {
-        return configService.find(projectId, "HEAD")
+    List<String> command(Project project) {
+        return configService.find(project, "HEAD")
             .map(WorkbenchConfig::getBuildSettings)
             .map(BuildSettings::getBuildCommand)
             .orElseGet(ArrayList::new);

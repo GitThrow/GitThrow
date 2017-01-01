@@ -3,10 +3,10 @@ package net.orekyuu.workbench.job.task;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.orekyuu.workbench.build.model.domain.TestStatus;
+import net.orekyuu.workbench.build.usecase.TestLogUsecase;
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
 import net.orekyuu.workbench.job.TestLogModel;
-import net.orekyuu.workbench.service.TestLogService;
 import org.eclipse.jgit.lib.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class SaveTestLogTask implements Task {
 
     @Autowired
-    private TestLogService testLogService;
+    private TestLogUsecase testLogService;
     @Autowired
     private JobWorkspaceService jobWorkspaceService;
 
@@ -37,7 +37,7 @@ public class SaveTestLogTask implements Task {
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
-            }).ifPresent(json -> testLogService.create(args.getProjectId(), json, status, head));
+            }).ifPresent(json -> testLogService.create(args.getProject(), json, status, head));
         }
 
         return true;

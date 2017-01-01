@@ -2,6 +2,8 @@ package net.orekyuu.workbench.build.usecase;
 
 import net.orekyuu.workbench.build.model.domain.Artifact;
 import net.orekyuu.workbench.build.port.ArtifactRepository;
+import net.orekyuu.workbench.build.port.table.ArtifactDao;
+import net.orekyuu.workbench.build.util.ArtifactUtil;
 import net.orekyuu.workbench.project.domain.model.Project;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -16,9 +18,11 @@ import java.util.Optional;
 public class ArtifactUsecase {
 
     private final ArtifactRepository artifactRepository;
+    private final ArtifactDao artifactDao;
 
-    public ArtifactUsecase(ArtifactRepository artifactRepository) {
+    public ArtifactUsecase(ArtifactRepository artifactRepository, ArtifactDao artifactDao) {
         this.artifactRepository = artifactRepository;
+        this.artifactDao = artifactDao;
     }
 
     @Transactional(readOnly = false)
@@ -33,6 +37,12 @@ public class ArtifactUsecase {
 
     @Transactional(readOnly = false)
     public Artifact delete(Artifact artifact, Project project) {
+        return artifactRepository.delete(artifact, project);
+    }
+
+    @Transactional(readOnly = false)
+    public Artifact delete(int artifactId, Project project) {
+        Artifact artifact = artifactDao.findById(artifactId).map(ArtifactUtil::fromTable).get();
         return artifactRepository.delete(artifact, project);
     }
 

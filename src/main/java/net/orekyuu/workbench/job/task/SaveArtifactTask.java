@@ -1,12 +1,12 @@
 package net.orekyuu.workbench.job.task;
 
-import net.orekyuu.workbench.build.port.table.ArtifactTable;
+import net.orekyuu.workbench.build.model.domain.Artifact;
+import net.orekyuu.workbench.build.usecase.ArtifactUsecase;
+import net.orekyuu.workbench.build.usecase.WorkbenchConfigUsecase;
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.JobWorkspaceService;
 import net.orekyuu.workbench.job.WorkbenchConfig;
 import net.orekyuu.workbench.job.message.LogMessage;
-import net.orekyuu.workbench.service.ArtifactService;
-import net.orekyuu.workbench.service.WorkbenchConfigService;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -39,17 +39,16 @@ public class SaveArtifactTask implements Task {
     public static final String ARTIFACT_KEY = "SaveArtifactTask.artifact";
 
     @Autowired
-    private ArtifactService artifactService;
+    private ArtifactUsecase artifactUsecase;
     @Autowired
-    private WorkbenchConfigService workbenchConfigService;
+    private WorkbenchConfigUsecase configUsecase;
     @Autowired
     private JobWorkspaceService jobWorkspaceService;
 
     @Override
     public boolean process(JobMessenger messenger, TaskArguments args) throws Exception {
 
-        String projectId = args.getProjectId();
-        Optional<WorkbenchConfig> configOpt = workbenchConfigService.find(projectId, "HEAD");
+        Optional<WorkbenchConfig> configOpt = configUsecase.find(args.getProject(), "HEAD");
         if (!configOpt.isPresent()) {
             return true;
         }
@@ -82,8 +81,8 @@ public class SaveArtifactTask implements Task {
 
         Pair<String, byte[]> pair = toByteArray(files);
         if (pair != null) {
-            ArtifactTable save = artifactService.save(projectId, pair.getRight(), pair.getLeft());
-            args.putData(ARTIFACT_KEY, save);
+            Artifact artifact = artifactUsecase.create(args.getProject(), pair.getLeft(), pair.getRight());
+            args.putData(ARTIFACT_KEY, artifact);
         }
 
         return true;

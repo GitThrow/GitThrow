@@ -96,23 +96,23 @@ public class PullRequestRepository {
             throw new IllegalStateException("PullRequest is not open: " + pullrequest.getState());
         }
 
-        OpenPullRequestTable deletedTable = openPullRequestDao.delete(pullrequest.getProjectId(), pullrequest.getPullrequestNum()).getEntity();
+        openPullRequestDao.delete(pullrequest.getProjectId(), pullrequest.getPullrequestNum());
 
         ClosedPullRequestTable result = closedPullRequestDao.insert(new ClosedPullRequestTable(
-            deletedTable.getProject(),
+            pullrequest.getProjectId(),
             null,
-            deletedTable.getTitle(),
-            deletedTable.getDescription(),
-            deletedTable.getReviewer(),
-            deletedTable.getProponent(),
+            pullrequest.getTitle(),
+            pullrequest.getDescription(),
+            pullrequest.getReviewer().getId(),
+            pullrequest.getProponent().getId(),
             baseCommit,
             targetCommit
         )).getEntity();
 
         return PullRequestUtil.fromTable(
             result,
-            userUsecase.findById(deletedTable.getReviewer()).get(),
-            userUsecase.findById(deletedTable.getProponent()).get());
+            userUsecase.findById(pullrequest.getReviewer().getId()).get(),
+            userUsecase.findById(pullrequest.getProponent().getId()).get());
     }
 
     public List<PullRequest> findByProject(Project project) {

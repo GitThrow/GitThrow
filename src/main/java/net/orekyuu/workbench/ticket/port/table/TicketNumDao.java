@@ -18,7 +18,7 @@ public interface TicketNumDao {
     Result<TicketNumTable> update(TicketNumTable num);
 
     @Update(sqlFile = true)
-    Result<TicketNumTable> increment(String projectId);
+    int increment(String projectId);
 
     @Delete(sqlFile = true)
     int deleteByProject(String projectId);

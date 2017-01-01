@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.ticket.port;
 
+import net.orekyuu.workbench.project.domain.model.Project;
 import net.orekyuu.workbench.ticket.domain.model.TicketType;
 import net.orekyuu.workbench.ticket.port.table.TicketTypeDao;
 import org.springframework.stereotype.Repository;
@@ -18,8 +19,10 @@ public class TicketTypeRepository {
         this.ticketTypeDao = ticketTypeDao;
     }
 
-    public Optional<TicketType> findById(int id) {
-        return ticketTypeDao.findById(id).map(it -> new TicketType(it.getId().intValue(), it.getType()));
+    public Optional<TicketType> findById(Project project, int id) {
+        return ticketTypeDao.findById(id)
+            .filter(table -> table.getProject().equals(project.getId()))
+            .map(it -> new TicketType(it.getId().intValue(), it.getType()));
     }
 
     public List<TicketType> findByProject(String id) {

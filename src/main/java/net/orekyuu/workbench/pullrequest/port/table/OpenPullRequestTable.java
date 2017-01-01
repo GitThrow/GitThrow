@@ -6,7 +6,7 @@ import org.seasar.doma.Table;
 
 import java.util.Objects;
 
-@Entity(immutable = false)
+@Entity(immutable = true)
 @Table(name = "open_pull_request")
 public class OpenPullRequestTable {
     @Column(name = "project")
