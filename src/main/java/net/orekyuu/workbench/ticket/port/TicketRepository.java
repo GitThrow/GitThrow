@@ -70,11 +70,11 @@ public class TicketRepository {
             error.add("priorityTable");
         }
 
-        if (projectUsecase.isJoined(project.getId(), assignee.getId())) {
+        if (assignee != null && !projectUsecase.isJoined(project.getId(), assignee.getId())) {
             error.add("assignee");
         }
 
-        if (projectUsecase.isJoined(project.getId(), proponent.getId())) {
+        if (!projectUsecase.isJoined(project.getId(), proponent.getId())) {
             error.add("proponent");
         }
 
@@ -132,7 +132,7 @@ public class TicketRepository {
         User assignee = null;
         if (ticket.getAssignee() != null) {
             assignee = userRepository.findById(ticket.getAssignee().getId()).get();
-            if (projectUsecase.isJoined(ticket.getProjectId(), assignee.getId())) {
+            if (!projectUsecase.isJoined(ticket.getProjectId(), assignee.getId())) {
                 error.add("assignee");
             }
         }
@@ -140,7 +140,7 @@ public class TicketRepository {
         User proponent = null;
         if (ticket.getProponent() != null) {
             proponent = userRepository.findById(ticket.getProponent().getId()).get();
-            if (projectUsecase.isJoined(ticket.getProjectId(), proponent.getId())) {
+            if (!projectUsecase.isJoined(ticket.getProjectId(), proponent.getId())) {
                 error.add("proponent");
             }
         }

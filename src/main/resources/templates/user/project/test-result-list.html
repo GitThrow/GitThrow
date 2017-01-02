@@ -36,9 +36,9 @@
               <th>コミット</th>
             </tr>
             <tr th:each="log : ${testLogs}">
-              <!--/*@thymesVar id="log" type="net.orekyuu.workbench.entity.TestLog"*/-->
+              <!--/*@thymesVar id="log" type="net.orekyuu.workbench.build.model.domain.TestLog"*/-->
               <td><a href="" th:href="|@{/project/}${project.id}/test/${log.id}|" th:text="${#temporals.format(log.createdAt, 'yyyy/MM/dd HH:mm:ss')}"></a></td>
-              <td th:text="${log.status}">ステータス</td>
+              <td th:text="${log.status.name()}">ステータス</td>
               <td th:text="${log.commit}">ハッシュ</td>
             </tr>
           </table>

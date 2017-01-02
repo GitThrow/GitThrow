@@ -22,10 +22,10 @@
 
     <section class="content">
 
-      <!--/*@thymesVar id="pullRequest" type="net.orekyuu.workbench.controller.rest.model.PullRequestModel"*/-->
+      <!--/*@thymesVar id="pullRequest" type="net.orekyuu.workbench.pullrequest.domain.model.PullRequest"*/-->
       <div class="box">
         <div class="box-header with-border">
-          <h3 class="box-title" th:text="|#${pullRequest.number} ${pullRequest.title}|">タイトル</h3>
+          <h3 class="box-title" th:text="|#${pullRequest.pullrequestNum} ${pullRequest.title}|">タイトル</h3>
         </div>
         <div class="box-body">
           <div class="row">

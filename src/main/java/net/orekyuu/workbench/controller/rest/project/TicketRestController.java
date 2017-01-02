@@ -51,8 +51,8 @@ public class TicketRestController {
             proponent,
             limit,
             ticketUsecase.findTypeById(project, req.getType()).orElseThrow(() -> new ResourceNotFoundException("Ticket type")),
-            ticketUsecase.findStatusById(project, req.getType()).orElseThrow(() -> new ResourceNotFoundException("Ticket status")),
-            ticketUsecase.findPriorityById(project, req.getType()).orElseThrow(() -> new ResourceNotFoundException("Ticket priority"))
+            ticketUsecase.findStatusById(project, req.getStatus()).orElseThrow(() -> new ResourceNotFoundException("Ticket status")),
+            ticketUsecase.findPriorityById(project, req.getPriority()).orElseThrow(() -> new ResourceNotFoundException("Ticket priority"))
             );
         return ticketUsecase.update(ticket);
     }

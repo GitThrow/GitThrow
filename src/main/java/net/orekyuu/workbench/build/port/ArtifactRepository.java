@@ -24,11 +24,11 @@ public class ArtifactRepository {
 
     private final ArtifactDao artifactDao;
 
-    @Value("${net.orekyuu.workbench.artifact-dir}")
     private String artifactDir;
 
-    public ArtifactRepository(ArtifactDao artifactDao) {
+    public ArtifactRepository(ArtifactDao artifactDao, @Value("${net.orekyuu.workbench.artifact-dir}")String artifactDir) {
         this.artifactDao = artifactDao;
+        this.artifactDir = artifactDir;
     }
 
     public Artifact create(Project project, String fileName, byte[] data) {

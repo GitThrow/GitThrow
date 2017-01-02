@@ -3,10 +3,7 @@ package net.orekyuu.workbench.user.port;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
 import net.orekyuu.workbench.user.domain.model.User;
 import net.orekyuu.workbench.user.domain.model.UserSettings;
-import net.orekyuu.workbench.user.port.table.UserDao;
-import net.orekyuu.workbench.user.port.table.UserSettingDao;
-import net.orekyuu.workbench.user.port.table.UserSettingTable;
-import net.orekyuu.workbench.user.port.table.UserTable;
+import net.orekyuu.workbench.user.port.table.*;
 import net.orekyuu.workbench.user.util.BotUserUtil;
 import net.orekyuu.workbench.user.util.UserUtil;
 import org.slf4j.Logger;
@@ -27,13 +24,15 @@ public class UserRepository {
     private final PasswordEncoder passwordEncoder;
     private final UserDao userDao;
     private final UserSettingDao userSettingDao;
+    private final UserAvatarDao avatarDao;
 
     private static final Logger logger = LoggerFactory.getLogger(UserRepository.class);
 
-    public UserRepository(PasswordEncoder passwordEncoder, UserDao userDao, UserSettingDao userSettingDao) {
+    public UserRepository(PasswordEncoder passwordEncoder, UserDao userDao, UserSettingDao userSettingDao, UserAvatarDao avatarDao) {
         this.passwordEncoder = passwordEncoder;
         this.userDao = userDao;
         this.userSettingDao = userSettingDao;
+        this.avatarDao = avatarDao;
     }
 
     @Transactional(readOnly = false)
@@ -47,6 +46,8 @@ public class UserRepository {
             UserTable result = userDao.insert(table).getEntity();
 
             User user = UserUtil.fromTable(result);
+
+            avatarDao.insert(new UserAvatarTable(user.getId(), UserUtil.loadDefaultUserIcon()));
             logger.info("User created: " + user);
             return user;
         } catch (DuplicateKeyException e) {

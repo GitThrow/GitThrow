@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="../../../static/css/highlight/default.css" th:href="@{/css/highlight/default.css}">
 </head>
 <body class="skin-blue">
-<!--/*@thymesVar id="ticket" type="net.orekyuu.workbench.controller.rest.model.TicketModel"*/-->
+<!--/*@thymesVar id="ticket" type="net.orekyuu.workbench.ticket.domain.model.Ticket"*/-->
 <div class="wrapper">
 
   <div th:replace="user/project/fragment/project-page-content :: project-page-topmenu"></div>
@@ -43,16 +43,16 @@
               <div class="form-group">
                 <label for="assign" class="control-label">作成者</label>
                 <div class="">
-                  <input class="form-control" type="text" disabled th:value="${ticket.proponentUserId}">
+                  <input class="form-control" type="text" disabled th:value="${ticket.proponent.id}">
                 </div>
               </div>
               <div class="form-group">
                 <label for="assign" class="control-label">担当者</label>
                 <div class="">
                   <select class="form-control select2" title="assign" id="assign" th:remove="all-but-first">
-                    <!--/*@thymesVar id="u" type="net.orekyuu.workbench.entity.User"*/-->
-                    <option selected="selected" th:each="u : ${member}" th:text="${u.name}"
-                            th:selected="${u.id.equals(ticket.assignUserId)}" th:value="${u.id}">hoge
+                    <!--/*@thymesVar id="u" type="net.orekyuu.workbench.user.domain.model.User"*/-->
+                    <option selected="selected" th:each="u : ${project.member}" th:text="${u.name}"
+                            th:selected="${u.equals(ticket.assignee)}" th:value="${u.id}">hoge
                     </option>
                   </select>
                 </div>
@@ -61,9 +61,9 @@
                 <label for="type" class=" control-label">タイプ</label>
                 <div class="">
                   <select class="form-control" title="type" id="type">
-                    <!--/*@thymesVar id="type" type="net.orekyuu.workbench.ticket.port.table.TicketTypeTable"*/-->
-                    <option th:each="type : ${typeList}" th:text="${type.type}"
-                            th:value="${type.id}" th:selected="${type.type.equals(ticket.type)}">hoge
+                    <!--/*@thymesVar id="type" type="net.orekyuu.workbench.ticket.domain.model.TicketType"*/-->
+                    <option th:each="type : ${typeList}" th:text="${type.name}"
+                            th:value="${type.id}" th:selected="${type.equals(ticket.type)}">hoge
                     </option>
                   </select>
                 </div>
@@ -72,9 +72,9 @@
                 <label for="priority" class=" control-label">優先度</label>
                 <div class="">
                   <select class="form-control" title="priority" id="priority">
-                    <!--/*@thymesVar id="priority" type="net.orekyuu.workbench.ticket.port.table.TicketPriorityTable"*/-->
-                    <option th:each="priority : ${priorityList}" th:text="${priority.priority}"
-                            th:value="${priority.id}" th:selected="${priority.priority.equals(ticket.priority)}">hoge
+                    <!--/*@thymesVar id="priority" type="net.orekyuu.workbench.ticket.domain.model.TicketPriority"*/-->
+                    <option th:each="priority : ${priorityList}" th:text="${priority.name}"
+                            th:value="${priority.id}" th:selected="${priority.equals(ticket.priority)}">hoge
                     </option>
                   </select>
                 </div>
@@ -84,9 +84,9 @@
                 <label for="status" class=" control-label">ステータス</label>
                 <div class="">
                   <select class="form-control" title="status" id="status">
-                    <!--/*@thymesVar id="status" type="net.orekyuu.workbench.ticket.port.table.TicketStatusTable"*/-->
-                    <option th:each="status : ${statusList}" th:text="${status.status}"
-                            th:value="${status.id}" th:selected="${status.status.equals(ticket.status)}">hoge
+                    <!--/*@thymesVar id="status" type="net.orekyuu.workbench.ticket.domain.model.TicketStatus"*/-->
+                    <option th:each="status : ${statusList}" th:text="${status.name}"
+                            th:value="${status.id}" th:selected="${status.equals(ticket.status)}">hoge
                     </option>
                   </select>
                 </div>
@@ -167,7 +167,7 @@
     });
 
 
-    $('#desc').html(marked([[${ticket.desc}]]));
+    $('#desc').html(marked([[${ticket.description}]]));
 
     //イベントでチケットの更新
     $('#type').change(function (e) {
@@ -193,15 +193,16 @@
     function update() {
       var ticket = {
         project: [[${project.id}]],
-        ticketNumTable: [[${ticket.number}]],
+        ticketNum: [[${ticket.ticketNum}]],
         title: $('#title').text(),
-        description: [[${ticket.desc}]],
+        description: [[${ticket.description}]],
         assignee: $('#assign').val(),
-        type: $('#type').val(),
-        priority: $('#priority').val(),
-        status: $('#status').val(),
+        type: parseInt($('#type').val()),
+        priority: parseInt($('#priority').val()),
+        status: parseInt($('#status').val()),
         limit: $('#limit').val()
       };
+      console.log(ticket);
       updateTicket(ticket);
     }
 
@@ -209,19 +210,19 @@
     function updateComments() {
       var $comments = $('#comments');
       $comments.empty();
-      fetchTicketComment([[${project.id}]], [[${ticket.number}]])
+      fetchTicketComment([[${project.id}]], [[${ticket.ticketNum}]])
         .then(function (response) {
           _.chain(response.data).map(function (comment) {
             comment.text = marked(comment.text);
-            comment.isSelf = comment.userId === /*[[${#authentication.principal.user.id}]]*/"hoge";
+            comment.isSelf = comment.user.id === /*[[${#authentication.principal.user.id}]]*/"hoge";
             return comment;
           }).map(function (comment) {
             var str = '<div class="direct-chat-msg ' + (comment.isSelf ? '' : 'right') + '">';
             str += '<div class="direct-chat-info clearfix">';
-            str += '<span class="direct-chat-name pull-left">' + comment.userName + '(id: ' + comment.userId + ')</span>';
+            str += '<span class="direct-chat-name pull-left">' + comment.user.name + '(id: ' + comment.user.id + ')</span>';
             str += '<span class="direct-chat-timestamp pull-right">' + comment.createdAt + '</span>';
             str += '</div>';
-            str += '<img class="direct-chat-img" src="/user/icon/' + comment.userId + '">';
+            str += '<img class="direct-chat-img" src="/user/icon/' + comment.user.id + '">';
             str += '<div class="direct-chat-text">';
             str += comment.text;
             str += '</div>';
@@ -244,7 +245,7 @@
       $commentBtn.prop("disabled", true);
       $commentText.prop("disabled", true);
 
-      createTicketComment([[${project.id}]], [[${ticket.number}]], $commentText.val())
+      createTicketComment([[${project.id}]], [[${ticket.ticketNum}]], $commentText.val())
         .then(function () {
           $commentBtn.prop("disabled", false);
           $commentText.prop("disabled", false);

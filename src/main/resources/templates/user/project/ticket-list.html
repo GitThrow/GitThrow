@@ -41,12 +41,12 @@
               <th>ステータス</th>
             </tr>
             <tr th:each="ticket : ${ticketList}">
-              <!--/*@thymesVar id="ticket" type="net.orekyuu.workbench.controller.rest.model.TicketModel"*/-->
-              <td th:text="${ticket.number}">1</td>
-              <td><a href="" th:href="|@{/project/}${project.id}/ticket/${ticket.number}|" th:text="${ticket.title}">タイトル</a></td>
-              <td th:text="${ticket.type}">バグ</td>
-              <td th:text="${ticket.priority}">高</td>
-              <td th:text="${ticket.status}">新規</td>
+              <!--/*@thymesVar id="ticket" type="net.orekyuu.workbench.ticket.domain.model.Ticket"*/-->
+              <td th:text="${ticket.ticketNum}">1</td>
+              <td><a href="" th:href="|@{/project/}${project.id}/ticket/${ticket.ticketNum}|" th:text="${ticket.title}">タイトル</a></td>
+              <td th:text="${ticket.type.name}">バグ</td>
+              <td th:text="${ticket.priority.name}">高</td>
+              <td th:text="${ticket.status.name}">新規</td>
             </tr>
           </table>
         </div>

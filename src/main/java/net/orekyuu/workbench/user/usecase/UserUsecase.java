@@ -81,6 +81,6 @@ public class UserUsecase {
     public boolean matchPassword(User user, String password) {
         UserTable table = userDao.findById(user.getId())
             .orElseThrow(() -> new IllegalArgumentException("存在しないユーザーです: " + user.getId()));
-        return passwordEncoder.matches(table.getPassword(), password);
+        return passwordEncoder.matches(password, table.getPassword());
     }
 }
