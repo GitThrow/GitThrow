@@ -154,6 +154,7 @@ public class ProjectRepository {
     public Project delete(Project project) {
         ProjectTable table = new ProjectTable(project.getId(), project.getName(), project.getOwner().getId());
 
+        pullRequestNumDao.deleteByProject(project.getId());
         ticketNumDao.deleteByProject(project.getId());
         ticketPriorityDao.deleteByProject(project.getId());
         ticketStatusDao.deleteByProject(project.getId());
