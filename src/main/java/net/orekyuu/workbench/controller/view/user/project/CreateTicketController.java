@@ -1,11 +1,17 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
 import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
-import net.orekyuu.workbench.entity.*;
 import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
-import net.orekyuu.workbench.service.*;
+import net.orekyuu.workbench.project.domain.model.Project;
+import net.orekyuu.workbench.project.usecase.ProjectUsecase;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
+import net.orekyuu.workbench.ticket.domain.model.TicketPriority;
+import net.orekyuu.workbench.ticket.domain.model.TicketStatus;
+import net.orekyuu.workbench.ticket.domain.model.TicketType;
+import net.orekyuu.workbench.ticket.usecase.TicketUsecase;
+import net.orekyuu.workbench.user.domain.model.User;
+import net.orekyuu.workbench.user.usecase.UserUsecase;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -20,6 +26,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -28,20 +35,17 @@ import java.util.List;
 public class CreateTicketController {
 
     @Autowired
-    private TicketService ticketService;
+    private TicketUsecase ticketUsecase;
     @Autowired
-    private TicketTypeService typeService;
+    private ProjectUsecase projectService;
     @Autowired
-    private TicketStatusService statusService;
-    @Autowired
-    private TicketPriorityService priorityService;
-    @Autowired
-    private ProjectService projectService;
+    private UserUsecase userUsecase;
 
     @ProjectMemberOnly
     @GetMapping("/project/{projectId}/ticket/create")
     public String show(@ProjectName @PathVariable String projectId, Model model) throws ProjectNotFoundException {
-        setupModel(model, projectId);
+        Project project = projectService.findById(projectId).get();
+        setupModel(model, project);
 
         return "user/project/new-ticket";
     }
@@ -51,27 +55,31 @@ public class CreateTicketController {
     public String createTicket(@ProjectName @PathVariable String projectId, Model model,
                                @Valid CreateTicketForm form, BindingResult result,
                                @AuthenticationPrincipal WorkbenchUserDetails principal) throws ProjectNotFoundException {
-        setupModel(model, projectId);
+        Project project = projectService.findById(projectId).get();
+        setupModel(model, project);
 
         if (result.hasErrors()) {
             return "user/project/new-ticket";
         }
 
-        OpenTicket ticket = new OpenTicket();
-        ticket.project = projectId;
-        ticket.proponent = principal.getUser().id;
-        ticket.title = form.title;
-        ticket.description = form.desc == null ? "" : form.desc;
-        ticket.status = form.status; //違うプロジェクトのものが指定されるかも
-        ticket.priority = form.priority;
-        ticket.type = form.type;
-        ticket.assignee = form.assignee; //プロジェクトに参加していないユーザーが割り当てられるかも
+
+        LocalDateTime time = null;
         Date limit = form.limit;
         if (limit != null) {
-            ticket.limit = limit.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            time = limit.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
 
-        ticketService.createTicket(ticket);
+        ticketUsecase.create(
+            project,
+            form.title,
+            form.desc,
+            userUsecase.findById(form.getAssignee()).orElse(null),
+            principal.getUser(),
+            time,
+            new TicketType(form.getType(), ""),
+            new TicketStatus(form.getStatus(), ""),
+            new TicketPriority(form.getPriority(), ""));
+
 
         return "redirect:/project/" + projectId + "/ticket";
     }
@@ -87,11 +95,11 @@ public class CreateTicketController {
         return new CreateTicketForm();
     }
 
-    private void setupModel(Model model, String projectId) throws ProjectNotFoundException {
-        List<TicketType> typeList = typeService.findByProject(projectId);
-        List<TicketStatus> statusList = statusService.findByProject(projectId);
-        List<TicketPriority> priorityList = priorityService.findByProject(projectId);
-        List<User> member = projectService.findProjectMember(projectId);
+    private void setupModel(Model model, Project project) throws ProjectNotFoundException {
+        List<TicketType> typeList = ticketUsecase.findTypeByProject(project);
+        List<TicketStatus> statusList = ticketUsecase.findStatusByProject(project);
+        List<TicketPriority> priorityList = ticketUsecase.findPriorityByProject(project);
+        List<User> member = project.getMember();
 
         model.addAttribute("typeList", typeList);
         model.addAttribute("statusList", statusList);

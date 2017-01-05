@@ -1,6 +1,7 @@
 package net.orekyuu.workbench.git;
 
-import net.orekyuu.workbench.service.RemoteRepositoryService;
+import net.orekyuu.workbench.git.domain.RemoteRepository;
+import net.orekyuu.workbench.git.domain.RemoteRepositoryFactory;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +15,15 @@ import java.util.List;
 @Component
 public class FileDiffSender {
     @Autowired
-    private RemoteRepositoryService remoteRepositoryService;
+    private RemoteRepositoryFactory repositoryFactory;
 
     @Async
     public void calcDiff(String projectId, String base, String target, SseEmitter emitter) throws GitAPIException, IOException {
-        List<DiffEntry> diff = remoteRepositoryService.diff(projectId, base, target);
+        RemoteRepository repository = repositoryFactory.create(projectId);
+
+        List<DiffEntry> diff = repository.diff(base, target);
         for (DiffEntry entry : diff) {
-            FileDiff fileDiff = remoteRepositoryService.calcFileDiff(projectId, entry);
+            FileDiff fileDiff = repository.calcFileDiff(entry);
             emitter.send(fileDiff);
         }
         //なんかcompleteができてなくてクライアント側でエラー？

@@ -1,15 +1,15 @@
 package net.orekyuu.workbench.config.security;
 
 
-import net.orekyuu.workbench.entity.User;
+import net.orekyuu.workbench.user.domain.model.User;
 import org.springframework.security.core.authority.AuthorityUtils;
 
 public class WorkbenchUserDetails extends org.springframework.security.core.userdetails.User {
 
     private final User user;
 
-    public WorkbenchUserDetails(User user) {
-        super(user.id, user.password, AuthorityUtils.createAuthorityList("ROLE_USER"));
+    public WorkbenchUserDetails(User user, String password) {
+        super(user.getId(), password, AuthorityUtils.createAuthorityList("ROLE_USER"));
         this.user = user;
     }
 

@@ -1,11 +1,12 @@
 package net.orekyuu.workbench.job.task;
 
-import net.orekyuu.workbench.entity.TestStatus;
+import net.orekyuu.workbench.build.model.domain.TestStatus;
+import net.orekyuu.workbench.build.usecase.WorkbenchConfigUsecase;
 import net.orekyuu.workbench.job.*;
 import net.orekyuu.workbench.job.message.LogMessage;
 import net.orekyuu.workbench.job.message.TestResult;
 import net.orekyuu.workbench.job.message.TestResultMessage;
-import net.orekyuu.workbench.service.WorkbenchConfigService;
+import net.orekyuu.workbench.project.domain.model.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +37,13 @@ public class TestTask implements Task {
     @Autowired
     private JobWorkspaceService jobWorkspaceService;
     @Autowired
-    private WorkbenchConfigService configService;
+    private WorkbenchConfigUsecase configService;
 
     @Override
     public boolean process(JobMessenger messenger, TaskArguments args) throws Exception {
         logger.info("Start TestTask");
         Path workspacePath = jobWorkspaceService.getWorkspacePath(args.getJobId());
-        List<String> command = command(args.getProjectId());
+        List<String> command = command(args.getProject());
         if (command.isEmpty()) {
             messenger.send(new LogMessage("テスト設定が有効化されていません"));
             return false;
@@ -62,8 +63,8 @@ public class TestTask implements Task {
         return true;
     }
 
-    List<String> command(String projectId) {
-        return configService.find(projectId, "HEAD")
+    List<String> command(Project project) {
+        return configService.find(project, "HEAD")
             .map(WorkbenchConfig::getTestSettings)
             .map(TestSettings::getTestCommand)
             .orElseGet(ArrayList::new);

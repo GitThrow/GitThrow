@@ -1,7 +1,7 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
-import net.orekyuu.workbench.entity.Project;
-import net.orekyuu.workbench.service.ProjectService;
+import net.orekyuu.workbench.project.domain.model.Project;
+import net.orekyuu.workbench.project.usecase.ProjectUsecase;
 import net.orekyuu.workbench.service.exceptions.ContentNotFoundException;
 import net.orekyuu.workbench.service.exceptions.NotProjectMemberException;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.*;
 public class ProjectControllerAdvice {
 
     @Autowired
-    private ProjectService projectService;
+    private ProjectUsecase usecase;
 
     @ModelAttribute
     public void addProjectObject(@PathVariable("projectId") String projectId, Model model) throws ProjectNotFoundException {
-        Project project = projectService.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
+        Project project = usecase.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
         model.addAttribute("project", project);
     }
 
@@ -38,7 +38,7 @@ public class ProjectControllerAdvice {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String handleContentNotFoundException(ContentNotFoundException e, Model model) throws ProjectNotFoundException {
-        Project project = projectService.findById(e.getProjectId()).orElseThrow(() -> new ProjectNotFoundException(e.getProjectId()));
+        Project project = usecase.findById(e.getProjectId()).orElseThrow(() -> new ProjectNotFoundException(e.getProjectId()));
         model.addAttribute("project", project);
         return "error/content_not_found";
     }

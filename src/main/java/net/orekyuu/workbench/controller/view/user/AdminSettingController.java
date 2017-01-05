@@ -1,8 +1,8 @@
 package net.orekyuu.workbench.controller.view.user;
 
 import net.orekyuu.workbench.infra.AdminOnly;
-import net.orekyuu.workbench.service.UserService;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
+import net.orekyuu.workbench.user.usecase.UserUsecase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,12 +20,12 @@ import javax.validation.constraints.Size;
 public class AdminSettingController {
 
     @Autowired
-    private UserService userService;
+    private UserUsecase userUsecase;
 
     @GetMapping("admin/user-setting")
     @AdminOnly
     public String showAdminSetting(Model model) {
-        model.addAttribute("users", userService.findAll(false));
+        model.addAttribute("users", userUsecase.findAll(false));
         return "user/user-management";
     }
 
@@ -33,7 +33,7 @@ public class AdminSettingController {
     @AdminOnly
     public String createNewUser(@Valid NewUserForm form, BindingResult result,
                                 RedirectAttributes redirectAttributes) {
-        userService.findById(form.id).ifPresent(u -> {
+        userUsecase.findById(form.id).ifPresent(u -> {
             result.addError(new FieldError("newUserForm", "id", "使用されているIDです"));
         });
 
@@ -44,7 +44,7 @@ public class AdminSettingController {
         }
 
         try {
-            userService.createUser(form.id, form.name, form.password);
+            userUsecase.create(form.id, form.name, form.password);
         } catch (UserExistsException e) {
             throw new RuntimeException(e);
         }

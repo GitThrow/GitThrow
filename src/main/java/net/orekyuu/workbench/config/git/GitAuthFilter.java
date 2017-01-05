@@ -1,10 +1,9 @@
 package net.orekyuu.workbench.config.git;
 
-import net.orekyuu.workbench.entity.User;
-import net.orekyuu.workbench.service.ProjectService;
-import net.orekyuu.workbench.service.UserService;
+import net.orekyuu.workbench.project.usecase.ProjectUsecase;
+import net.orekyuu.workbench.user.domain.model.User;
+import net.orekyuu.workbench.user.usecase.UserUsecase;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -46,12 +45,10 @@ public class GitAuthFilter implements Filter {
         String userName = split[0];
         String pw = split[1];
 
-        PasswordEncoder passwordEncoder = context.getBean(PasswordEncoder.class);
-        UserService userService = context.getBean(UserService.class);
-        Optional<User> userOpt = userService.findById(userName);
+        UserUsecase userUsecase = context.getBean(UserUsecase.class);
+        Optional<User> userOpt = userUsecase.findById(userName);
         boolean auth = userOpt
-            .map(u -> u.password)
-            .map(userPW -> passwordEncoder.matches(pw, userPW))
+            .map(user -> userUsecase.matchPassword(user, pw))
             .orElse(false);
 
         if (!auth) {
@@ -61,11 +58,11 @@ public class GitAuthFilter implements Filter {
         }
 
         User user = userOpt.orElseThrow(NullPointerException::new);
-        ProjectService projectService = context.getBean(ProjectService.class);
+        ProjectUsecase projectUsecase = context.getBean(ProjectUsecase.class);
 
         String projectId = getProjectId(req.getRequestURI());
         //参加していない
-        if (projectId == null || !projectService.isJoined(projectId, user.id)) {
+        if (projectId == null || !projectUsecase.isJoined(projectId, user.getId())) {
             res.sendError(403, "リポジトリにアクセスする権限がありません");
             return;
         }

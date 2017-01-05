@@ -1,6 +1,6 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-<!--/*@thymesVar id="project" type="net.orekyuu.workbench.entity.Project"*/-->
+<!--/*@thymesVar id="project" type="net.orekyuu.workbench.project.domain.model.Project"*/-->
 <head th:fragment="project-page-head" th:remove="tag">
   <meta charset="utf-8">
   <!-- for responsive -->
@@ -86,7 +86,7 @@
           <i class="fa fa-gear"></i> <span>設定</span>
         </a></li>
         <li class=""
-            th:if="${project.ownerUserId.equals(#authentication.principal.user.id)}"
+            th:if="${project.owner.equals(#authentication.principal.user)}"
             th:class="${#httpServletRequest.requestURI.matches('^/project/'+project.id+'/admin-settings.*$')} ? 'active'">
           <a href="" th:href="|@{/project/}${project.id}/admin-settings|">
           <i class="fa fa-wrench"></i> <span>管理者設定</span>

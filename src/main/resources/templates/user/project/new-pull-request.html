@@ -80,7 +80,7 @@
                 <select class="form-control select2" title="reviewer" id="reviewer" th:remove="all-but-first" th:field="*{reviewer}">
                   <!--/*@thymesVar id="u" type="net.orekyuu.workbench.entity.User"*/-->
                   <option selected="selected" th:each="u : ${member}" th:text="${u.name}"
-                          th:selected="${#authentication.principal.user.id == u.id}" th:value="${u.id}">hoge</option>
+                          th:selected="${#authentication.principal.user.equals(u)}" th:value="${u.id}">hoge</option>
                 </select>
                 <p class="help-block" th:if="${#fields.hasErrors('reviewer')}" th:errors="*{reviewer}">エラーメッセージ</p>
               </div>

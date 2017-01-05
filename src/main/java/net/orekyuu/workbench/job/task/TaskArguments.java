@@ -1,6 +1,7 @@
 package net.orekyuu.workbench.job.task;
 
-import net.orekyuu.workbench.entity.User;
+import net.orekyuu.workbench.project.domain.model.Project;
+import net.orekyuu.workbench.user.domain.model.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,13 +14,13 @@ import java.util.UUID;
 public final class TaskArguments {
 
     private final UUID jobId;
-    private final String projectId;
+    private final Project project;
     private final User user;
     private final Map<String, Object> taskDataMap = new HashMap<>();
 
-    public TaskArguments(UUID jobId, String projectId, User user) {
+    public TaskArguments(UUID jobId, Project project, User user) {
         this.jobId = jobId;
-        this.projectId = projectId;
+        this.project = project;
         this.user = user;
     }
 
@@ -31,10 +32,10 @@ public final class TaskArguments {
     }
 
     /**
-     * @return 実行対象のプロジェクトID
+     * @return 実行対象のプロジェクト
      */
-    public String getProjectId() {
-        return projectId;
+    public Project getProject() {
+        return project;
     }
 
     /**

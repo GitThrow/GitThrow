@@ -1,11 +1,15 @@
 package net.orekyuu.workbench.job.task;
 
-import net.orekyuu.workbench.entity.Artifact;
-import net.orekyuu.workbench.entity.TestStatus;
+import net.orekyuu.workbench.build.model.domain.TestStatus;
+import net.orekyuu.workbench.build.port.table.ArtifactTable;
 import net.orekyuu.workbench.job.JobMessenger;
 import net.orekyuu.workbench.job.message.BuildResult;
-import net.orekyuu.workbench.service.TicketCommentService;
-import net.orekyuu.workbench.util.BotUserUtil;
+import net.orekyuu.workbench.project.usecase.ProjectUsecase;
+import net.orekyuu.workbench.ticket.domain.model.Ticket;
+import net.orekyuu.workbench.ticket.usecase.TicketCommentUsecase;
+import net.orekyuu.workbench.ticket.usecase.TicketUsecase;
+import net.orekyuu.workbench.user.usecase.UserUsecase;
+import net.orekyuu.workbench.user.util.BotUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,11 +23,16 @@ public class MergeJobCommentTask implements Task {
     private int commentTarget;
 
     @Autowired
-    private TicketCommentService ticketCommentService;
+    private TicketCommentUsecase commentUsecase;
+    @Autowired
+    private TicketUsecase ticketUsecase;
+    @Autowired
+    private ProjectUsecase projectUsecase;
+    @Autowired
+    private UserUsecase userUsecase;
 
     @Override
     public boolean process(JobMessenger messenger, TaskArguments args) throws Exception {
-        String projectId = args.getProjectId();
 
         StringBuilder builder = new StringBuilder("### レポート");
         builder.append("\n");
@@ -41,10 +50,10 @@ public class MergeJobCommentTask implements Task {
         builder.append("  \n");
 
         //成果物のリンク
-        Optional<Artifact> artifact = args.getData(SaveArtifactTask.ARTIFACT_KEY);
+        Optional<ArtifactTable> artifact = args.getData(SaveArtifactTask.ARTIFACT_KEY);
         artifact.ifPresent(it -> {
-            String link = "/project/" + projectId + "/artifact/" + it.id;
-            String message = String.format("成果物: [%s](%s)", it.fileName, link);
+            String link = "/project/" + args.getProject().getId() + "/artifact/" + it.getId();
+            String message = String.format("成果物: [%s](%s)", it.getFileName(), link);
             builder.append(message);
         });
         builder.append("  \n");
@@ -54,7 +63,12 @@ public class MergeJobCommentTask implements Task {
         opt.ifPresent(it -> {
             builder.append("テスト結果: ").append(it == TestStatus.PASSING ? "PASSING" : "FAILED");
         });
-        ticketCommentService.createComment(projectId, commentTarget, builder.toString(), BotUserUtil.toBotUserId(projectId));
+
+        Ticket ticket = ticketUsecase.findById(args.getProject(), commentTarget).get();
+        commentUsecase.create(
+            ticket,
+            builder.toString(),
+            userUsecase.findById(BotUserUtil.toBotUserId(args.getProject().getId())).get());
         return true;
     }
 

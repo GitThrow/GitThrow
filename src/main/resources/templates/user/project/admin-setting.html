@@ -51,13 +51,13 @@
                 <th></th>
               </tr>
               <tr th:each="user : ${projectMember}">
-                <!--/*@thymesVar id="user" type="net.orekyuu.workbench.entity.User"*/-->
+                <!--/*@thymesVar id="user" type="net.orekyuu.workbench.user.domain.model.User"*/-->
                 <td><img src="../../../static/img/user2-160x160.jpg" th:src="|@{/user/icon/}${user.id}|" alt="" class="img-circle" width="24"></td>
                 <td th:text="${user.name}">おれきゅう</td>
                 <td th:text="${user.id}">orekyuu</td>
                 <!--管理者は削除できないようにする-->
-                <td><!--/*@thymesVar id="project" type="net.orekyuu.workbench.entity.Project"*/-->
-                <button type="submit" class="btn btn-danger" name="delete" th:value="${user.id}" th:unless="${project.ownerUserId.equals(user.id)}">削除</button></td>　
+                <td><!--/*@thymesVar id="project" type="net.orekyuu.workbench.project.domain.model.Project"*/-->
+                <button type="submit" class="btn btn-danger" name="delete" th:value="${user.id}" th:unless="${project.owner.equals(user)}">削除</button></td>　
               </tr>
             </table>
           </div>

@@ -1,8 +1,9 @@
 package net.orekyuu.workbench.controller.view.user.project;
 
+import net.orekyuu.workbench.git.domain.RemoteRepository;
+import net.orekyuu.workbench.git.domain.RemoteRepositoryFactory;
 import net.orekyuu.workbench.infra.ProjectMemberOnly;
 import net.orekyuu.workbench.infra.ProjectName;
-import net.orekyuu.workbench.service.RemoteRepositoryService;
 import net.orekyuu.workbench.service.exceptions.ContentNotFoundException;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -29,18 +30,21 @@ import java.util.stream.Stream;
 public class RepositoryBrowseController {
 
     @Autowired
-    private RemoteRepositoryService remoteRepositoryService;
+    private RemoteRepositoryFactory repositoryFactory;
 
     @ProjectMemberOnly
     @GetMapping(value = "project/{projectId}/raw/{hash}/**")
-    public ResponseEntity<byte[]> test(@ProjectName @PathVariable String projectId, @PathVariable String hash, HttpServletRequest request)
+    public ResponseEntity<byte[]> test(@ProjectName @PathVariable String projectId, @PathVariable String hash,
+                                       HttpServletRequest request)
             throws ProjectNotFoundException, GitAPIException {
 
         String requestPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String[] pathArray = requestPath.split("/");
         // URL Mappingに対して固定の処理になっている
         String relativePath = Arrays.stream(pathArray).skip(5).collect(Collectors.joining("/"));
-        byte[] bytes = remoteRepositoryService.getRepositoryFile(projectId, hash, relativePath)
+
+        RemoteRepository repository = repositoryFactory.create(projectId);
+        byte[] bytes = repository.getRepositoryFile(hash, relativePath)
             .orElseThrow(() -> new ContentNotFoundException(projectId))
             .toByteArray();
         HttpHeaders headers = new HttpHeaders();

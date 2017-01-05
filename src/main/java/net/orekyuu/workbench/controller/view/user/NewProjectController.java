@@ -1,9 +1,9 @@
 package net.orekyuu.workbench.controller.view.user;
 
 import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
-import net.orekyuu.workbench.entity.User;
-import net.orekyuu.workbench.service.ProjectService;
+import net.orekyuu.workbench.project.usecase.ProjectUsecase;
 import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
+import net.orekyuu.workbench.user.domain.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -22,7 +22,7 @@ import javax.validation.constraints.Size;
 public class NewProjectController {
 
     @Autowired
-    private ProjectService projectService;
+    private ProjectUsecase projectUsecase;
 
     @GetMapping("/new-project")
     public String show() {
@@ -40,7 +40,7 @@ public class NewProjectController {
 
         User user = principal.getUser();
         try {
-            projectService.createProject(form.id, form.name, user);
+            projectUsecase.createProject(form.id, form.name, user);
         } catch (ProjectExistsException e) {
             result.addError(new FieldError("id", "id", "すでに存在しているプロジェクトです"));
             return "user/new-project";

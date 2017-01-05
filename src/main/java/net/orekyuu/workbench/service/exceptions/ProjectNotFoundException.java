@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.service.exceptions;
 
+import net.orekyuu.workbench.controller.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -7,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * プロジェクトが見つからない時にスローされる
  */
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class ProjectNotFoundException extends Exception {
+public class ProjectNotFoundException extends ResourceNotFoundException {
 
     private String projectId;
     public ProjectNotFoundException(String projectId) {

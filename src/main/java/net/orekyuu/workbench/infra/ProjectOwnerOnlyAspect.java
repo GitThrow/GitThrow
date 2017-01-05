@@ -2,8 +2,8 @@ package net.orekyuu.workbench.infra;
 
 import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
 import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
-import net.orekyuu.workbench.entity.Project;
-import net.orekyuu.workbench.service.ProjectService;
+import net.orekyuu.workbench.project.domain.model.Project;
+import net.orekyuu.workbench.project.usecase.ProjectUsecase;
 import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -22,7 +22,7 @@ import java.util.Optional;
 @Component
 public class ProjectOwnerOnlyAspect {
     @Autowired
-    private ProjectService projectService;
+    private ProjectUsecase projectService;
 
     @Around("@annotation(net.orekyuu.workbench.infra.ProjectOwnerOnly)")
     public Object projectAuthAspect(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -32,7 +32,7 @@ public class ProjectOwnerOnlyAspect {
             .getAuthentication().getPrincipal();
 
         Project project = projectService.findById(projectName).orElseThrow(() -> new ProjectNotFoundException(projectName));
-        boolean joined = Objects.equals(project.ownerUserId, userDetails.getUser().id);
+        boolean joined = Objects.equals(project.getOwner(), userDetails.getUser());
         if (!joined) {
             throw new NotMemberException();
         }

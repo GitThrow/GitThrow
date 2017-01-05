@@ -1,13 +1,12 @@
 package net.orekyuu.workbench.controller.view.user;
 
 import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
-import net.orekyuu.workbench.entity.User;
-import net.orekyuu.workbench.entity.UserAvatar;
-import net.orekyuu.workbench.entity.UserSetting;
-import net.orekyuu.workbench.service.UserService;
+import net.orekyuu.workbench.user.domain.model.User;
+import net.orekyuu.workbench.user.domain.model.UserSettings;
+import net.orekyuu.workbench.user.usecase.PasswordNotMatchException;
+import net.orekyuu.workbench.user.usecase.UserUsecase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,7 +20,6 @@ import javax.imageio.ImageIO;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,57 +33,51 @@ import java.util.Objects;
 public class UserSettingController {
 
     @Autowired
-    private UserService userService;
+    private UserUsecase userUsecase;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @GetMapping("/user-setting")
+    @GetMapping("/userUsecase-setting")
     public String show(Model model, @AuthenticationPrincipal WorkbenchUserDetails principal) {
         UserSettingForm form = (UserSettingForm) model.asMap().get("userSettingForm");
-        form.name = principal.getUser().name;
-        form.email = principal.getUser().email;
+        User user = principal.getUser();
+        form.name = user.getName();
+        form.email = user.getEmail();
 
-        if(userService.findSettingById(principal.getUser().id).get().useGravatar){
+        UserSettings settings = user.getUserSettings();
+        if (settings.isUseGravatar()) {
             form.useGravatar = "on";
         }
 
-        return "user/user-setting";
+        return "userUsecase/userUsecase-setting";
     }
 
-    @PostMapping("/user-setting")
+    @PostMapping("/userUsecase-setting")
     public String update(@Valid UserSettingForm form, BindingResult result, @AuthenticationPrincipal WorkbenchUserDetails principal) {
 
         //データに変更があるかどうか
         boolean change = false;
 
         if (result.hasErrors()) {
-            return "user/user-setting";
+            return "userUsecase/userUsecase-setting";
         }
 
         User user = principal.getUser();
-        if (!Objects.equals(user.name, form.name)) {
-            user.name = form.name;
-            userService.update(user);
+        if (!Objects.equals(user.getName(), form.name)) {
+            user.changeName(form.name);
             change = true;
         }
 
-        if (!Objects.equals(user.email, form.email)) {
-            user.email = form.email;
-            userService.update(user);
+        if (!Objects.equals(user.getEmail(), form.email)) {
+            user.changeEmail(form.email);
             change = true;
 
-            if(form.email.length()>0 && form.useGravatar != null){
+            if (form.email.length() > 0 && form.useGravatar != null) {
                 try {
 
                     String md5 = md5Hex(form.email);
 
 
-                    byte[] bytes = getImageByteArray("https://www.gravatar.com/avatar/"+md5+"?s=200", "jpg");
-                    UserAvatar userAvatar = new UserAvatar();
-                    userAvatar.id = user.id;
-                    userAvatar.avatar = bytes;
-                    userService.updateIcon(userAvatar);
+                    byte[] bytes = getImageByteArray("https://www.gravatar.com/avatar/" + md5 + "?s=200", "jpg");
+                    userUsecase.updateAvater(user, bytes);
 
                     change = true;
                 } catch (IOException e) {
@@ -99,73 +91,59 @@ public class UserSettingController {
 
             try {
                 byte[] bytes = form.avatar.getBytes();
-                UserAvatar userAvatar = new UserAvatar();
-                userAvatar.id = user.id;
-                userAvatar.avatar = bytes;
-                userService.updateIcon(userAvatar);
-
+                userUsecase.updateAvater(user, bytes);
                 change = true;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        UserSetting userSetting = userService.findSettingById(principal.getUser().id).get();
-        if(userSetting.useGravatar != (form.useGravatar!=null)){
-            userSetting.useGravatar = form.useGravatar!=null ;
-            userService.updateSetting(userSetting);
+        if (form.useGravatar != null) {
+            user.setUserSettings(new UserSettings(form.useGravatar.equals("on")));
         }
 
-
-        return "redirect:/user-setting" + (!change ? "":"?update=success");
+        userUsecase.save(user);
+        return "redirect:/userUsecase-setting" + (!change ? "" : "?update=success");
     }
 
-    @PostMapping("/user-setting-pw")
-    public String update(@Valid UserPWSettingForm form, BindingResult result,RedirectAttributes attr, @AuthenticationPrincipal WorkbenchUserDetails principal) {
+    @PostMapping("/userUsecase-setting-pw")
+    public String update(@Valid UserPWSettingForm form, BindingResult result, RedirectAttributes attr, @AuthenticationPrincipal WorkbenchUserDetails principal) {
 
-      //データに変更があるかどうか
-        boolean change = false;
 
         if (result.hasErrors()) {
             attr.addFlashAttribute("org.springframework.validation.BindingResult.userPWSettingForm", result);
             attr.addFlashAttribute("userPWSettingForm", form);
-            return "redirect:/user-setting";
+            return "redirect:/userUsecase-setting";
         }
 
         User user = principal.getUser();
 
-        if(form.password.length() == 0 || form.oldPassword.length() == 0)return "redirect:/user-setting";
-
-        if(!passwordEncoder.matches(form.oldPassword, user.password))return "redirect:/user-setting?update=pw_error";
-
-        if(!passwordEncoder.matches(form.password, user.password)){
-
-            user.password = passwordEncoder.encode(form.password);
-            userService.update(user);
-
-            change = true;
+        try {
+            userUsecase.changePassword(user, form.oldPassword, form.password);
+            return "redirect:/userUsecase-setting?update=success";
+        } catch (PasswordNotMatchException e) {
+            //パスワードがマッチしない
+            return "redirect:/userUsecase-setting?update=pw_error";
         }
-
-        return "redirect:/user-setting" + (!change ? "":"?update=success");
     }
 
     //Gravatar関係 別クラスに分けてもいいかも
     public static String hex(byte[] array) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < array.length; ++i) {
-        sb.append(Integer.toHexString((array[i]
-            & 0xFF) | 0x100).substring(1,3));
+            sb.append(Integer.toHexString((array[i]
+                & 0xFF) | 0x100).substring(1, 3));
         }
         return sb.toString();
     }
 
-    public static String md5Hex (String message) {
+    public static String md5Hex(String message) {
         try {
-        MessageDigest md =
-            MessageDigest.getInstance("MD5");
-        return hex (md.digest(message.getBytes("CP1252")));
-        } catch (NoSuchAlgorithmException e) {
-        } catch (UnsupportedEncodingException e) {
+            MessageDigest md =
+                MessageDigest.getInstance("MD5");
+            return hex(md.digest(message.getBytes("CP1252")));
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -177,7 +155,6 @@ public class UserSettingController {
         ImageIO.write(readImage, fileNameExtension, outPutStream);
         return outPutStream.toByteArray();
     }
-
 
 
     @ModelAttribute
@@ -193,7 +170,7 @@ public class UserSettingController {
         private String email;
 
         @Pattern(regexp = "on")
-        private String useGravatar="";
+        private String useGravatar = "";
 
         private MultipartFile avatar;
 
@@ -238,10 +215,10 @@ public class UserSettingController {
     public static class UserPWSettingForm {
 
 
-        @Size(min = 0, max = 16)
+        @Size(min = 3, max = 16)
         private String password;
 
-        @Size(min = 0, max = 16)
+        @Size(min = 3, max = 16)
         private String oldPassword;
 
 

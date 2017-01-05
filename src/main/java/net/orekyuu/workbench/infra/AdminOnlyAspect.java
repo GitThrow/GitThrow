@@ -18,7 +18,7 @@ public class AdminOnlyAspect {
         WorkbenchUserDetails userDetails = (WorkbenchUserDetails) SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
 
-        if (!userDetails.getUser().admin) {
+        if (!userDetails.getUser().isAdmin()) {
             throw new NotAdminException();
         }
 
