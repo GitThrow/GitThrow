@@ -4,10 +4,7 @@ import net.orekyuu.workbench.project.domain.model.Project;
 import net.orekyuu.workbench.project.usecase.ProjectUsecase;
 import net.orekyuu.workbench.pullrequest.domain.model.PullRequest;
 import net.orekyuu.workbench.pullrequest.domain.model.PullRequestState;
-import net.orekyuu.workbench.pullrequest.port.table.ClosedPullRequestDao;
-import net.orekyuu.workbench.pullrequest.port.table.ClosedPullRequestTable;
-import net.orekyuu.workbench.pullrequest.port.table.OpenPullRequestDao;
-import net.orekyuu.workbench.pullrequest.port.table.OpenPullRequestTable;
+import net.orekyuu.workbench.pullrequest.port.table.*;
 import net.orekyuu.workbench.pullrequest.util.PullRequestUtil;
 import net.orekyuu.workbench.user.domain.model.User;
 import net.orekyuu.workbench.user.usecase.UserUsecase;
@@ -21,13 +18,15 @@ public class PullRequestRepository {
 
     private final ClosedPullRequestDao closedPullRequestDao;
     private final OpenPullRequestDao openPullRequestDao;
+    private final PullRequestNumDao pullRequestNumDao;
     private final UserUsecase userUsecase;
 
     private final ProjectUsecase projectUsecase;
 
-    public PullRequestRepository(ClosedPullRequestDao closedPullRequestDao, OpenPullRequestDao openPullRequestDao, UserUsecase userUsecase, ProjectUsecase projectUsecase) {
+    public PullRequestRepository(ClosedPullRequestDao closedPullRequestDao, OpenPullRequestDao openPullRequestDao, PullRequestNumDao pullRequestNumDao, UserUsecase userUsecase, ProjectUsecase projectUsecase) {
         this.closedPullRequestDao = closedPullRequestDao;
         this.openPullRequestDao = openPullRequestDao;
+        this.pullRequestNumDao = pullRequestNumDao;
         this.userUsecase = userUsecase;
         this.projectUsecase = projectUsecase;
     }
@@ -41,9 +40,13 @@ public class PullRequestRepository {
             throw new IllegalArgumentException("proponentがプロジェクトメンバーではありません");
         }
 
+        //番号を更新
+        PullRequestNumberTable numberTable = pullRequestNumDao.findByProjectId(project.getId()).get();
+        numberTable = pullRequestNumDao.update(new PullRequestNumberTable(project.getId(), numberTable.getPrCount() + 1)).getEntity();
+
         OpenPullRequestTable result = openPullRequestDao.insert(new OpenPullRequestTable(
             project.getId(),
-            null,
+            numberTable.getPrCount(),
             title,
             desc,
             reviewer.getId(),
@@ -100,7 +103,7 @@ public class PullRequestRepository {
 
         ClosedPullRequestTable result = closedPullRequestDao.insert(new ClosedPullRequestTable(
             pullrequest.getProjectId(),
-            null,
+            (long)pullrequest.getPullrequestNum(),
             pullrequest.getTitle(),
             pullrequest.getDescription(),
             pullrequest.getReviewer().getId(),

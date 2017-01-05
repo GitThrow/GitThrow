@@ -45,7 +45,9 @@ public class UserRepository {
         try {
             UserTable result = userDao.insert(table).getEntity();
 
-            User user = UserUtil.fromTable(result);
+
+            UserSettingTable settingTable = userSettingDao.insert(new UserSettingTable(result.getId(), false)).getEntity();
+            User user = UserUtil.fromTable(result, settingTable);
 
             avatarDao.insert(new UserAvatarTable(user.getId(), UserUtil.loadDefaultUserIcon()));
             logger.info("User created: " + user);
@@ -81,10 +83,13 @@ public class UserRepository {
     public User save(User user) {
         UserTable table = userDao.update(new UserTable(user.getId(), user.getName(), null, user.getEmail(), user.isAdmin())).getEntity();
         UserSettings settings = user.getUserSettings();
+        User result;
         if (settings != null) {
-            userSettingDao.update(new UserSettingTable(user.getId(), settings.isUseGravatar()));
+            UserSettingTable settingTable = userSettingDao.update(new UserSettingTable(user.getId(), settings.isUseGravatar())).getEntity();
+            result = UserUtil.fromTable(table, settingTable);
+        } else {
+            result = UserUtil.fromTable(table);
         }
-        User result = UserUtil.fromTable(table);
         logger.info("User updated: " + result);
         return result;
     }

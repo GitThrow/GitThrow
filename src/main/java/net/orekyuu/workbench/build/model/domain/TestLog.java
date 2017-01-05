@@ -1,5 +1,7 @@
 package net.orekyuu.workbench.build.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -11,6 +13,7 @@ public class TestLog {
     private final TestStatus status;
     private final String commit;
 
+    @JsonCreator
     public TestLog(Long id, String projectId, String log, LocalDateTime createdAt, TestStatus status, String commit) {
         this.id = id;
         this.projectId = projectId;

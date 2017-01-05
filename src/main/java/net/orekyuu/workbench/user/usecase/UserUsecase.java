@@ -45,7 +45,7 @@ public class UserUsecase {
     @Transactional(readOnly = false)
     public void changePassword(User user, String password, String newPassword) {
         UserTable table = userDao.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("存在しないユーザーです: " + user.getId()));
-        if (!passwordEncoder.matches(table.getPassword(), password)) {
+        if (!passwordEncoder.matches(password, table.getPassword())) {
             throw new PasswordNotMatchException();
         }
         userDao.update(new UserTable(user.getId(), user.getName(), passwordEncoder.encode(newPassword), user.getEmail(), user.isAdmin()));

@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.pullrequest.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import net.orekyuu.workbench.user.domain.model.User;
 
 import java.util.Objects;
@@ -16,7 +17,7 @@ public class PullRequest {
     private final String target;
     private PullRequestState state;
 
-
+    @JsonCreator
     public PullRequest(String projectId, int pullrequestNum, String title, String description, User reviewer, User proponent, String base, String target, PullRequestState state) {
         this.projectId = projectId;
         this.pullrequestNum = pullrequestNum;

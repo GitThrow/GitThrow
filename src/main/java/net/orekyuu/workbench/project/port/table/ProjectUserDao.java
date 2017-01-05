@@ -20,6 +20,9 @@ public interface ProjectUserDao {
     @BatchDelete
     BatchResult<ProjectUserTable> delete(Iterable<ProjectUserTable> projectUser);
 
+    @Delete(sqlFile = true)
+    int deleteByProject(String projectId);
+
     @Select
     Optional<ProjectUserTable> findByUserAndProject(String projectId, String userId);
 }

@@ -1,11 +1,10 @@
 package net.orekyuu.workbench.ticket.port.table;
 
-import org.seasar.doma.Dao;
-import org.seasar.doma.Delete;
-import org.seasar.doma.Insert;
-import org.seasar.doma.Update;
+import org.seasar.doma.*;
 import org.seasar.doma.boot.ConfigAutowireable;
 import org.seasar.doma.jdbc.Result;
+
+import java.util.Optional;
 
 @ConfigAutowireable
 @Dao
@@ -17,9 +16,9 @@ public interface TicketNumDao {
     @Update
     Result<TicketNumTable> update(TicketNumTable num);
 
-    @Update(sqlFile = true)
-    int increment(String projectId);
-
     @Delete(sqlFile = true)
     int deleteByProject(String projectId);
+
+    @Select
+    Optional<TicketNumTable> findByProjectID(String projectId);
 }

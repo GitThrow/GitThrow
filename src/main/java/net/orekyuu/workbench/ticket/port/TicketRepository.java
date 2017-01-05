@@ -27,15 +27,17 @@ public class TicketRepository {
     private final TicketTypeDao typeDao;
     private final TicketStatusDao statusDao;
     private final TicketPriorityDao priorityDao;
+    private final TicketNumDao ticketNumDao;
 
     private final UserRepository userRepository;
     private final ProjectUsecase projectUsecase;
 
-    public TicketRepository(OpenTicketDao ticketDao, TicketTypeDao typeDao, TicketStatusDao statusDao, TicketPriorityDao priorityDao, UserRepository userRepository, ProjectUsecase projectUsecase) {
+    public TicketRepository(OpenTicketDao ticketDao, TicketTypeDao typeDao, TicketStatusDao statusDao, TicketPriorityDao priorityDao, TicketNumDao ticketNumDao, UserRepository userRepository, ProjectUsecase projectUsecase) {
         this.ticketDao = ticketDao;
         this.typeDao = typeDao;
         this.statusDao = statusDao;
         this.priorityDao = priorityDao;
+        this.ticketNumDao = ticketNumDao;
         this.userRepository = userRepository;
         this.projectUsecase = projectUsecase;
     }
@@ -82,11 +84,11 @@ public class TicketRepository {
             throw new IllegalArgumentException(error.stream().collect(Collectors.joining(", ")) + "がprojectIdと一致しません");
         }
 
-
-
+        TicketNumTable numTable = ticketNumDao.findByProjectID(project.getId()).get();
+        numTable = ticketNumDao.update(new TicketNumTable(project.getId(), numTable.getTicketCount() + 1L)).getEntity();
         OpenTicketTable ticketTable = ticketDao.insert(new OpenTicketTable(
             project.getId(),
-            -1,
+            numTable.getTicketCount().intValue(),
             title,
             desc,
             assignee.getId(),

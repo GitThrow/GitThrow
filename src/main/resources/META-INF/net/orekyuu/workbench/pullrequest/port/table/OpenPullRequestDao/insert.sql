@@ -10,14 +10,7 @@ INSERT INTO open_pull_request (
 )
 VALUES (
   /* pr.project */'project',
-  (
-    SELECT
-      `ticket_count`
-    FROM
-      `ticket_number`
-    WHERE
-      ticket_number.project = /* pr.project */'project'
-  ),
+  /* pr.prNum */0,
   /* pr.title */'title',
   /* pr.description */'description',
   /* pr.reviewer */'reviewer',

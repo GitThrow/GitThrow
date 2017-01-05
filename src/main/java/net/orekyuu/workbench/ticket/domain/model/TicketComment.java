@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.ticket.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import net.orekyuu.workbench.user.domain.model.User;
 
@@ -14,6 +15,7 @@ public class TicketComment {
     private final LocalDateTime createdAt;
     private final User user;
 
+    @JsonCreator
     public TicketComment(int id, String projectId, String text, LocalDateTime createdAt, User user) {
         this.id = id;
         this.projectId = projectId;

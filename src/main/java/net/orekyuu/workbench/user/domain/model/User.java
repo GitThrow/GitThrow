@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.user.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import net.orekyuu.workbench.user.util.BotUserUtil;
 
 import java.util.Objects;
@@ -12,11 +13,13 @@ public final class User {
     private boolean admin;
     private UserSettings userSettings;
 
+    @JsonCreator
     public User(String id, String name, String email, boolean admin, UserSettings settings) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.admin = admin;
+        this.userSettings = settings;
     }
 
     public void changeName(String name) {

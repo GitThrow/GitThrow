@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/ticket/comment")
+@RequestMapping("/rest/project/{project}/ticket/{ticketId}/comment")
 public class TicketCommentRestController {
 
     @Autowired
@@ -31,8 +31,8 @@ public class TicketCommentRestController {
     private UserUsecase userService;
 
     @GetMapping
-    public List<TicketComment> show(@RequestParam("project") String projectId,
-                                    @RequestParam("id") int id,
+    public List<TicketComment> show(@PathVariable("project") String projectId,
+                                    @PathVariable("ticketId") int id,
                                     @AuthenticationPrincipal WorkbenchUserDetails principal) {
         Project project = projectUsecase.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
 
@@ -46,15 +46,17 @@ public class TicketCommentRestController {
     }
 
     @PostMapping
-    public TicketComment create(@RequestBody CommentCreateRequest req,
+    public TicketComment create(@PathVariable("project") String projectId,
+                                @PathVariable("ticketId") int id,
+                                @RequestBody TicketComment comment,
                                 @AuthenticationPrincipal WorkbenchUserDetails principal) {
-        Project project = projectUsecase.findById(req.getProject()).orElseThrow(() -> new ProjectNotFoundException(req.getProject()));
+        Project project = projectUsecase.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
 
         if (!project.getMember().contains(principal.getUser())) {
             throw new NotMemberException();
         }
 
-        Ticket ticket = ticketUsecase.findById(project, req.getId()).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
-        return commentUsecase.create(ticket, req.getText(), principal.getUser());
+        Ticket ticket = ticketUsecase.findById(project, id).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
+        return commentUsecase.create(ticket, comment.getText(), principal.getUser());
     }
 }

@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.user.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import net.orekyuu.workbench.user.port.table.UserSettingTable;
 
 import java.util.Objects;
@@ -11,6 +12,7 @@ public class UserSettings {
         this(table.isUseGravatar());
     }
 
+    @JsonCreator
     public UserSettings(boolean useGravatar) {
         this.useGravatar = useGravatar;
     }

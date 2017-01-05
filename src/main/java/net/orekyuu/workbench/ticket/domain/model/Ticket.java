@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.ticket.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import net.orekyuu.workbench.user.domain.model.User;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ public class Ticket {
     private TicketStatus status;
     private TicketPriority priority;
 
+    @JsonCreator
     public Ticket(String projectId, int ticketNum, String title, String description, User assignee, User proponent, LocalDateTime limit, TicketType type, TicketStatus status, TicketPriority priority) {
         this.projectId = projectId;
         this.ticketNum = ticketNum;

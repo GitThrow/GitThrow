@@ -7,6 +7,9 @@ import net.orekyuu.workbench.project.port.table.ProjectDao;
 import net.orekyuu.workbench.project.port.table.ProjectTable;
 import net.orekyuu.workbench.project.port.table.ProjectUserDao;
 import net.orekyuu.workbench.project.port.table.ProjectUserTable;
+import net.orekyuu.workbench.pullrequest.port.table.PullRequestNumDao;
+import net.orekyuu.workbench.pullrequest.port.table.PullRequestNumberTable;
+import net.orekyuu.workbench.service.exceptions.ProjectExistsException;
 import net.orekyuu.workbench.service.exceptions.UserExistsException;
 import net.orekyuu.workbench.ticket.port.table.*;
 import net.orekyuu.workbench.user.domain.model.User;
@@ -22,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +45,7 @@ public class ProjectRepository {
     private final UserAvatarDao userAvatarDao;
     private final UserSettingDao userSettingDao;
     private final UserDao userDao;
+    private final PullRequestNumDao pullRequestNumDao;
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
@@ -51,9 +56,10 @@ public class ProjectRepository {
     private static final List<String> defaultTicketPriority = Arrays.asList("低", "中", "高");
     private static final List<String> defaultTicketType = Arrays.asList("バグ", "新規機能", "提案", "リリース", "etc");
 
-    public ProjectRepository(ProjectDao projectDao, ProjectUserDao projectUserDao, TicketNumDao ticketNumDao, TicketPriorityDao ticketPriorityDao, TicketStatusDao ticketStatusDao, TicketTypeDao ticketTypeDao, RemoteRepositoryFactory repositoryFactory, UserAvatarDao userAvatarDao, UserSettingDao userSettingDao, UserDao userDao, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public ProjectRepository(ProjectDao projectDao, ProjectUserDao projectUserDao, TicketNumDao ticketNumDao, TicketPriorityDao ticketPriorityDao, TicketStatusDao ticketStatusDao, TicketTypeDao ticketTypeDao, RemoteRepositoryFactory repositoryFactory, UserAvatarDao userAvatarDao, UserSettingDao userSettingDao, UserDao userDao, PullRequestNumDao pullRequestNumDao, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.projectDao = projectDao;
         this.userDao = userDao;
+        this.pullRequestNumDao = pullRequestNumDao;
         this.userRepository = userRepository;
         this.projectUserDao = projectUserDao;
         this.ticketNumDao = ticketNumDao;
@@ -81,16 +87,24 @@ public class ProjectRepository {
      * @param projectName プロジェクト名
      * @param owner プロジェクトの管理者
      * @return 作成したプロジェクト
-     * @throws IOException
-     * @throws UserExistsException
      */
-    public Project create(String projectId, String projectName, User owner) throws IOException, UserExistsException {
+    public Project create(String projectId, String projectName, User owner) {
         ProjectTable table = new ProjectTable(projectId, projectName, owner.getId());
-        Project result = fromTable(projectDao.insert(table).getEntity());
+        ProjectTable entity;
+        try {
+            entity = projectDao.insert(table).getEntity();
+        } catch (DuplicateKeyException e) {
+            throw new ProjectExistsException(projectId);
+        }
 
         RemoteRepository repository = repositoryFactory.create(projectId);
-        repository.init();
+        try {
+            repository.init();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
 
+        pullRequestNumDao.insert(new PullRequestNumberTable(projectId, 0L));
         ticketNumDao.insert(new TicketNumTable(projectId, 0L));
         //デフォルトの優先度一覧
         defaultTicketPriority.stream()
@@ -107,9 +121,14 @@ public class ProjectRepository {
             .map(str -> new TicketTypeTable(null, projectId, str))
             .forEach(ticketTypeDao::insert);
 
-        createBot(projectId);
+        try {
+            createBot(projectId);
+        } catch (UserExistsException e) {
+            throw new RuntimeException(e);
+        }
         projectUserDao.insert(new ProjectUserTable(projectId, owner.getId()));
 
+        Project result = fromTable(entity);
         logger.info("Project created: " + result.toString());
         return result;
     }
@@ -134,13 +153,17 @@ public class ProjectRepository {
      */
     public Project delete(Project project) {
         ProjectTable table = new ProjectTable(project.getId(), project.getName(), project.getOwner().getId());
-        Project result = fromTable(projectDao.delete(table).getEntity());
 
         ticketNumDao.deleteByProject(project.getId());
         ticketPriorityDao.deleteByProject(project.getId());
         ticketStatusDao.deleteByProject(project.getId());
         ticketTypeDao.deleteByProject(project.getId());
+        projectUserDao.deleteByProject(project.getId());
 
+        Project result = fromTable(projectDao.delete(table).getEntity());
+
+        RemoteRepository repository = repositoryFactory.create(project.getId());
+        repository.delete();
         logger.info("Project deleted: " + result);
         return result;
     }
@@ -202,6 +225,7 @@ public class ProjectRepository {
             //ユーザーが存在してるので失敗
             throw new UserExistsException(bot.getId(), e);
         }
+        projectUserDao.insert(new ProjectUserTable(projectId, bot.getId()));
         return UserUtil.fromTable(bot);
     }
 

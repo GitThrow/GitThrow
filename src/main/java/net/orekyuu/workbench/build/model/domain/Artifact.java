@@ -1,5 +1,7 @@
 package net.orekyuu.workbench.build.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import java.util.Objects;
 
 public class Artifact {
@@ -7,6 +9,7 @@ public class Artifact {
     private final int id;
     private final String fileName;
 
+    @JsonCreator
     public Artifact(int id, String fileName) {
         this.id = id;
         this.fileName = fileName;

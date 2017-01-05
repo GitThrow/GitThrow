@@ -12,14 +12,7 @@ INSERT INTO open_tickets (
 )
 VALUES (
   /* ticket.project */'project',
-  (
-    SELECT
-      `ticket_count`
-    FROM
-      `ticket_number`
-    WHERE
-      ticket_number.project = /* ticket.project */'project'
-  ),
+  /* ticket.ticketNum */0,
   /* ticket.title */'title',
   /* ticket.description */'description',
   /* ticket.assignee */'assignee',

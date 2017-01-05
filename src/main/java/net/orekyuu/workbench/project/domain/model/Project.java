@@ -1,5 +1,6 @@
 package net.orekyuu.workbench.project.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import net.orekyuu.workbench.project.domain.policy.ProjectMemberPolicy;
 import net.orekyuu.workbench.project.domain.policy.ProjectNamePolicy;
 import net.orekyuu.workbench.user.domain.model.User;
@@ -24,6 +25,7 @@ public final class Project {
     private ProjectMemberPolicy projectMemberPolicy = new ProjectMemberPolicy(this);
     private ProjectNamePolicy projectNamePolicy = new ProjectNamePolicy();
 
+    @JsonCreator
     public Project(String id, String name, User owner, List<User> member) {
         if (!projectNamePolicy.check(name)) {
             throw new PolicyException();
@@ -61,7 +63,7 @@ public final class Project {
      * @return プロジェクトメンバー
      */
     public List<User> getMember() {
-        return new ArrayList<>(member);
+        return member;
     }
 
     public String getId() {

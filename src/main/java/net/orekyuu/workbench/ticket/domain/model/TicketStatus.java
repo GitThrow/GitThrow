@@ -1,11 +1,14 @@
 package net.orekyuu.workbench.ticket.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import java.util.Objects;
 
 public class TicketStatus {
     private final int id;
     private final String name;
 
+    @JsonCreator
     public TicketStatus(int id, String name) {
         this.id = id;
         this.name = name;
