@@ -6,6 +6,9 @@
   <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css"/>
   <!-- Select2 -->
   <link rel="stylesheet" href="../../../static/plugins/select2/select2.min.css" th:href="@{/plugins/select2/select2.min.css}">
+
+  <link rel="stylesheet" href="../../../static/css/github-markdown.css" th:href="@{/css/github-markdown.css}">
+  <link rel="stylesheet" href="../../../static/css/highlight/default.css" th:href="@{/css/highlight/default.css}">
 </head>
 <body class="skin-blue">
 <div class="wrapper">
@@ -44,10 +47,24 @@
             </div>
 
             <div class="form-group" th:classappend="${#fields.hasErrors('desc')? 'has-error' :''}">
-              <label for="desc" class="col-sm-3 control-label">説明文</label>
-              <div class="col-sm-9">
-                <textarea id="desc" th:field="*{desc}" cols="30" rows="10" class="form-control"></textarea>
-                <p class="help-block" th:if="${#fields.hasErrors('desc')}" th:errors="*{desc}">エラーメッセージ</p>
+              <label for="title" class="col-sm-3 control-label">説明文</label>
+              <div id="editor" class="col-sm-9">
+                <div class="nav-tabs-custom">
+                  <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab_write" data-toggle="tab">Write</a></li>
+                    <li class=""><a href="#tab_preview" data-toggle="tab">Preview</a></li>
+                  </ul>
+                  <div class="tab-content">
+                    <div class="tab-pane active" id="tab_write">
+                      <textarea id="desc" th:field="*{desc}" cols="30" rows="10" class="form-control" :value="input" @input="update"></textarea>
+                    </div>
+                    <!-- /.tab-pane -->
+                    <div class="tab-pane" id="tab_preview">
+                      <div v-html="compiledMarkdown"></div>
+                    </div>
+                  </div>
+                  <!-- /.tab-content -->
+                </div>
               </div>
             </div>
 
@@ -129,6 +146,9 @@
 <!-- bootstrap datepicker -->
 <script src="../../../static/plugins/datepicker/bootstrap-datepicker.js" th:src="@{/plugins/datepicker/bootstrap-datepicker.js}"></script>
 
+<!-- marked.js -->
+<script src="../../../static/plugins/marked/marked.min.js" th:src="@{/plugins/marked/marked.min.js}"></script>
+<script src="../../../static/js/highlight.pack.js" th:src="@{/js/highlight.pack.js}"></script>
 <script>
   $(function () {
     //select2
@@ -140,6 +160,31 @@
       format: 'yyyy/mm/dd'
     });
   });
+
+  //marked.js
+  marked.setOptions({
+    sanitize: true,
+    highlight: function (code, lang) {
+      return hljs.highlightAuto(code, [lang]).value;
+    }
+  });
+
+  new Vue({
+    el: '#editor',
+    data: {
+      input: ''
+    },
+    computed: {
+      compiledMarkdown: function () {
+        return marked(this.input, { sanitize: true })
+      }
+    },
+    methods: {
+      update: _.debounce(function (e) {
+        this.input = e.target.value
+      }, 300)
+    }
+  })
 </script>
 </body>
 </html>
