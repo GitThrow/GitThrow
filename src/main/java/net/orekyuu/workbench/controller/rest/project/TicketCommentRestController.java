@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/project/{project}/ticket/{ticketId}/comment")
+@RequestMapping("/rest/{project}/ticket/{ticketId}/comment")
 public class TicketCommentRestController {
 
     @Autowired

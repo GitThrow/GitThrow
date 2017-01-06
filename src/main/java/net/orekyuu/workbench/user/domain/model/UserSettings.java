@@ -1,6 +1,7 @@
 package net.orekyuu.workbench.user.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import net.orekyuu.workbench.user.port.table.UserSettingTable;
 
 import java.util.Objects;
@@ -13,7 +14,7 @@ public class UserSettings {
     }
 
     @JsonCreator
-    public UserSettings(boolean useGravatar) {
+    public UserSettings(@JsonProperty("useGravatar") boolean useGravatar) {
         this.useGravatar = useGravatar;
     }
 

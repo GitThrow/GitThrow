@@ -2,6 +2,7 @@ package net.orekyuu.workbench.ticket.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import net.orekyuu.workbench.user.domain.model.User;
 
 import java.time.LocalDateTime;
@@ -16,7 +17,12 @@ public class TicketComment {
     private final User user;
 
     @JsonCreator
-    public TicketComment(int id, String projectId, String text, LocalDateTime createdAt, User user) {
+    public TicketComment(
+        @JsonProperty("id") int id,
+        @JsonProperty("projectId") String projectId,
+        @JsonProperty("text") String text,
+        @JsonProperty("createdAt") LocalDateTime createdAt,
+        @JsonProperty("user") User user) {
         this.id = id;
         this.projectId = projectId;
         this.text = text;
