@@ -116,7 +116,24 @@
           <div class="row">
             <form action="" class="col-sm-12">
               <div class="form-group">
-                <textarea class="form-control" rows="3" placeholder="コメントを入力 ..." id="comment-text"></textarea>
+                <div id="editor">
+                  <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                      <li class="active"><a href="#tab_write" data-toggle="tab">Write</a></li>
+                      <li class=""><a href="#tab_preview" data-toggle="tab">Preview</a></li>
+                    </ul>
+                    <div class="tab-content">
+                      <div class="tab-pane active" id="tab_write">
+                        <textarea class="form-control" rows="3" placeholder="コメントを入力 ..." id="comment-text" :value="input" @input="update"></textarea>
+                      </div>
+                      <!-- /.tab-pane -->
+                      <div class="tab-pane" id="tab_preview">
+                        <div v-html="compiledMarkdown"></div>
+                      </div>
+                    </div>
+                    <!-- /.tab-content -->
+                  </div>
+                </div>
               </div>
               <div class="form-group">
                 <button class="btn btn-success pull-right" id="comment-submit">送信</button>
@@ -163,6 +180,23 @@
       sanitize: true,
       highlight: function (code, lang) {
         return hljs.highlightAuto(code, [lang]).value;
+      }
+    });
+
+    var editor = new Vue({
+      el: '#editor',
+      data: {
+        input: ''
+      },
+      computed: {
+        compiledMarkdown: function () {
+          return marked(this.input, { sanitize: true })
+        }
+      },
+      methods: {
+        update: _.debounce(function (e) {
+          this.input = e.target.value
+        }, 300)
       }
     });
 
@@ -249,7 +283,7 @@
         .then(function () {
           $commentBtn.prop("disabled", false);
           $commentText.prop("disabled", false);
-          $commentText.val('');
+          editor.input = '';
           updateComments();
         }).catch(function (e) {
           $commentBtn.prop("disabled", false);

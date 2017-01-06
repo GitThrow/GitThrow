@@ -5,11 +5,7 @@
  * @return {*}
  */
 function fetchTicketComment(projectId, ticketNum) {
-    return axios.get('/rest/ticket/comment', {
-        params: {
-            project: projectId,
-            id: ticketNum
-        },
+    return axios.get('/rest/'+projectId+'/ticket/'+ticketNum+'/comment', {
         headers: {
             'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
         }
@@ -25,11 +21,10 @@ function fetchTicketComment(projectId, ticketNum) {
  */
 function createTicketComment(projectId, ticketNum, text) {
     var req = {
-        project: projectId,
-        id: ticketNum,
+        projectId: projectId,
         text: text
     };
-    return axios.post('/rest/ticket/comment', req, {
+    return axios.post('/rest/'+projectId+'/ticket/'+ticketNum+'/comment', req, {
         headers: {
             'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
         }
