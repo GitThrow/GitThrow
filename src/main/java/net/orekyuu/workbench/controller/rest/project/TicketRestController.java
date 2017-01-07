@@ -2,23 +2,19 @@ package net.orekyuu.workbench.controller.rest.project;
 
 import net.orekyuu.workbench.config.security.WorkbenchUserDetails;
 import net.orekyuu.workbench.controller.exception.ResourceNotFoundException;
-import net.orekyuu.workbench.controller.view.user.project.NotMemberException;
 import net.orekyuu.workbench.project.domain.model.Project;
 import net.orekyuu.workbench.project.usecase.ProjectUsecase;
-import net.orekyuu.workbench.service.exceptions.ProjectNotFoundException;
 import net.orekyuu.workbench.ticket.domain.model.Ticket;
 import net.orekyuu.workbench.ticket.usecase.TicketUsecase;
-import net.orekyuu.workbench.user.domain.model.User;
 import net.orekyuu.workbench.user.usecase.UserUsecase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/ticket")
+@RequestMapping("/rest/{project}/ticket")
 public class TicketRestController {
 
     @Autowired
@@ -28,43 +24,33 @@ public class TicketRestController {
     @Autowired
     private UserUsecase userUsecase;
 
-    @PostMapping
-    @ResponseBody
-    public Ticket updateTicket(@RequestBody TicketUpdateRequest req, @AuthenticationPrincipal WorkbenchUserDetails principal) {
-        Project project = projectUsecase.findById(req.getProject()).orElseThrow(() -> new ProjectNotFoundException(req.getProject()));
-
-        if (!project.getMember().contains(principal.getUser())) {
-            throw new NotMemberException();
-        }
-
-
-        User assignee = req.getAssignee() == null ? null : userUsecase.findById(req.getAssignee()).filter(u -> project.getMember().contains(u)).orElse(null);
-        User proponent = req.getProponent() == null ? null : userUsecase.findById(req.getProponent()).filter(u -> project.getMember().contains(u)).orElse(null);
-        LocalDateTime limit = req.getLimit() != null ? req.getLimit().atStartOfDay() : null;
-
-        Ticket ticket = new Ticket(
-            req.getProject(),
-            req.getTicketNum(),
-            req.getTitle(),
-            req.getDescription(),
-            assignee,
-            proponent,
-            limit,
-            ticketUsecase.findTypeById(project, req.getType()).orElseThrow(() -> new ResourceNotFoundException("Ticket type")),
-            ticketUsecase.findStatusById(project, req.getStatus()).orElseThrow(() -> new ResourceNotFoundException("Ticket status")),
-            ticketUsecase.findPriorityById(project, req.getPriority()).orElseThrow(() -> new ResourceNotFoundException("Ticket priority"))
-            );
-        return ticketUsecase.update(ticket);
+    @PutMapping("{ticketId}")
+    public Ticket updateTicket(@PathVariable("ticketId") int id, Project project, @RequestBody Ticket ticket) {
+        return ticketUsecase.update(new Ticket(project.getId(), id, ticket.getTitle(), ticket.getDescription(), ticket.getAssignee(), ticket.getProponent(), ticket.getLimit(), ticket.getType(), ticket.getStatus(), ticket.getPriority()));
     }
 
-    @GetMapping("/all")
-    public List<Ticket> showAll(@RequestParam("project") String projectId, @AuthenticationPrincipal WorkbenchUserDetails principal) {
-        Project project = projectUsecase.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
-
-        if (!project.getMember().contains(principal.getUser())) {
-            throw new NotMemberException();
-        }
-
+    @GetMapping
+    public List<Ticket> showAll(Project project) {
         return ticketUsecase.findByProject(project);
+    }
+
+    @GetMapping("{ticketId}")
+    public Ticket find(Project project, @PathVariable("ticketId") int id) {
+        return ticketUsecase.findById(project, id)
+            .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @PostMapping
+    public Ticket create(Project project, @AuthenticationPrincipal WorkbenchUserDetails principal, @RequestBody Ticket ticket) {
+        return ticketUsecase.create(
+            project,
+            ticket.getTitle(),
+            ticket.getDescription(),
+            ticket.getAssignee(),
+            principal.getUser(),
+            ticket.getLimit(),
+            ticket.getType(),
+            ticket.getStatus(),
+            ticket.getPriority());
     }
 }

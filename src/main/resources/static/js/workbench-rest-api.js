@@ -33,10 +33,9 @@ function createTicketComment(projectId, ticketNum, text) {
 
 /**
  * チケットを更新する
- * @param ticket チケット
  */
-function updateTicket(ticket) {
-    return axios.post('/rest/ticket', ticket, {
+function updateTicket(projectId, ticketNum, ticket) {
+    return axios.put('/rest/'+projectId+'/ticket/'+ticketNum, ticket, {
         headers: {
             'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
         }
