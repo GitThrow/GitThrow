@@ -1,4 +1,4 @@
-package net.orekyuu.workbench.controller.rest.project;
+package net.orekyuu.workbench.controller.rest;
 
 import net.orekyuu.workbench.user.domain.model.User;
 import net.orekyuu.workbench.user.usecase.UserUsecase;

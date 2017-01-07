@@ -1,6 +1,7 @@
 package net.orekyuu.workbench.ticket.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
@@ -10,7 +11,8 @@ public class TicketType {
     private final String name;
 
     @JsonCreator
-    public TicketType(int id, String name) {
+    public TicketType(@JsonProperty("id") int id,
+                      @JsonProperty("name") String name) {
         this.id = id;
         this.name = name;
     }

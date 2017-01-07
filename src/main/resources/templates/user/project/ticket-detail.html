@@ -226,18 +226,16 @@
 
     function update() {
       var ticket = {
-        project: [[${project.id}]],
-        ticketNum: [[${ticket.ticketNum}]],
         title: $('#title').text(),
         description: [[${ticket.description}]],
-        assignee: $('#assign').val(),
-        type: parseInt($('#type').val()),
-        priority: parseInt($('#priority').val()),
-        status: parseInt($('#status').val()),
+        assignee: { id: $('#assign').val() },
+        type: { id: parseInt($('#type').val()) },
+        priority: { id: parseInt($('#priority').val()) },
+        status: { id: parseInt($('#status').val()) },
         limit: $('#limit').val()
       };
       console.log(ticket);
-      updateTicket(ticket);
+      updateTicket([[${project.id}]], [[${ticket.ticketNum}]], ticket);
     }
 
     //コメント取得
