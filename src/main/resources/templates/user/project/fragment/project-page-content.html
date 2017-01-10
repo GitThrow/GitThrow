@@ -1,6 +1,6 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-<!--/*@thymesVar id="project" type="net.orekyuu.workbench.project.domain.model.Project"*/-->
+<!--/*@thymesVar id="project" type="net.orekyuu.gitthrow.project.domain.model.Project"*/-->
 <head th:fragment="project-page-head" th:remove="tag">
   <meta charset="utf-8">
   <!-- for responsive -->
@@ -29,7 +29,7 @@
   <header class="main-header" th:fragment="project-page-topmenu">
 
     <!-- ロゴ -->
-    <a href="" class="logo" th:href="@{/}">Workbench</a>
+    <a href="" class="logo" th:href="@{/}">GitThrow</a>
 
     <!-- トップメニュー -->
     <nav class="navbar navbar-static-top" role="navigation">
@@ -182,7 +182,7 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="../../../../static/js/js.cookie.js" th:src="@{/js/js.cookie.js}"></script>
   <script src="../../../../static/js/underscore-min.js" th:src="@{/js/underscore-min.js}"></script>
-  <script src="../../../../static/js/workbench-rest-api.js" th:src="@{/js/workbench-rest-api.js}"></script>
+  <script src="../../../../static/js/gitthrow-rest-api.js" th:src="@{/js/gitthrow-rest-api.js}"></script>
   <script src="../../../../static/plugins/clipboard/clipboard.min.js" th:src="@{/plugins/clipboard/clipboard.min.js}"></script>
   <script>
 

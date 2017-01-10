@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
-  <title>Workbench</title>
+  <title>GitThrow</title>
   <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css" />
 </head>
 <body class="skin-blue">
@@ -32,7 +32,7 @@
           <form action="" method="post" th:action="|@{/project/}${project.id}/artifactTable/delete|">
             <table class="table table-hover">
               <tr th:each="artifactTable : ${artifactTables}">
-                <!--/*@thymesVar id="artifactTable" type="net.orekyuu.workbench.build.port.table.ArtifactTable"*/-->
+                <!--/*@thymesVar id="artifactTable" type="net.orekyuu.gitthrow.build.port.table.ArtifactTable"*/-->
                 <td><a href="" th:href="|@{/project/}${project.id}/artifactTable/${artifactTable.id}|" th:text="${artifactTable.fileName}">ファイル名</a></td>
                 <td style="width: 30px">
                   <button class="btn" type="submit" name="artifactId" th:value="${artifactTable.id}"><i class="fa fa-close"></i></button>

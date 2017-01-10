@@ -4,11 +4,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>net.orekyuu</groupId>
-  <artifactId>workbench2</artifactId>
+  <artifactId>GitThrow</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Workbench2</name>
+  <name>GitThrow</name>
   <description></description>
 
   <parent>

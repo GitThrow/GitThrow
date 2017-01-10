@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
-  <title>Workbench</title>
+  <title>GitThrow</title>
   <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css"/>
   <!-- Select2 -->
   <link rel="stylesheet" href="../../../static/plugins/select2/select2.min.css" th:href="@{/plugins/select2/select2.min.css}">
@@ -30,7 +30,7 @@
 
       <!-- コンテンツ1 -->
       <div class="box">
-        <!--/*@thymesVar id="createTicketForm" type="net.orekyuu.workbench.controller.view.user.project.CreateTicketController.CreateTicketForm"*/-->
+        <!--/*@thymesVar id="createTicketForm" type="net.orekyuu.gitthrow.controller.view.user.project.CreateTicketController.CreateTicketForm"*/-->
         <form action="" th:action="|@{/project}/${project.id}/ticket/create|" th:object="${createTicketForm}" method="post"
               class="form-horizontal">
           <div class="box-header with-border">
@@ -72,7 +72,7 @@
               <label for="type" class="col-sm-3 control-label">タイプ</label>
               <div class="col-sm-9">
                 <select class="form-control" title="type" id="type" th:field="*{type}">
-                  <!--/*@thymesVar id="type" type="net.orekyuu.workbench.ticket.domain.model.TicketType"*/-->
+                  <!--/*@thymesVar id="type" type="net.orekyuu.gitthrow.ticket.domain.model.TicketType"*/-->
                   <option th:each="type : ${typeList}" th:text="${type.name}" th:value="${type.id}">hoge</option>
                 </select>
                 <p class="help-block" th:if="${#fields.hasErrors('type')}" th:errors="*{type}">エラーメッセージ</p>
@@ -83,7 +83,7 @@
               <label for="priority" class="col-sm-3 control-label">優先度</label>
               <div class="col-sm-9">
                 <select class="form-control" title="priority" id="priority" th:field="*{priority}">
-                  <!--/*@thymesVar id="priority" type="net.orekyuu.workbench.ticket.domain.model.TicketPriority"*/-->
+                  <!--/*@thymesVar id="priority" type="net.orekyuu.gitthrow.ticket.domain.model.TicketPriority"*/-->
                   <option th:each="priority : ${priorityList}" th:text="${priority.name}" th:value="${priority.id}">hoge</option>
                 </select>
                 <p class="help-block" th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}">エラーメッセージ</p>
@@ -94,7 +94,7 @@
               <label for="status" class="col-sm-3 control-label">ステータス</label>
               <div class="col-sm-9">
                 <select class="form-control" title="status" id="status" th:field="*{status}">
-                  <!--/*@thymesVar id="status" type="net.orekyuu.workbench.ticket.domain.model.TicketStatus"*/-->
+                  <!--/*@thymesVar id="status" type="net.orekyuu.gitthrow.ticket.domain.model.TicketStatus"*/-->
                   <option th:each="status : ${statusList}" th:text="${status.name}" th:value="${status.id}">hoge</option>
                 </select>
                 <p class="help-block" th:if="${#fields.hasErrors('status')}" th:errors="*{status}">エラーメッセージ</p>
@@ -105,7 +105,7 @@
               <label for="assign" class="col-sm-3 control-label">担当者</label>
               <div class="col-sm-9">
                 <select class="form-control select2" title="assign" id="assign" th:remove="all-but-first" th:field="*{assignee}">
-                  <!--/*@thymesVar id="u" type="net.orekyuu.workbench.user.domain.model.User"*/-->
+                  <!--/*@thymesVar id="u" type="net.orekyuu.gitthrow.user.domain.model.User"*/-->
                   <option selected="selected" th:each="u : ${member}" th:text="${u.name}"
                           th:selected="${#authentication.principal.user.equals(u)}" th:value="${u.id}">hoge</option>
                 </select>

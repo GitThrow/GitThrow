@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
-  <title>Workbench</title>
+  <title>GitThrow</title>
   <link th:replace="user/fragment/user-page-content :: user-page-head" rel="stylesheet" type="text/css"/>
     <link href="../../static/plugins/jquery-toast-plugin/jquery.toast.min.css"
      th:href="@{/plugins/jquery-toast-plugin/jquery.toast.min.css}" rel="stylesheet"type="text/css"/>
@@ -38,7 +38,7 @@
                 <th>ID</th>
                 <th>管理者</th>
               </tr>
-              <!--/*@thymesVar id="user" type="net.orekyuu.workbench.entity.User"*/-->
+              <!--/*@thymesVar id="user" type="net.orekyuu.gitthrow.entity.User"*/-->
               <tr th:each="user : ${users}">
                 <td><img src="../../static/img/user2-160x160.jpg" th:src="|@{/user/icon/}${user.id}|" alt="" class="img-circle" width="24"></td>
                 <td th:text="${user.name}">おれきゅう</td>
@@ -63,7 +63,7 @@
               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
               <h4 class="modal-title" id="modalTitle">新規ユーザー</h4>
             </div>
-            <!--/*@thymesVar id="newUserForm" type="net.orekyuu.workbench.controller.view.user.AdminSettingController.NewUserForm"*/-->
+            <!--/*@thymesVar id="newUserForm" type="net.orekyuu.gitthrow.controller.view.user.AdminSettingController.NewUserForm"*/-->
             <form action="" th:action="@{/admin/user-setting/register}" method="post" th:object="${newUserForm}">
               <div class="modal-body">
                 <div class="form-group" th:classappend="${#fields.hasErrors('id')?'has-error':''}">
