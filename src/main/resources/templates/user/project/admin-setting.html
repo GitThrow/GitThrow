@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
-  <title>Workbench</title>
+  <title>GitThrow</title>
   <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css"/>
   <link rel="stylesheet" href="../../../static/css/github-markdown.css" th:href="@{/css/github-markdown.css}"/>
   <link rel="stylesheet" href="../../../static/css/highlight/default.css" th:href="@{/css/highlight/default.css}"/>
@@ -51,12 +51,12 @@
                 <th></th>
               </tr>
               <tr th:each="user : ${projectMember}">
-                <!--/*@thymesVar id="user" type="net.orekyuu.workbench.user.domain.model.User"*/-->
+                <!--/*@thymesVar id="user" type="net.orekyuu.gitthrow.user.domain.model.User"*/-->
                 <td><img src="../../../static/img/user2-160x160.jpg" th:src="|@{/user/icon/}${user.id}|" alt="" class="img-circle" width="24"></td>
                 <td th:text="${user.name}">おれきゅう</td>
                 <td th:text="${user.id}">orekyuu</td>
                 <!--管理者は削除できないようにする-->
-                <td><!--/*@thymesVar id="project" type="net.orekyuu.workbench.project.domain.model.Project"*/-->
+                <td><!--/*@thymesVar id="project" type="net.orekyuu.gitthrow.project.domain.model.Project"*/-->
                 <button type="submit" class="btn btn-danger" name="delete" th:value="${user.id}" th:unless="${project.owner.equals(user)}">削除</button></td>　
               </tr>
             </table>

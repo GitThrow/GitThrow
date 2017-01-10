@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
-  <title>Workbench</title>
+  <title>GitThrow</title>
   <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css" />
   <style>
     .log {
@@ -44,7 +44,7 @@
           <h3 class="box-title">テストログ</h3>
         </div>
         <div class="box-body table-responsive">
-          <!--/*@thymesVar id="testLogModel" type="net.orekyuu.workbench.job.TestLogModel"*/-->
+          <!--/*@thymesVar id="testLogModel" type="net.orekyuu.gitthrow.job.TestLogModel"*/-->
           <div>
             <pre th:each="line : ${testLogModel.getLines()}" th:text="${line.getContent()}" class="log" th:classappend="${line.getType().name().equals('ERROR') ? 'error':'' }"></pre>
           </div>

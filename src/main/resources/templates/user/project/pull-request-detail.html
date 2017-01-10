@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
-  <title>Workbench</title>
+  <title>GitThrow</title>
   <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css" />
   <link href="../../../static/css/diff.css" rel="stylesheet" type="text/css"
         th:href="@{/css/diff.css}"/>
@@ -22,7 +22,7 @@
 
     <section class="content">
 
-      <!--/*@thymesVar id="pullRequest" type="net.orekyuu.workbench.pullrequest.domain.model.PullRequest"*/-->
+      <!--/*@thymesVar id="pullRequest" type="net.orekyuu.gitthrow.pullrequest.domain.model.PullRequest"*/-->
       <div class="box">
         <div class="box-header with-border">
           <h3 class="box-title" th:text="|#${pullRequest.pullrequestNum} ${pullRequest.title}|">タイトル</h3>

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
-  <title>Workbench</title>
+  <title>GitThrow</title>
   <link th:replace="user/project/fragment/project-page-content :: project-page-head" rel="stylesheet" type="text/css" />
   <!-- Select2 -->
   <link rel="stylesheet" href="../../../static/plugins/select2/select2.min.css" th:href="@{/plugins/select2/select2.min.css}">
@@ -27,7 +27,7 @@
 
       <!-- コンテンツ1 -->
       <div class="box">
-        <!--/*@thymesVar id="newPullRequestForm" type="net.orekyuu.workbench.controller.view.user.project.PullRequestController.NewPullRequestForm"*/-->
+        <!--/*@thymesVar id="newPullRequestForm" type="net.orekyuu.gitthrow.controller.view.user.project.PullRequestController.NewPullRequestForm"*/-->
         <form action="" th:action="|@{/project}/${project.id}/pull-request/create|" th:object="${newPullRequestForm}" method="post"
               class="form-horizontal">
 
@@ -78,7 +78,7 @@
               <label for="reviewer" class="col-sm-3 control-label">レビュアー</label>
               <div class="col-sm-9">
                 <select class="form-control select2" title="reviewer" id="reviewer" th:remove="all-but-first" th:field="*{reviewer}">
-                  <!--/*@thymesVar id="u" type="net.orekyuu.workbench.entity.User"*/-->
+                  <!--/*@thymesVar id="u" type="net.orekyuu.gitthrow.entity.User"*/-->
                   <option selected="selected" th:each="u : ${member}" th:text="${u.name}"
                           th:selected="${#authentication.principal.user.equals(u)}" th:value="${u.id}">hoge</option>
                 </select>
