@@ -1,6 +1,6 @@
 SELECT
   *
 FROM
-  artifactTable
+  artifact
 WHERE
   id = /* id */0
