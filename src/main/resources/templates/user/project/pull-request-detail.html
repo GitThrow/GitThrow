@@ -35,29 +35,29 @@
             <!--/* 情報表示用のカラム */-->
             <div class="col-sm-4">
               <div class="form-group">
-                <button id="merge" class="btn btn-primary" style="width: 100%" th:if="${!(pullRequest.conflict||pullRequest.closed)}">マージ</button>
-                <button class="btn" style="width: 100%" disabled th:if="${pullRequest.closed}">マージ済み</button>
-                <button class="btn" style="width: 100%" disabled th:if="${pullRequest.conflict}">コンフリクト</button>
+                <button id="merge" class="btn btn-primary" style="width: 100%" th:if="${!(pullRequest.state.name().equals('MERGED'))}">マージ</button>
+                <button class="btn" style="width: 100%" disabled th:if="${pullRequest.state.name().equals('MERGED')}">マージ済み</button>
+                <!--<button class="btn" style="width: 100%" disabled th:if="${pullRequest.conflict}">コンフリクト</button>-->
               </div>
               <hr>
               <div class="form-group">
                 <label class="control-label">作成者</label>
-                <div th:text="${pullRequest.proponent}">admin</div>
+                <div th:text="${pullRequest.proponent.name}">admin</div>
               </div>
 
               <div class="form-group">
                 <label class="control-label">レビュアー</label>
-                <div th:text="${pullRequest.reviewer}">admin</div>
+                <div th:text="${pullRequest.reviewer.name}">admin</div>
               </div>
 
               <div class="form-group">
                 <label class="control-label">ベース</label>
-                <div th:text="${pullRequest.baseBranch}">admin</div>
+                <div th:text="${pullRequest.base}">base</div>
               </div>
 
               <div class="form-group">
                 <label class="control-label">対象</label>
-                <div th:text="${pullRequest.targetBranch}">admin</div>
+                <div th:text="${pullRequest.target}">target</div>
               </div>
 
             </div>
@@ -113,11 +113,11 @@
 
     //Diff
     var projectId = [[${projectId}]];
-    var baseBranch = [[${pullRequest.baseBranch}]];
-    var targetBranch = [[${pullRequest.targetBranch}]];
-    var prNum = [[${pullRequest.number}]];
+    var baseBranch = [[${pullRequest.base}]];
+    var targetBranch = [[${pullRequest.target}]];
+    var prNum = [[${pullRequest.pullrequestNum}]];
 
-    var source = new EventSource("/rest/pull-request/diff?projectId=" + projectId + "&base=" + baseBranch + "&target=" + targetBranch, { withCredentials: true });
+    var source = new EventSource(`/rest/${projectId}/pull-request/diff?&base=${baseBranch}&target=${targetBranch}`, { withCredentials: true });
     source.onmessage = function(event) {
       var data = JSON.parse(event.data);
       var lines = data.lines;
@@ -183,7 +183,7 @@
     function updateComments() {
       var $comments = $('#comments');
       $comments.empty();
-      fetchTicketComment([[${project.id}]], [[${pullRequest.number}]])
+      fetchTicketComment([[${project.id}]], [[${pullRequest.pullrequestNum}]])
         .then(function (response) {
           _.chain(response.data).map(function (comment) {
             comment.text = marked(comment.text);
@@ -218,7 +218,7 @@
       $commentBtn.prop("disabled", true);
       $commentText.prop("disabled", true);
 
-      createTicketComment([[${project.id}]], [[${pullRequest.number}]], $commentText.val())
+      createTicketComment([[${project.id}]], [[${pullRequest.pullrequestNum}]], $commentText.val())
         .then(function () {
           $commentBtn.prop("disabled", false);
           $commentText.prop("disabled", false);
