@@ -42,6 +42,38 @@ function updateTicket(projectId, ticketNum, ticket) {
     });
 }
 
+function fetchAllPullRequest(projectId) {
+    return axios.get(`/rest/${projectId}/pull-request`, {
+        headers: {
+            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+        }
+    });
+}
+
+function showPullRequest(projectId, prNum) {
+    return axios.get(`/rest/${projectId}/pull-request/${prNum}`, {
+        headers: {
+            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+        }
+    });
+}
+
+function createPullRequest(projectId, pullRequest) {
+    return axios.post(`/rest/${projectId}/pull-request/`, pullRequest, {
+        headers: {
+            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+        }
+    });
+}
+
+function updatePullRequest(projectId, prNum, pullRequest) {
+    return axios.put(`/rest/${projectId}/pull-request/${prNum}`, pullRequest, {
+        headers: {
+            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+        }
+    });
+}
+
 /**
  * すべてのユーザーを取得する
  */

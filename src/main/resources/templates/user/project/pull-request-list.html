@@ -32,15 +32,14 @@
           </div>
         </div>
         <div class="box-body table-responsive no-padding">
-          <table class="table table-hover">
+          <table class="table table-hover" id="pr-list">
             <tr>
               <th>#</th>
               <th>タイトル</th>
             </tr>
-            <tr th:each="pr : ${pullRequestList}">
-              <!--/*@thymesVar id="pr" type="net.orekyuu.gitthrow.pullrequest.domain.model.PullRequest"*/-->
-              <td th:text="${pr.pullrequestNum}">1</td>
-              <td><a href="" th:href="|@{/project/}${project.id}/pull-request/${pr.pullrequestNum}|" th:text="${pr.title}">タイトル</a></td>
+            <tr v-for="pr in prList">
+              <td>{{pr.pullrequestNum}}</td>
+              <td><a v-bind:href="'/project/'+pr.projectId+'/pull-request/'+pr.pullrequestNum">{{pr.title}}</a></td>
             </tr>
           </table>
         </div>
@@ -55,5 +54,18 @@
 
 </div><!-- end wrapper -->
 <div th:replace="user/project/fragment/project-page-content :: project-page-script" ></div>
+<script th:inline="javascript">
+  var projectId = [[${projectId}]];
+  var vm = new Vue({
+      el: '#pr-list',
+      data: {
+          prList: []
+      }
+  });
+
+  fetchAllPullRequest(projectId).then(function (result) {
+    vm.prList = result.data;
+  });
+</script>
 </body>
 </html>
