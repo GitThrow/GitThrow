@@ -43,8 +43,7 @@ public class PullRequestController {
 
     @GetMapping("/project/{projectId}/pull-request")
     @ProjectMemberOnly
-    public String show(@ProjectName @PathVariable String projectId, Model model, Project project) {
-        model.addAttribute("pullRequestList", pullrequestUsecase.findByProject(project));
+    public String show(@ProjectName @PathVariable String projectId) {
         return "user/project/pull-request-list";
     }
 

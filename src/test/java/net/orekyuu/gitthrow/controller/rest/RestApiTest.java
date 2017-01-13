@@ -83,10 +83,10 @@ public abstract class RestApiTest {
     @After
     public void tearDown() throws Exception {
         util.deleteGitRepositoryAndWorkspaceDir();
+        onTearDown();
     }
 
     protected void onTearDown() throws Exception {
-        onTearDown();
     }
 
     protected final ResultActions postMvc(String url, String content, User user) throws Exception {
