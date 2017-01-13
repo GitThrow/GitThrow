@@ -39,8 +39,8 @@
             </tr>
             <tr th:each="pr : ${pullRequestList}">
               <!--/*@thymesVar id="pr" type="net.orekyuu.gitthrow.pullrequest.domain.model.PullRequest"*/-->
-              <td th:text="${pr.number}">1</td>
-              <td><a href="" th:href="|@{/project/}${project.id}/pull-request/${pr.number}|" th:text="${pr.title}">タイトル</a></td>
+              <td th:text="${pr.pullrequestNum}">1</td>
+              <td><a href="" th:href="|@{/project/}${project.id}/pull-request/${pr.pullrequestNum}|" th:text="${pr.title}">タイトル</a></td>
             </tr>
           </table>
         </div>
