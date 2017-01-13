@@ -2,6 +2,7 @@ package net.orekyuu.gitthrow.pullrequest.usecase;
 
 import net.orekyuu.gitthrow.project.domain.model.Project;
 import net.orekyuu.gitthrow.pullrequest.domain.model.PullRequest;
+import net.orekyuu.gitthrow.pullrequest.port.PullRequestCommentRepository;
 import net.orekyuu.gitthrow.pullrequest.port.PullRequestRepository;
 import net.orekyuu.gitthrow.user.domain.model.User;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,11 @@ import java.util.Optional;
 public class PullRequestUsecase {
 
     private final PullRequestRepository pullRequestRepository;
+    private final PullRequestCommentRepository commentRepository;
 
-    public PullRequestUsecase(PullRequestRepository pullRequestRepository) {
+    public PullRequestUsecase(PullRequestRepository pullRequestRepository, PullRequestCommentRepository commentRepository) {
         this.pullRequestRepository = pullRequestRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Transactional(readOnly = false)

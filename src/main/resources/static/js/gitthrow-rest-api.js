@@ -74,6 +74,27 @@ function updatePullRequest(projectId, prNum, pullRequest) {
     });
 }
 
+function fetchPullRequestComment(projectId, prNum) {
+    return axios.get(`/rest/${projectId}/pull-request/${prNum}/comment`, {
+        headers: {
+            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+        }
+    });
+}
+
+function createPullRequestComment(projectId, prNum, text) {
+    var req = {
+        projectId: projectId,
+        text: text
+    };
+    return axios.post(`/rest/${projectId}/pull-request/${prNum}/comment`, req, {
+        headers: {
+            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+        }
+    });
+}
+
+
 /**
  * すべてのユーザーを取得する
  */

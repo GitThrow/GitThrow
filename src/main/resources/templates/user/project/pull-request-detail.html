@@ -183,19 +183,19 @@
     function updateComments() {
       var $comments = $('#comments');
       $comments.empty();
-      fetchTicketComment([[${project.id}]], [[${pullRequest.pullrequestNum}]])
+      fetchPullRequestComment([[${project.id}]], [[${pullRequest.pullrequestNum}]])
         .then(function (response) {
           _.chain(response.data).map(function (comment) {
             comment.text = marked(comment.text);
-            comment.isSelf = comment.userId === /*[[${#authentication.principal.user.id}]]*/"hoge";
+            comment.isSelf = comment.user.id === /*[[${#authentication.principal.user.id}]]*/"hoge";
             return comment;
           }).map(function (comment) {
             var str = '<div class="direct-chat-msg ' + (comment.isSelf ? '' : 'right') + '">';
             str += '<div class="direct-chat-info clearfix">';
-            str += '<span class="direct-chat-name pull-left">' + comment.userName + '(id: ' + comment.userId + ')</span>';
+            str += '<span class="direct-chat-name pull-left">' + comment.user.name + '(id: ' + comment.user.id + ')</span>';
             str += '<span class="direct-chat-timestamp pull-right">' + comment.createdAt + '</span>';
             str += '</div>';
-            str += '<img class="direct-chat-img" src="/user/icon/' + comment.userId + '">';
+            str += '<img class="direct-chat-img" src="/user/icon/' + comment.user.id + '">';
             str += '<div class="direct-chat-text">';
             str += comment.text;
             str += '</div>';
@@ -218,7 +218,7 @@
       $commentBtn.prop("disabled", true);
       $commentText.prop("disabled", true);
 
-      createTicketComment([[${project.id}]], [[${pullRequest.pullrequestNum}]], $commentText.val())
+      createPullRequestComment([[${project.id}]], [[${pullRequest.pullrequestNum}]], $commentText.val())
         .then(function () {
           $commentBtn.prop("disabled", false);
           $commentText.prop("disabled", false);
