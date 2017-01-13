@@ -1,5 +1,6 @@
 package net.orekyuu.gitthrow.controller.rest.project;
 
+import net.orekyuu.gitthrow.config.security.WorkbenchUserDetails;
 import net.orekyuu.gitthrow.controller.exception.ResourceNotFoundException;
 import net.orekyuu.gitthrow.git.FileDiffSender;
 import net.orekyuu.gitthrow.project.domain.model.Project;
@@ -9,6 +10,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -41,8 +43,8 @@ public class PullRequestRestController {
     }
 
     @PostMapping
-    public PullRequest create(@RequestBody PullRequest pullRequest, Project project) {
-        return pullRequestUsecase.create(project, pullRequest.getTitle(), pullRequest.getDescription(), pullRequest.getReviewer(), pullRequest.getProponent(), pullRequest.getBase(), pullRequest.getTarget());
+    public PullRequest create(@RequestBody PullRequest pullRequest, Project project, @AuthenticationPrincipal WorkbenchUserDetails principal) {
+        return pullRequestUsecase.create(project, pullRequest.getTitle(), pullRequest.getDescription(), pullRequest.getReviewer(), principal.getUser(), pullRequest.getBase(), pullRequest.getTarget());
     }
 
     @GetMapping("{prNum}")

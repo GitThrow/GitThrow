@@ -1,6 +1,7 @@
 package net.orekyuu.gitthrow.pullrequest.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import net.orekyuu.gitthrow.user.domain.model.User;
 
 import java.util.Objects;
@@ -18,7 +19,15 @@ public class PullRequest {
     private PullRequestState state;
 
     @JsonCreator
-    public PullRequest(String projectId, int pullrequestNum, String title, String description, User reviewer, User proponent, String base, String target, PullRequestState state) {
+    public PullRequest(@JsonProperty("project") String projectId,
+                       @JsonProperty("prNum")int pullrequestNum,
+                       @JsonProperty("title") String title,
+                       @JsonProperty("description") String description,
+                       @JsonProperty("reviewer") User reviewer,
+                       @JsonProperty("proponent") User proponent,
+                       @JsonProperty("base") String base,
+                       @JsonProperty("target") String target,
+                       @JsonProperty("state") PullRequestState state) {
         this.projectId = projectId;
         this.pullrequestNum = pullrequestNum;
         this.title = title;

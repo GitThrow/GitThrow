@@ -3,10 +3,7 @@ UPDATE
 SET
   `title` = /* pr.title */'',
   `description` = /* pr.description */'',
-  `reviewer` = /* pr.reviewer */'',
-  `proponent` = /* pr.proponent */'',
-  `base_commit` = /* pr.baseCommit */'',
-  `target_commit` = /* pr.targetCommit */''
+  `reviewer` = /* pr.reviewer */''
 WHERE
   pr_num = /* pr.prNum */0
   AND
