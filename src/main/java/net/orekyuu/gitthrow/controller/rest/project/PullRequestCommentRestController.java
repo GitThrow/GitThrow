@@ -23,7 +23,7 @@ public class PullRequestCommentRestController {
     private PullRequestCommentUsecase commentUsecase;
 
     @GetMapping
-    public List<PullRequestComment> show(Project project, @PathVariable("prNum") int id) {
+    public List<PullRequestComment> all(Project project, @PathVariable("prNum") int id) {
         PullRequest pr = pullRequestUsecase.findById(project, id).orElseThrow(() -> new ResourceNotFoundException("PullRequest not found"));
 
         return commentUsecase.findByPullRequest(pr);

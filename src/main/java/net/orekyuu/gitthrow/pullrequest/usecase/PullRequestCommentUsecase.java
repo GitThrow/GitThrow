@@ -8,6 +8,7 @@ import net.orekyuu.gitthrow.user.domain.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -36,6 +37,8 @@ public class PullRequestCommentUsecase {
     }
 
     public List<PullRequestComment> findByPullRequest(PullRequest pr) {
-        return commentRepository.findByPullRequest(pr);
+        List<PullRequestComment> result = commentRepository.findByPullRequest(pr);
+        result.sort(Comparator.comparing(PullRequestComment::getCreatedAt));
+        return result;
     }
 }
