@@ -2,19 +2,15 @@ package net.orekyuu.gitthrow.controller.rest.project;
 
 import net.orekyuu.gitthrow.config.security.WorkbenchUserDetails;
 import net.orekyuu.gitthrow.controller.exception.ResourceNotFoundException;
-import net.orekyuu.gitthrow.git.FileDiffSender;
 import net.orekyuu.gitthrow.project.domain.model.Project;
 import net.orekyuu.gitthrow.pullrequest.domain.model.PullRequest;
 import net.orekyuu.gitthrow.pullrequest.usecase.PullRequestUsecase;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -22,20 +18,9 @@ import java.util.List;
 public class PullRequestRestController {
 
     @Autowired
-    private FileDiffSender fileDiffSender;
-    @Autowired
     private PullRequestUsecase pullRequestUsecase;
 
     private static final Logger logger = LoggerFactory.getLogger(PullRequestRestController.class);
-
-    @GetMapping("/diff")
-    public SseEmitter diff(@RequestParam("projectId") String projectId,
-                            @RequestParam("base") String base,
-                            @RequestParam("target") String target) throws GitAPIException, IOException {
-        SseEmitter emitter = new SseEmitter(-1L);
-        fileDiffSender.calcDiff(projectId, base, target, emitter);
-        return emitter;
-    }
 
     @GetMapping
     public List<PullRequest> all(Project project) {

@@ -65,24 +65,60 @@
 
           <hr>
           <!--コメント-->
-          <div id="comments"></div>
+          <div id="comments">
+            <div class="direct-chat-msg" v-for="comment in comments" v-bind:class="{right: !isSelf(comment)}">
+              <div class="direct-chat-info clearfix">
+                <span class="direct-chat-name pull-left">{{comment.user.name}}(id: {{comment.user.id}})</span>
+                <span class="direct-chat-timestamp pull-right">{{comment.createdAt}}</span>
+              </div>
+              <img class="direct-chat-img" v-bind:src="'/user/icon/' + comment.user.id">
+              <div class="direct-chat-text">
+                <p v-html="compiledMarkdown(comment)"></p>
+              </div>
+            </div>
+          </div>
 
           <hr>
           <!--コメント送信フォーム-->
           <div class="row">
-            <form action="" class="col-sm-12">
-              <div class="form-group">
-                <textarea class="form-control" rows="3" placeholder="コメントを入力 ..." id="comment-text"></textarea>
+            <div id="editor" class="col-sm-12">
+              <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                  <li class="active"><a href="#tab_write" data-toggle="tab">Write</a></li>
+                  <li class=""><a href="#tab_preview" data-toggle="tab">Preview</a></li>
+                </ul>
+                <div class="tab-content">
+                  <div class="tab-pane active" id="tab_write">
+                    <textarea class="form-control" rows="3" placeholder="コメントを入力 ..." :value="input" @input="update" :disabled="working"></textarea>
+                  </div>
+                  <!-- /.tab-pane -->
+                  <div class="tab-pane" id="tab_preview">
+                    <div v-html="compiledMarkdown"></div>
+                  </div>
+                </div>
+                <!-- /.tab-content -->
               </div>
-              <div class="form-group">
-                <button class="btn btn-success pull-right" id="comment-submit">送信</button>
+              <div style="padding-right: 10px;">
+                <button class="btn pull-right btn-success" @click="sendComment" :disabled="working">送信</button>
               </div>
-            </form>
+            </div>
           </div>
 
           <hr>
           <!--コード差分-->
           <div id="diff">
+            <div class="file-diff" v-for="file in diffFiles">
+              <div class="file-diff-header">{{file.fileName}}</div>
+              <div class="file-diff-content">
+                <div class="line" v-for="line in file.lines">
+                  <div class="gutter">
+                    <div class="line-num line-num-a">{{line.newLineNum == -1 ? '' : line.newLineNum}}</div>
+                    <div class="line-num line-num-b">{{line.oldLineNum == -1 ? '' : line.oldLineNum}}</div>
+                  </div>
+                  <pre class="line-content" v-bind:class="{'line-add': line.change==='add', 'line-remove': line.change==='delete'}">{{line.content}}</pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -101,70 +137,87 @@
 <script src="../../../static/js/highlight.pack.js" th:src="@{/js/highlight.pack.js}"></script>
 
 <script th:inline="javascript">
-  $(function () {
-    function escapeHtml(str) {
-      str = str.replace(/&/g, '&amp;');
-      str = str.replace(/</g, '&lt;');
-      str = str.replace(/>/g, '&gt;');
-      str = str.replace(/"/g, '&quot;');
-      str = str.replace(/'/g, '&#39;');
-      return str;
-    }
+  var projectId = [[${projectId}]];
+  var baseBranch = [[${pullRequest.base}]];
+  var targetBranch = [[${pullRequest.target}]];
+  var prNum = [[${pullRequest.pullrequestNum}]];
 
-    //Diff
-    var projectId = [[${projectId}]];
-    var baseBranch = [[${pullRequest.base}]];
-    var targetBranch = [[${pullRequest.target}]];
-    var prNum = [[${pullRequest.pullrequestNum}]];
-
-    var source = new EventSource(`/rest/${projectId}/pull-request/diff?&base=${baseBranch}&target=${targetBranch}`, { withCredentials: true });
-    source.onmessage = function(event) {
-      var data = JSON.parse(event.data);
-      var lines = data.lines;
-
-      var diff = '<div class="file-diff">';
-      var header = '<div class="file-diff-header">' + escapeHtml(data.fileName) + '</div>';
-      diff += header;
-
-      diff += '<div class="file-diff-content">';
-
-      for (var i = 0; i < lines.length; i++) {
-        var line = '<div class="line">';
-        var gutter = '<div class="gutter">';
-        gutter += '<div class="line-num line-num-a" >' + (lines[i].oldLineNum == -1 ? ' ' : + lines[i].oldLineNum) + '</div>';
-        gutter += '<div class="line-num line-num-b" >' + (lines[i].newLineNum == -1 ? ' ' : + lines[i].newLineNum) + '</div>';
-        gutter += '</div>';
-        line += gutter;
-
-        var color = '';
-        if (lines[i].change === 'add') {
-          color = 'line-add';
-        }
-        if (lines[i].change === 'delete') {
-          color = 'line-remove';
-        }
-
-        var lineContent = '<pre class="line-content ' + color + '">' + escapeHtml(lines[i].content) + '</pre>';
-        line += lineContent;
-        line += '</div>';
-        diff += line;
+  commentVm = new Vue({
+    el: "#comments",
+    data: {
+      comments: []
+    },
+    methods: {
+      compiledMarkdown: function (comment) {
+        return marked(comment.text);
+      },
+      isSelf: function (comment) {
+        return comment.user.id === /*[[${#authentication.principal.user.id}]]*/'';
       }
+    }
+  });
 
-      diff += '</div>';
-      diff += '</div>';
-      $('#diff').append(diff);
-    };
+  editorVm = new Vue({
+    el: '#editor',
+    data: {
+      input: '',
+      working: false
+    },
+    computed: {
+      compiledMarkdown: function () {
+        return marked(this.input, { sanitize: true })
+      }
+    },
+    methods: {
+      update: _.debounce(function (e) {
+        this.input = e.target.value
+      }, 300),
+      sendComment: function (e) {
+        this.working = true;
+        createPullRequestComment(projectId, prNum, this.input)
+          .then(function (response) {
+            editorVm.working = false;
+            editorVm.input = '';
+            updateComments();
+          });
+      }
+    }
+  });
 
-    source.onerror = function (event) {
-      source.close();
-    };
+  diffVm = new Vue({
+      el: '#diff',
+      data: {
+          diffFiles: []
+      }
+  });
 
+  //Diff
+  var source = new EventSource(`/project/${projectId}/git/diff?&base=${baseBranch}&target=${targetBranch}`, { withCredentials: true });
+  source.onmessage = function(event) {
+    diffVm.diffFiles.push(JSON.parse(event.data));
+  };
+
+  source.onerror = function (event) {
+    source.close();
+  };
+
+  function updateComments() {
+    fetchPullRequestComment([[${project.id}]], [[${pullRequest.pullrequestNum}]])
+      .then(function (response) {
+        commentVm.comments = response.data;
+      });
+  }
+
+  updateComments();
+
+  $(function () {
     //marked.js
     marked.setOptions({
       sanitize:true,
       highlight: function(code, lang) {
         return hljs.highlightAuto(code, [lang]).value;
-      }
+      },
+      renderer: linkRenderer
     });
     $('#desc').html(marked([[${pullRequest.description}]]));
 
@@ -177,58 +230,6 @@
         mergeEeventSource.close();
       };
       window.location.href = '/project/' + projectId + '/pull-request/';
-    });
-
-    //コメント取得
-    function updateComments() {
-      var $comments = $('#comments');
-      $comments.empty();
-      fetchPullRequestComment([[${project.id}]], [[${pullRequest.pullrequestNum}]])
-        .then(function (response) {
-          _.chain(response.data).map(function (comment) {
-            comment.text = marked(comment.text);
-            comment.isSelf = comment.user.id === /*[[${#authentication.principal.user.id}]]*/"hoge";
-            return comment;
-          }).map(function (comment) {
-            var str = '<div class="direct-chat-msg ' + (comment.isSelf ? '' : 'right') + '">';
-            str += '<div class="direct-chat-info clearfix">';
-            str += '<span class="direct-chat-name pull-left">' + comment.user.name + '(id: ' + comment.user.id + ')</span>';
-            str += '<span class="direct-chat-timestamp pull-right">' + comment.createdAt + '</span>';
-            str += '</div>';
-            str += '<img class="direct-chat-img" src="/user/icon/' + comment.user.id + '">';
-            str += '<div class="direct-chat-text">';
-            str += comment.text;
-            str += '</div>';
-            str += '</div>';
-            return str;
-          }).each(function (comment) {
-            $comments.append(comment);
-          })
-        }).catch(function (e) {
-        console.log(e);
-      });
-    }
-
-    updateComments();
-
-    //コメント送信
-    var $commentBtn = $('#comment-submit');
-    var $commentText = $('#comment-text');
-    $commentBtn.click(function () {
-      $commentBtn.prop("disabled", true);
-      $commentText.prop("disabled", true);
-
-      createPullRequestComment([[${project.id}]], [[${pullRequest.pullrequestNum}]], $commentText.val())
-        .then(function () {
-          $commentBtn.prop("disabled", false);
-          $commentText.prop("disabled", false);
-          $commentText.val('');
-          updateComments();
-        }).catch(function (e) {
-        $commentBtn.prop("disabled", false);
-        $commentText.prop("disabled", false);
-        console.log(e);
-      });
     });
   });
 </script>
