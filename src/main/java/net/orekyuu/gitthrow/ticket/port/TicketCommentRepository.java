@@ -31,8 +31,6 @@ public class TicketCommentRepository {
             text, LocalDateTime.now(), user.getId());
 
         TicketCommentTable result = commentDao.insert(table).getEntity();
-        userUsecase.findById(result.getUserId());
-
         return TicketUtil.commentFromTable(result, userUsecase.findById(result.getUserId()).orElse(null));
     }
 
