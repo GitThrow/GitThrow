@@ -101,3 +101,12 @@ function createPullRequestComment(projectId, prNum, text) {
 function fetchAllUser() {
     return axios.get('/rest/user/all');
 }
+
+// Job
+function testJob(projectId, hash = "master", prNum = null) {
+    var prNumOption = '';
+    if (prNum) {
+        prNumOption = `&prNum=${prNum}`
+    }
+    return new EventSource(`/project/${projectId}/job/test?hash=${hash}${prNumOption}`, { withCredentials: true });
+}

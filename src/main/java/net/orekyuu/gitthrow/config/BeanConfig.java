@@ -2,6 +2,8 @@ package net.orekyuu.gitthrow.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.orekyuu.gitthrow.job.JobWorkspaceService;
+import net.orekyuu.gitthrow.job.JobWorkspaceServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -10,6 +12,11 @@ import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 
 @Configuration
 public class BeanConfig {
+
+    @Bean
+    public JobWorkspaceService jobWorkspaceService() {
+        return new JobWorkspaceServiceImpl();
+    }
 
     @Bean
     public IDialect java8TimeDialect() {

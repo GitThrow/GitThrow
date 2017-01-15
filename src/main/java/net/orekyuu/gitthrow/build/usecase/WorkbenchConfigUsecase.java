@@ -6,11 +6,13 @@ import net.orekyuu.gitthrow.git.domain.RemoteRepositoryFactory;
 import net.orekyuu.gitthrow.job.WorkbenchConfig;
 import net.orekyuu.gitthrow.project.domain.model.Project;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Optional;
 
+@Service
 public class WorkbenchConfigUsecase {
 
     private final RemoteRepositoryFactory factory;

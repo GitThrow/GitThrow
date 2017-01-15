@@ -1,36 +1,36 @@
-package net.orekyuu.gitthrow.controller.rest.project;
+package net.orekyuu.gitthrow.controller.view.user.project;
 
 import net.orekyuu.gitthrow.config.security.WorkbenchUserDetails;
-import net.orekyuu.gitthrow.controller.view.user.project.NotMemberException;
+import net.orekyuu.gitthrow.infra.ProjectMemberOnly;
+import net.orekyuu.gitthrow.infra.ProjectName;
 import net.orekyuu.gitthrow.job.BuildJob;
 import net.orekyuu.gitthrow.job.MergeJob;
 import net.orekyuu.gitthrow.job.TestJob;
 import net.orekyuu.gitthrow.project.domain.model.Project;
 import net.orekyuu.gitthrow.project.usecase.ProjectUsecase;
-import net.orekyuu.gitthrow.service.exceptions.ProjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@RestController
-public class JobRestController {
+@Controller
+@RequestMapping("/project/{projectId}/job/")
+public class JobController {
 
     @Autowired
     private ProjectUsecase projectService;
 
-    @GetMapping("/rest/job/build")
-    public SseEmitter build(@RequestParam("projectId") String projectId,
+    @ProjectMemberOnly
+    @GetMapping("build")
+    public SseEmitter build(Project project,
+                            @ProjectName @PathVariable("projectId") String projectId,
                             @RequestParam(value = "prNum", required = false) Integer prNum,
                             @AuthenticationPrincipal WorkbenchUserDetails principal) {
-        Project project = projectService.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
-
-        if (!project.getMember().contains(principal.getUser())) {
-            throw new NotMemberException();
-        }
         SseEmitter emitter = new SseEmitter(-1L);
         BuildJob job = buildJob();
         job.setHash("master");
@@ -41,32 +41,31 @@ public class JobRestController {
         return emitter;
     }
 
-    @GetMapping("/rest/job/test")
-    public SseEmitter test(@RequestParam("projectId") String projectId, @AuthenticationPrincipal WorkbenchUserDetails principal) {
-        Project project = projectService.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
-
-        if (!project.getMember().contains(principal.getUser())) {
-            throw new NotMemberException();
-        }
+    @ProjectMemberOnly
+    @GetMapping("test")
+    public SseEmitter test(Project project,
+                           @ProjectName @PathVariable("projectId") String projectId,
+                           @RequestParam(value = "hash", required = false, defaultValue = "master") String hash,
+                           @RequestParam(value = "prNum", required = false) Integer prNum,
+                           @AuthenticationPrincipal WorkbenchUserDetails principal) {
         SseEmitter emitter = new SseEmitter(-1L);
         TestJob job = testJob();
-        job.setHash("master");
+        job.setHash(hash);
+        if (prNum != null) {
+            job.setPrNum(prNum);
+        }
         job.start(emitter, project, principal.getUser());
         return emitter;
     }
 
-    @GetMapping("/rest/job/merge")
-    public SseEmitter merge(@RequestParam("projectId") String projectId,
+    @ProjectMemberOnly
+    @GetMapping("merge")
+    public SseEmitter merge(Project project,
+                            @ProjectName @PathVariable("projectId") String projectId,
                             @RequestParam("base") String base,
                             @RequestParam("target") String target,
                             @RequestParam("prNum") int prNum,
                             @AuthenticationPrincipal WorkbenchUserDetails principal) {
-
-        Project project = projectService.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
-
-        if (!project.getMember().contains(principal.getUser())) {
-            throw new NotMemberException();
-        }
         SseEmitter emitter = new SseEmitter(-1L);
         MergeJob job = mergeJob();
         job.setTargetBranch(target);

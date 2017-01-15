@@ -7,6 +7,7 @@ import net.orekyuu.gitthrow.job.message.LogMessage;
 import net.orekyuu.gitthrow.job.message.TestResult;
 import net.orekyuu.gitthrow.job.message.TestResultMessage;
 import net.orekyuu.gitthrow.project.domain.model.Project;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +73,12 @@ public class TestTask implements Task {
 
     private int exec(JobMessenger jobMessenger, TaskArguments args, Path workspacePath, String command) {
         //ここOSとか環境によって動作が怪しい
-        ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", command);
+        ProcessBuilder processBuilder;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            processBuilder = new ProcessBuilder("cmd", "/C", command);
+        } else {
+            processBuilder = new ProcessBuilder("bash", "-c", command);
+        }
         processBuilder.directory(workspacePath.toFile());
 
         String charset = "UTF-8";

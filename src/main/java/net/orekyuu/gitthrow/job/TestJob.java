@@ -1,12 +1,11 @@
 package net.orekyuu.gitthrow.job;
 
-import net.orekyuu.gitthrow.job.task.CleanWorkspaceTask;
-import net.orekyuu.gitthrow.job.task.GitCloneTask;
-import net.orekyuu.gitthrow.job.task.SaveTestLogTask;
-import net.orekyuu.gitthrow.job.task.TestTask;
+import net.orekyuu.gitthrow.job.task.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.OptionalInt;
 
 @Component
 @Scope("prototype")
@@ -20,8 +19,11 @@ public class TestJob extends Job {
     private GitCloneTask cloneTask;
     @Autowired
     private CleanWorkspaceTask cleanWorkspaceTask;
+    @Autowired
+    private TestJobCommentTask commentTask;
 
     private String hash = "master";
+    private OptionalInt prNum = OptionalInt.empty();
 
     @Override
     protected void onInit() {
@@ -29,6 +31,10 @@ public class TestJob extends Job {
         addTask(cloneTask);
         addTask(testTask);
         addTask(saveTestLogTask);
+        prNum.ifPresent((int num) -> {
+            commentTask.setCommentTarget(num);
+            addTask(commentTask);
+        });
         addTask(cleanWorkspaceTask);
     }
 
@@ -38,6 +44,10 @@ public class TestJob extends Job {
      */
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    public void setPrNum(int pr) {
+        this.prNum = OptionalInt.of(pr);
     }
 
 }

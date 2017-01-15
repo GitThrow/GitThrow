@@ -39,6 +39,10 @@
                 <button class="btn" style="width: 100%" disabled th:if="${pullRequest.state.name().equals('MERGED')}">マージ済み</button>
                 <!--<button class="btn" style="width: 100%" disabled th:if="${pullRequest.conflict}">コンフリクト</button>-->
               </div>
+              <!--/*@thymesVar id="config" type="net.orekyuu.gitthrow.job.WorkbenchConfig"*/-->
+              <div class="form-group" th:if="${config != null && config.testSettings != null && config.testSettings.testCommand != null && !config.testSettings.testCommand.isEmpty()}">
+                <button id="test" class="btn btn-primary" style="width: 100%"  :disabled="working" @click="exec">テスト</button>
+              </div>
               <hr>
               <div class="form-group">
                 <label class="control-label">作成者</label>
@@ -191,6 +195,36 @@
       }
   });
 
+  testButton = new Vue({
+      el: '#test',
+      data: {
+        working: false
+      },
+      methods: {
+        exec: function (e) {
+          console.log('start');
+          testButton.working = true;
+          var job = testJob(projectId, targetBranch, prNum);
+          job.onmessage = function (event) {
+            data = JSON.parse(event.data);
+            if (data.messageType === "state" && (data.state == "success" || data.state === "error")) {
+              testButton.working = false;
+              updateComments();
+            } else {
+              console.log(data);
+            }
+          };
+          job.onerror = function (event) {
+            console.log('error');
+            console.log(event);
+            testButton.working = false;
+            updateComments();
+            job.close();
+          };
+        }
+      }
+  });
+
   //Diff
   var source = new EventSource(`/project/${projectId}/git/diff?&base=${baseBranch}&target=${targetBranch}`, { withCredentials: true });
   source.onmessage = function(event) {
@@ -216,8 +250,7 @@
       sanitize:true,
       highlight: function(code, lang) {
         return hljs.highlightAuto(code, [lang]).value;
-      },
-      renderer: linkRenderer
+      }
     });
     $('#desc').html(marked([[${pullRequest.description}]]));
 
@@ -225,7 +258,7 @@
     $('#merge').click(function (e) {
       $('#merge').prop('disabled', true);
 
-      var mergeEeventSource = new EventSource("/rest/job/merge?projectId=" + projectId + "&base=" + baseBranch + "&target=" + targetBranch + '&prNum=' + prNum, { withCredentials: true });
+      var mergeEeventSource = new EventSource(`/project/{projectId}/job/merge/${projectId}?base=${baseBranch}&target=${targetBranch}&prNum=${prNum}`, { withCredentials: true });
       mergeEeventSource.onerror = function (e) {
         mergeEeventSource.close();
       };
@@ -233,6 +266,5 @@
     });
   });
 </script>
-
 </body>
 </html>
