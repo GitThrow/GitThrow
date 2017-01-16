@@ -2,6 +2,7 @@ package net.orekyuu.gitthrow.job.task;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.orekyuu.gitthrow.build.model.domain.TestLog;
 import net.orekyuu.gitthrow.build.model.domain.TestStatus;
 import net.orekyuu.gitthrow.build.usecase.TestLogUsecase;
 import net.orekyuu.gitthrow.job.JobMessenger;
@@ -23,6 +24,8 @@ public class SaveTestLogTask implements Task {
     @Autowired
     private JobWorkspaceService jobWorkspaceService;
 
+    public static final String TEST_LOG_KEY = "SaveTestLogTask.testLog";
+
     @Override
     public boolean process(JobMessenger messenger, TaskArguments args) throws Exception {
         Optional<TestLogModel> opt = args.getData(TestTask.TEST_LOG_KEY);
@@ -37,7 +40,10 @@ public class SaveTestLogTask implements Task {
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
-            }).ifPresent(json -> testLogService.create(args.getProject(), json, status, head));
+            }).ifPresent(json -> {
+                TestLog log = testLogService.create(args.getProject(), json, status, head);
+                args.putData(TEST_LOG_KEY, log);
+            });
         }
 
         return true;

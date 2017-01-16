@@ -1,11 +1,13 @@
 package net.orekyuu.gitthrow.controller.view.user.project;
 
+import net.orekyuu.gitthrow.build.usecase.WorkbenchConfigUsecase;
 import net.orekyuu.gitthrow.config.security.WorkbenchUserDetails;
 import net.orekyuu.gitthrow.controller.exception.ResourceNotFoundException;
 import net.orekyuu.gitthrow.git.domain.RemoteRepository;
 import net.orekyuu.gitthrow.git.domain.RemoteRepositoryFactory;
 import net.orekyuu.gitthrow.infra.ProjectMemberOnly;
 import net.orekyuu.gitthrow.infra.ProjectName;
+import net.orekyuu.gitthrow.job.WorkbenchConfig;
 import net.orekyuu.gitthrow.project.domain.model.Project;
 import net.orekyuu.gitthrow.pullrequest.domain.model.PullRequest;
 import net.orekyuu.gitthrow.pullrequest.usecase.PullRequestUsecase;
@@ -40,6 +42,8 @@ public class PullRequestController {
     private RemoteRepositoryFactory repositoryFactory;
     @Autowired
     private UserUsecase userUsecase;
+    @Autowired
+    private WorkbenchConfigUsecase configUsecase;
 
     @GetMapping("/project/{projectId}/pull-request")
     @ProjectMemberOnly
@@ -93,7 +97,9 @@ public class PullRequestController {
     @ProjectMemberOnly
     public String showDetail(@ProjectName @PathVariable String projectId, @PathVariable int num, Model model, Project project) {
         PullRequest pullRequest = pullrequestUsecase.findById(project, num).orElseThrow(ResourceNotFoundException::new);
+        WorkbenchConfig config = configUsecase.find(project, pullRequest.getTarget()).orElse(null);
         model.addAttribute("pullRequest", pullRequest);
+        model.addAttribute("config", config);
         return "user/project/pull-request-detail";
     }
 
