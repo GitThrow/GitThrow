@@ -29,6 +29,7 @@ public class TestJob extends Job {
     protected void onInit() {
         cloneTask.setBranch(hash);
         addTask(cloneTask);
+        testTask.setHash(hash);
         addTask(testTask);
         addTask(saveTestLogTask);
         prNum.ifPresent((int num) -> {

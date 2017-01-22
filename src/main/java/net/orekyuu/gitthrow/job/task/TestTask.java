@@ -39,6 +39,7 @@ public class TestTask implements Task {
     private JobWorkspaceService jobWorkspaceService;
     @Autowired
     private WorkbenchConfigUsecase configService;
+    private String hash;
 
     @Override
     public boolean process(JobMessenger messenger, TaskArguments args) throws Exception {
@@ -65,7 +66,7 @@ public class TestTask implements Task {
     }
 
     List<String> command(Project project) {
-        return configService.find(project, "HEAD")
+        return configService.find(project, hash)
             .map(WorkbenchConfig::getTestSettings)
             .map(TestSettings::getTestCommand)
             .orElseGet(ArrayList::new);
@@ -128,5 +129,9 @@ public class TestTask implements Task {
             e.printStackTrace();
             return 1;
         }
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
     }
 }
