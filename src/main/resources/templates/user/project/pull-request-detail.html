@@ -258,7 +258,7 @@
     $('#merge').click(function (e) {
       $('#merge').prop('disabled', true);
 
-      var mergeEeventSource = new EventSource(`/project/{projectId}/job/merge/${projectId}?base=${baseBranch}&target=${targetBranch}&prNum=${prNum}`, { withCredentials: true });
+      var mergeEeventSource = new EventSource(`/project/${projectId}/job/merge/?base=${baseBranch}&target=${targetBranch}&prNum=${prNum}`, { withCredentials: true });
       mergeEeventSource.onerror = function (e) {
         mergeEeventSource.close();
       };
