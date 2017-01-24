@@ -1,5 +1,5 @@
 /* ユーザー */
-CREATE TABLE IF NOT EXISTS `users` (
+CREATE TABLE `users` (
   `id`       VARCHAR(32) PRIMARY KEY,
   `name`     VARCHAR(16)  NOT NULL,
   `password` VARCHAR(128) NOT NULL,
@@ -7,20 +7,20 @@ CREATE TABLE IF NOT EXISTS `users` (
   `admin`    BOOL         NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS `user_avatar` (
+CREATE TABLE `user_avatar` (
   `id`     VARCHAR(32) PRIMARY KEY,
   `avatar` LONGBLOB NOT NULL,
   CONSTRAINT `user_avatar_id_fk` FOREIGN KEY (`id`) REFERENCES `users` (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `user_setting` (
+CREATE TABLE `user_setting` (
   `id`       VARCHAR(32) PRIMARY KEY,
   `gravatar` BOOL NOT NULL,
   CONSTRAINT `user_setting_id_fk` FOREIGN KEY (`id`) REFERENCES `users` (`id`)
 );
 
 /* プロジェクト */
-CREATE TABLE IF NOT EXISTS `projects`
+CREATE TABLE `projects`
 (
   `project_id`   VARCHAR(32) PRIMARY KEY,
   `project_name` VARCHAR(16) NOT NULL,
@@ -29,14 +29,14 @@ CREATE TABLE IF NOT EXISTS `projects`
 );
 
 /* プロジェクトの詳細情報 */
-CREATE TABLE IF NOT EXISTS `project_profiles`
+CREATE TABLE `project_profiles`
 (
   `project_id`  VARCHAR(32) PRIMARY KEY,
   `description` TEXT NOT NULL, /* TEXTにデフォルト値を設定できないので、コード側で対応 */
   CONSTRAINT `project_profiles_project_fk` FOREIGN KEY (`project_id`) REFERENCES `projects` (`project_id`)
 );
 
-CREATE TABLE IF NOT EXISTS `project_user` (
+CREATE TABLE `project_user` (
   `user`    VARCHAR(32),
   `project` VARCHAR(32),
   CONSTRAINT `project_user_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`),
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `project_user` (
 );
 
 /* チケットのタイプ */
-CREATE TABLE IF NOT EXISTS `ticket_type` (
+CREATE TABLE `ticket_type` (
   `id`      INT AUTO_INCREMENT PRIMARY KEY,
   `project` VARCHAR(32) NOT NULL,
   `type`    VARCHAR(32) NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `ticket_type` (
 );
 
 /* チケットの状態 */
-CREATE TABLE IF NOT EXISTS `ticket_status` (
+CREATE TABLE `ticket_status` (
   `id`      INT PRIMARY KEY AUTO_INCREMENT,
   `project` VARCHAR(32) NOT NULL,
   `status`  VARCHAR(32) NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `ticket_status` (
 );
 
 /* チケットの優先度 */
-CREATE TABLE IF NOT EXISTS `ticket_priority` (
+CREATE TABLE `ticket_priority` (
   `id`       INT PRIMARY KEY AUTO_INCREMENT,
   `project`  VARCHAR(32) NOT NULL,
   `priority` VARCHAR(32) NOT NULL,
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS `ticket_priority` (
 );
 
 /* オープンしているチケット */
-CREATE TABLE IF NOT EXISTS `open_tickets` (
+CREATE TABLE `open_tickets` (
   `project`     VARCHAR(32)  NOT NULL,
   `ticket_num`  INT          NOT NULL, /* チケット番号 */
   `title`       VARCHAR(128) NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `open_tickets` (
 );
 
 /* チケットのコメント */
-CREATE TABLE IF NOT EXISTS `ticket_comment` (
+CREATE TABLE `ticket_comment` (
   `id`         INT PRIMARY KEY AUTO_INCREMENT,
   `project`    VARCHAR(32) NOT NULL,
   `ticket_num` INT         NOT NULL,
@@ -107,20 +107,20 @@ CREATE TABLE IF NOT EXISTS `ticket_comment` (
 );
 
 /* チケットの個数を数えるためのテーブル */
-CREATE TABLE IF NOT EXISTS `ticket_number` (
+CREATE TABLE `ticket_number` (
   `project`      VARCHAR(32) PRIMARY KEY,
   `ticket_count` INT NOT NULL DEFAULT 0, /* プロジェクトに存在するチケットの個数 */
   CONSTRAINT `ticket_number_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`)
 );
 
-CREATE TABLE IF NOT EXISTS `pr_number` (
+CREATE TABLE `pr_number` (
   `project`      VARCHAR(32) PRIMARY KEY,
   `pr_count` INT NOT NULL DEFAULT 0, /* プロジェクトに存在するプルリクエストの個数 */
   CONSTRAINT `pr_number_project_fk` FOREIGN KEY (`project`) REFERENCES `projects` (`project_id`)
 );
 
 /*開いているプルリクエスト*/
-CREATE TABLE IF NOT EXISTS `open_pull_request` (
+CREATE TABLE `open_pull_request` (
   `project`       VARCHAR(32)  NOT NULL,
   `pr_num`        INT          NOT NULL,
   `title`         VARCHAR(128) NOT NULL,
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS `open_pull_request` (
 );
 
 /*閉じているプルリクエスト*/
-CREATE TABLE IF NOT EXISTS `closed_pull_request` (
+CREATE TABLE `closed_pull_request` (
   `project`       VARCHAR(32)  NOT NULL,
   `pr_num`        INT          NOT NULL,
   `title`         VARCHAR(128) NOT NULL,
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS `closed_pull_request` (
 );
 
 /* プルリクエストのコメント */
-CREATE TABLE IF NOT EXISTS `pr_comment` (
+CREATE TABLE `pr_comment` (
   `id`         INT PRIMARY KEY AUTO_INCREMENT,
   `project`    VARCHAR(32) NOT NULL,
   `pr_num` INT         NOT NULL,
@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS `pr_comment` (
 
 
 /* 成果物 */
-CREATE TABLE IF NOT EXISTS `artifact` (
+CREATE TABLE `artifact` (
   `id`        INT AUTO_INCREMENT PRIMARY KEY,
   `project`   VARCHAR(32)  NOT NULL,
   `file_name` VARCHAR(512) NOT NULL,
@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS `artifact` (
   INDEX artifact_project(project)
 );
 
-CREATE TABLE IF NOT EXISTS `test_log` (
+CREATE TABLE `test_log` (
   `id`         INT AUTO_INCREMENT PRIMARY KEY,
   `project`    VARCHAR(32)  NOT NULL,
   `log`        TEXT         NOT NULL,
