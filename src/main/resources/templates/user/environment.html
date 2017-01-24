@@ -1,0 +1,60 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>GitThrow</title>
+  <link th:replace="user/fragment/user-page-content :: user-page-head" rel="stylesheet" type="text/css"/>
+  <link href="../../static/plugins/jquery-toast-plugin/jquery.toast.min.css"
+        th:href="@{/plugins/jquery-toast-plugin/jquery.toast.min.css}" rel="stylesheet"type="text/css"/>
+</head>
+<body class="skin-blue">
+<div class="wrapper">
+
+  <div th:replace="user/fragment/user-page-content :: user-page-topmenu"></div>
+  <div th:replace="user/fragment/user-page-content :: user-page-sidebar"></div>
+
+
+  <!-- content -->
+  <div class="content-wrapper">
+
+    <!-- コンテンツヘッダ -->
+    <section class="content-header">
+      <h1>環境</h1>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <section class="content">
+
+      <div class="box box-info">
+        <div class="box-header with-border">
+          <h3 class="box-title">システムプロパティ</h3>
+        </div>
+        <div class="box-body">
+
+          <table class="table table-hover">
+            <tr>
+              <th>Key</th>
+              <th>Value</th>
+            </tr>
+            <!--/*@thymesVar id="properties" type="java.util.Properties"*/-->
+            <tr th:each="entry : ${properties.entrySet()}">
+              <td th:text="${entry.getKey()}">key</td>
+              <td th:text="${entry.getValue()}">value</tr>
+          </table>
+        </div>
+      </div>
+
+    </section>
+  </div><!-- end content -->
+
+
+  <div th:replace="user/fragment/user-page-content :: user-page-footer"></div>
+
+
+</div>
+<!-- end wrapper -->
+<div th:replace="user/fragment/user-page-content :: user-page-script"></div>
+<!-- end script -->
+<script src="../../static/plugins/jquery-toast-plugin/jquery.toast.min.js" th:src="@{/plugins/jquery-toast-plugin/jquery.toast.min.js}" type="text/javascript"></script>
+</body>
+</html>
