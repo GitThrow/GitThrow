@@ -1,6 +1,5 @@
-package net.orekyuu.gitthrow.controller.view.user;
+package net.orekyuu.gitthrow.controller.view.admin;
 
-import net.orekyuu.gitthrow.infra.AdminOnly;
 import net.orekyuu.gitthrow.service.exceptions.UserExistsException;
 import net.orekyuu.gitthrow.user.usecase.UserUsecase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +22,12 @@ public class AdminSettingController {
     private UserUsecase userUsecase;
 
     @GetMapping("admin/user-setting")
-    @AdminOnly
     public String showAdminSetting(Model model) {
         model.addAttribute("users", userUsecase.findAll(false));
         return "user/user-management";
     }
 
     @PostMapping("admin/user-setting/register")
-    @AdminOnly
     public String createNewUser(@Valid NewUserForm form, BindingResult result,
                                 RedirectAttributes redirectAttributes) {
         userUsecase.findById(form.id).ifPresent(u -> {
