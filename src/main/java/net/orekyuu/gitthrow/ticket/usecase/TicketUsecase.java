@@ -1,5 +1,6 @@
 package net.orekyuu.gitthrow.ticket.usecase;
 
+import net.orekyuu.gitthrow.activity.usecase.ActivityUsecase;
 import net.orekyuu.gitthrow.project.domain.model.Project;
 import net.orekyuu.gitthrow.ticket.domain.model.Ticket;
 import net.orekyuu.gitthrow.ticket.domain.model.TicketPriority;
@@ -34,7 +35,9 @@ public class TicketUsecase {
 
     private final TicketCommentRepository commentRepository;
 
-    public TicketUsecase(TicketRepository ticketRepository, TicketPriorityRepository priorityRepository, TicketStatusRepository statusRepository, TicketTypeRepository typeRepository, OpenTicketDao ticketDao, TicketPriorityDao priorityDao, TicketStatusDao statusDao, TicketTypeDao typeDao, TicketCommentRepository commentRepository) {
+    private final ActivityUsecase activityUsecase;
+
+    public TicketUsecase(TicketRepository ticketRepository, TicketPriorityRepository priorityRepository, TicketStatusRepository statusRepository, TicketTypeRepository typeRepository, OpenTicketDao ticketDao, TicketPriorityDao priorityDao, TicketStatusDao statusDao, TicketTypeDao typeDao, TicketCommentRepository commentRepository, ActivityUsecase activityUsecase) {
         this.ticketRepository = ticketRepository;
         this.priorityRepository = priorityRepository;
         this.statusRepository = statusRepository;
@@ -44,12 +47,15 @@ public class TicketUsecase {
         this.statusDao = statusDao;
         this.typeDao = typeDao;
         this.commentRepository = commentRepository;
+        this.activityUsecase = activityUsecase;
     }
 
 
     @Transactional(readOnly = false)
     public Ticket create(Project project, String title, String desc, User assignee, User proponent, LocalDateTime limit, TicketType type, TicketStatus status, TicketPriority priority) {
-        return ticketRepository.create(project, title, desc, assignee, proponent, limit, type, status, priority);
+        Ticket ticket = ticketRepository.create(project, title, desc, assignee, proponent, limit, type, status, priority);
+        activityUsecase.createNewTicketActivity(project, ticket);
+        return ticket;
     }
 
     @Transactional(readOnly = false)

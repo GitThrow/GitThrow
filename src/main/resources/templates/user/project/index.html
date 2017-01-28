@@ -17,61 +17,75 @@
   <!-- content -->
   <div class="content-wrapper">
 
-    <!-- コンテンツヘッダ -->
-    <section class="content-header">
-      <h1 th:text="#{html.user.project.dashboard.page_title}">ページタイトル</h1>
-    </section>
-
     <!-- メインコンテンツ -->
     <section class="content">
 
       <div class="row">
-
-        <!-- 情報 -->
-        <div class="col-md-6">
-          <div class="box box-info">
-            <div class="box-header with-border">
-              <h3 class="box-title" th:text="#{html.user.project.dashboard.project_info_title}">情報</h3>
-            </div>
-            <div class="box-body no-padding">
-              <table class="table table-striped">
-                <tr>
-                  <td th:text="#{html.user.project.dashboard.git_repository}">Gitリポジトリ</td>
-                  <td>
-                    <div class="input-group input-group-sm">
-                      <input id="repo-url" type="text" class="form-control" disabled
-                             value="http://localhost:8080/repos/git/hoge"
-                             th:value="|http://${#httpServletRequest.serverName}:${#httpServletRequest.serverPort}/git/repos/${project.id}|">
-                      <span class="input-group-btn">
+          <!-- 情報 -->
+          <div class="col-md-12">
+            <div class="box box-solid">
+              <div class="box-header with-border">
+                <h3 class="box-title" th:text="#{html.user.project.dashboard.project_info_title}">情報</h3>
+              </div>
+              <div class="box-body no-padding">
+                <table class="table table-striped">
+                  <tr>
+                    <td th:text="#{html.user.project.dashboard.git_repository}">Gitリポジトリ</td>
+                    <td>
+                      <div class="input-group input-group-sm">
+                        <input id="repo-url" type="text" class="form-control" disabled
+                               value="http://localhost:8080/repos/git/hoge"
+                               th:value="|http://${#httpServletRequest.serverName}:${#httpServletRequest.serverPort}/git/repos/${project.id}|">
+                        <span class="input-group-btn">
                       <button type="button" class="btn btn-info btn-flat btn-copy" id="repo-copy"
-                       th:attr="data-clipboard-text=|http://${#httpServletRequest.serverName}:${#httpServletRequest.serverPort}/git/repos/${project.id}|">Copy</button>
+                              th:attr="data-clipboard-text=|http://${#httpServletRequest.serverName}:${#httpServletRequest.serverPort}/git/repos/${project.id}|">Copy</button>
                     </span>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td th:text="#{html.user.project.dashboard.admin_user}">管理者</td>
-                  <td th:text="${admin.name}">orekyuu</td>
-                </tr>
-                <tr>
-                  <td th:text="#{html.user.project.dashboard.member_count}">メンバー数</td>
-                  <td th:text="${member.size()}">3</td>
-                </tr>
-              </table>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td th:text="#{html.user.project.dashboard.admin_user}">管理者</td>
+                    <td th:text="${admin.name}">orekyuu</td>
+                  </tr>
+                  <tr>
+                    <td th:text="#{html.user.project.dashboard.member_count}">メンバー数</td>
+                    <td th:text="${member.size()}">3</td>
+                  </tr>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
+          <div class="col-md-12">
+            <div class="box box-solid">
+              <div class="box-header with-border">
+                <h3 class="box-title">Readme</h3>
+              </div>
+              <div class="box-body" id="readme">
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="row">
         <div class="col-md-6">
-          <div class="box box-info">
+          <div class="box box-solid">
             <div class="box-header with-border">
-              <h3 class="box-title">Readme</h3>
+              <h3 class="box-title">Activity</h3>
             </div>
-            <div class="box-body" id="readme">
-            </div>
+            <ul id="activity" style="padding: 10px">
+              <li v-for="it in activities" style="list-style-type: none; background-color: #ecf0f5; margin-bottom: 10px; padding: 5px">
+                <div style="text-align: left; float: left;">
+                  <div v-html="it.title" style="display: inline;"></div>
+                </div>
+                <div style="text-align: right">
+                  <div v-html="it.createdAt" style="display: inline;"></div>
+                </div>
+                <div v-html="marked(it.description)"></div>
+              </li>
+            </ul>
           </div>
         </div>
         <div class="col-md-6">
-          <div class="box box-info">
+          <div class="box box-solid">
             <div class="box-header with-border">
               <h3 class="box-title">Build Config Generator</h3>
             </div>
@@ -97,17 +111,49 @@
 
 <script th:src="@{/js/components/build-config-generator.js}"></script>
 <script th:inline="javascript">
+  var projectId = [[${projectId}]];
+
+  function fetchProjectActivities(projectId) {
+    return axios.get(`/rest/${projectId}/activity`, {
+      headers: {
+        'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+      }
+    });
+  }
+
   //vue
   new Vue({
       el: '#config-generator',
   });
 
+  var options = {
+    sanitize:true,
+    highlight: function(code, lang) {
+      return hljs.highlightAuto(code, [lang]).value;
+    }
+  };
+
+  var vm = new Vue({
+    el: '#activity',
+    data: {
+      activities: []
+    },
+    methods: {
+      marked: function (str) {
+        return marked(str, options);
+      }
+    }
+  });
+
+  fetchProjectActivities(projectId).then(function (req) {
+    vm.activities = req.data;
+  });
+
   $(function () {
-	  
     //marked.js
     var context=[[${#httpServletRequest.requestURI}]];
     var renderer=new marked.Renderer();
-    
+
     // 外部URL？
     var isCrossOrigin=function(href){
       return /https?:\/\//.test(href);
@@ -115,33 +161,31 @@
     // 外部URLじゃなければリポジトリのファイル参照する。とりあえずmaster
     var url=function(href){
       if(isCrossOrigin(href)){
-    	  return href;
+        return href;
       }
       var _href=href.startsWith('/')?href:'/'+href;
       var _context=context.endsWith('/')?context:context+'/';
       return _context+'raw/master'+_href;
     };
-    
+
     renderer.link=function(href,title,text){
       var markup='<p><a href="'+url(href)+'" title="'+(title||text)+'">'+text+'</a></p>';
       return markup;
     };
     renderer.image=function(href,title,text){
-        var markup='<img src="'+url(href)+'" alt="'+text+'" title="'+(title||text)+'"/>';
-        return markup;
+      var markup='<img src="'+url(href)+'" alt="'+text+'" title="'+(title||text)+'"/>';
+      return markup;
     };
-    
-    marked.setOptions({
-    	renderer:renderer,
+
+    var readmeOptions = {
+      renderer:renderer,
       sanitize:true,
       highlight: function(code, lang) {
         return hljs.highlightAuto(code, [lang]).value;
       }
-    });
-    
+    };
 
-
-    $('#readme').html(marked([[${readme}]]));
+    $('#readme').html(marked([[${readme}]], readmeOptions));
 
     //copy
     $('.btn-copy').tooltip({

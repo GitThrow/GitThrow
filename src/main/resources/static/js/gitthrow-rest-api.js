@@ -94,6 +94,14 @@ function createPullRequestComment(projectId, prNum, text) {
     });
 }
 
+function fetchProjectActivities(projectId) {
+    return axios.get(`/rest/${projectId}/activity`, {
+        headers: {
+            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+        }
+    });
+}
+
 
 /**
  * すべてのユーザーを取得する
