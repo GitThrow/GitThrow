@@ -1,5 +1,6 @@
 package net.orekyuu.gitthrow.project.port;
 
+import net.orekyuu.gitthrow.activity.port.table.ActivityDao;
 import net.orekyuu.gitthrow.git.domain.RemoteRepository;
 import net.orekyuu.gitthrow.git.domain.RemoteRepositoryFactory;
 import net.orekyuu.gitthrow.project.domain.model.Project;
@@ -48,6 +49,8 @@ public class ProjectRepository {
     private final PullRequestNumDao pullRequestNumDao;
     private final UserRepository userRepository;
 
+    private final ActivityDao activityDao;
+
     private final PasswordEncoder passwordEncoder;
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectRepository.class);
@@ -56,7 +59,7 @@ public class ProjectRepository {
     private static final List<String> defaultTicketPriority = Arrays.asList("低", "中", "高");
     private static final List<String> defaultTicketType = Arrays.asList("バグ", "新規機能", "提案", "リリース", "etc");
 
-    public ProjectRepository(ProjectDao projectDao, ProjectUserDao projectUserDao, TicketNumDao ticketNumDao, TicketPriorityDao ticketPriorityDao, TicketStatusDao ticketStatusDao, TicketTypeDao ticketTypeDao, RemoteRepositoryFactory repositoryFactory, UserAvatarDao userAvatarDao, UserSettingDao userSettingDao, UserDao userDao, PullRequestNumDao pullRequestNumDao, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public ProjectRepository(ProjectDao projectDao, ProjectUserDao projectUserDao, TicketNumDao ticketNumDao, TicketPriorityDao ticketPriorityDao, TicketStatusDao ticketStatusDao, TicketTypeDao ticketTypeDao, RemoteRepositoryFactory repositoryFactory, UserAvatarDao userAvatarDao, UserSettingDao userSettingDao, UserDao userDao, PullRequestNumDao pullRequestNumDao, UserRepository userRepository, ActivityDao activityDao, PasswordEncoder passwordEncoder) {
         this.projectDao = projectDao;
         this.userDao = userDao;
         this.pullRequestNumDao = pullRequestNumDao;
@@ -69,6 +72,7 @@ public class ProjectRepository {
         this.repositoryFactory = repositoryFactory;
         this.userAvatarDao = userAvatarDao;
         this.userSettingDao = userSettingDao;
+        this.activityDao = activityDao;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -160,6 +164,7 @@ public class ProjectRepository {
         ticketStatusDao.deleteByProject(project.getId());
         ticketTypeDao.deleteByProject(project.getId());
         projectUserDao.deleteByProject(project.getId());
+        activityDao.deleteByProjectId(project.getId());
 
         Project result = fromTable(projectDao.delete(table).getEntity());
 

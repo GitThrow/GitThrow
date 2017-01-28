@@ -1,5 +1,6 @@
 package net.orekyuu.gitthrow.project.usecase;
 
+import net.orekyuu.gitthrow.activity.usecase.ActivityUsecase;
 import net.orekyuu.gitthrow.project.domain.model.Project;
 import net.orekyuu.gitthrow.project.domain.policy.ProjectMemberPolicy;
 import net.orekyuu.gitthrow.project.port.ProjectRepository;
@@ -23,16 +24,20 @@ public class ProjectUsecase {
 
     private final ProjectRepository projectRepository;
     private final ProjectUserDao projectUserDao;
+    private final ActivityUsecase activityUsecase;
 
-    public ProjectUsecase(ProjectRepository projectRepository, ProjectUserDao projectUserDao) {
+    public ProjectUsecase(ProjectRepository projectRepository, ProjectUserDao projectUserDao, ActivityUsecase activityUsecase) {
         this.projectRepository = projectRepository;
         this.projectUserDao = projectUserDao;
+        this.activityUsecase = activityUsecase;
     }
 
 
     @Transactional(readOnly = false)
     public Project createProject(String projectId, String projectName, User owner) throws ProjectExistsException {
-        return projectRepository.create(projectId, projectName, owner);
+        Project project = projectRepository.create(projectId, projectName, owner);
+        activityUsecase.createInitRepositoryActivity(project, owner);
+        return project;
     }
 
     @Transactional(readOnly = false)
