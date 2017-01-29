@@ -102,6 +102,14 @@ function fetchProjectActivities(projectId) {
     });
 }
 
+function fetchUserActivities(userId) {
+    return axios.get(`/rest/user/${userId}/activity`, {
+        headers: {
+            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+        }
+    });
+}
+
 
 /**
  * すべてのユーザーを取得する

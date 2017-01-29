@@ -15,22 +15,45 @@
   <!-- content -->
   <div class="content-wrapper">
 
-    <!-- コンテンツヘッダ -->
-    <section class="content-header">
-      <h1>ページタイトル</h1>
-    </section>
-
     <!-- メインコンテンツ -->
     <section class="content">
 
-      <!-- コンテンツ1 -->
-      <div class="box">
-        <div class="box-header with-border">
-          <h3 class="box-title">新規プロジェクト</h3>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="box box-solid">
+            <div class="box-header with-border">
+              <h3 class="box-title">Activity graph</h3>
+            </div>
+            <div class="box-body">
+
+            </div>
+          </div>
         </div>
-        <div class="box-body">
-          <p>ボックスボディー</p>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="box box-solid">
+            <div class="box-header with-border">
+              <h3 class="box-title">Activity</h3>
+            </div>
+            <div class="box-body">
+              <ul id="activity" style="padding: 10px">
+                <li v-for="it in activities" style="list-style-type: none; background-color: #ecf0f5; margin-bottom: 10px; padding: 5px">
+                  <div style="text-align: left; float: left;">
+                    <div v-html="it.title" style="display: inline;"></div>
+                  </div>
+                  <div style="text-align: right">
+                    <div v-html="it.createdAt" style="display: inline;"></div>
+                  </div>
+                  <div v-html="marked(it.description)"></div>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
+
+
       </div>
 
     </section>
@@ -43,4 +66,33 @@
 </div><!-- end wrapper -->
 <div th:replace="user/fragment/user-page-content :: user-page-script" ></div>
 </body>
+<script th:inline="javascript">
+  var userId = [[${#authentication.principal.user.id}]];
+  var options = {
+    sanitize:true,
+    highlight: function(code, lang) {
+      return hljs.highlightAuto(code, [lang]).value;
+    }
+  };
+
+  var vm = new Vue({
+    el: '#activity',
+    data: {
+      activities: []
+    },
+    methods: {
+      marked: function (str) {
+        return marked(str, options);
+      }
+    }
+  });
+
+  fetchUserActivities(userId)
+    .then(res => {
+      var data = res.data;
+
+      //最新10件のみ表示
+      vm.activities = data.slice(0, 10);
+    });
+</script>
 </html>
