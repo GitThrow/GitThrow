@@ -25,9 +25,6 @@ import net.orekyuu.gitthrow.user.usecase.UserUsecase;
 public class GitActivityFilter implements Filter {
     private ApplicationContext context;
 
-    private static final String AUTH_HEADER_NAME = "WWW-Authenticate";
-    private static final String AUTH_HEADER_VALUE = "BASIC realm=\"Workbench\"";
-
     public GitActivityFilter(ApplicationContext context) {
         this.context = context;
     }
@@ -43,26 +40,30 @@ public class GitActivityFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         HttpServletResponse res = (HttpServletResponse) servletResponse;
 
+
+        String uri = req.getRequestURI();
+        String subUri = uri.substring("/git/repos/".length());
+        if (subUri.indexOf("git-receive-pack") < 0) {
+            return;
+        }
         String authorization = req.getHeader("Authorization");
         if (authorization == null) {
-            res.addHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE);
-            res.sendError(401);
             return;
         }
 
         if (res.getStatus() == 200) {
-            String decodeHeader = decode(authorization);
-            String[] split = decodeHeader.split(":");
-            String userName = split[0];
-            String uri = req.getRequestURI();
-            String uri2 = uri.substring("/git/repos/".length());
-            if (uri2.indexOf("git-receive-pack") > 0) {
-                UserUsecase userUsecase = context.getBean(UserUsecase.class);
-                Optional<User> userOpt = userUsecase.findById(userName);
+            String[] temp = subUri.split("/");
+            if (temp.length == 2) {
                 ActivityUsecase activityUsecase = context.getBean(ActivityUsecase.class);
-                String[] temp = uri2.split("/");
-                String projectId = temp[0];
                 ProjectUsecase projectUsecase = context.getBean(ProjectUsecase.class);
+                UserUsecase userUsecase = context.getBean(UserUsecase.class);
+                
+                String projectId = temp[0];
+                String decodeHeader = decode(authorization);
+                String[] split = decodeHeader.split(":");
+                String userName = split[0];
+                
+                Optional<User> userOpt = userUsecase.findById(userName);
                 projectUsecase.findById(projectId)
                     .ifPresent((project) -> {
                         userOpt.ifPresent((user) -> {
