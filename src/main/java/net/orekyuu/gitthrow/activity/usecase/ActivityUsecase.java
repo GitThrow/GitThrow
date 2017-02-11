@@ -75,7 +75,7 @@ public class ActivityUsecase {
     }
 
     public Activity createPushActivity(Project project, User user) {
-        return create("リポジトリにpushしました", String.format("project: %s", project.getName()), user, project);
+        return create("リポジトリにpushしました", String.format("user: %s", user.getName()), user, project);
     }
 
     @Transactional(readOnly = false)
