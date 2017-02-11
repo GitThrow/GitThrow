@@ -33,13 +33,13 @@ public class GitActivityFilter implements Filter {
     }
 
     @Override
-    public void destroy() {
-    }
+    public void destroy() {}
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException,
         ServletException {
 
+        filterChain.doFilter(servletRequest, servletResponse);
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         HttpServletResponse res = (HttpServletResponse) servletResponse;
 
@@ -50,26 +50,27 @@ public class GitActivityFilter implements Filter {
             return;
         }
 
-        String decodeHeader = decode(authorization);
-        String[] split = decodeHeader.split(":");
-        String userName = split[0];
-        String uri = req.getRequestURI();
-        String uri2 = uri.substring("/git/repos/".length());
-        if (uri2.indexOf("git-receive-pack") > 0) {
-            UserUsecase userUsecase = context.getBean(UserUsecase.class);
-            Optional<User> userOpt = userUsecase.findById(userName);
-            ActivityUsecase activityUsecase = context.getBean(ActivityUsecase.class);
-            String[] temp = uri2.split("/");
-            String projectId = temp[0];
-            ProjectUsecase projectUsecase = context.getBean(ProjectUsecase.class);
-            projectUsecase.findById(projectId)
-                .ifPresent((project) -> {
-                    userOpt.ifPresent((user) -> {
-                        activityUsecase.createPushActivity(project, user);
+        if (res.getStatus() == 200) {
+            String decodeHeader = decode(authorization);
+            String[] split = decodeHeader.split(":");
+            String userName = split[0];
+            String uri = req.getRequestURI();
+            String uri2 = uri.substring("/git/repos/".length());
+            if (uri2.indexOf("git-receive-pack") > 0) {
+                UserUsecase userUsecase = context.getBean(UserUsecase.class);
+                Optional<User> userOpt = userUsecase.findById(userName);
+                ActivityUsecase activityUsecase = context.getBean(ActivityUsecase.class);
+                String[] temp = uri2.split("/");
+                String projectId = temp[0];
+                ProjectUsecase projectUsecase = context.getBean(ProjectUsecase.class);
+                projectUsecase.findById(projectId)
+                    .ifPresent((project) -> {
+                        userOpt.ifPresent((user) -> {
+                            activityUsecase.createPushActivity(project, user);
+                        });
                     });
-                });
+            }
         }
-        filterChain.doFilter(servletRequest, servletResponse);
     }
 
 
@@ -80,7 +81,6 @@ public class GitActivityFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig config) throws ServletException {
-    }
+    public void init(FilterConfig config) throws ServletException {}
 
 }
