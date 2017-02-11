@@ -74,6 +74,10 @@ public class ActivityUsecase {
             mergedPullRequest.getProponent(), project);
     }
 
+    public Activity createPushActivity(Project project, User user) {
+        return create("リポジトリにpushしました", String.format("project: %s", project.getName()), user, project);
+    }
+
     @Transactional(readOnly = false)
     private Activity create(String title, String desc, User user, Project project) {
         logger.info("[Activity] create: title=%s, desc=%s, user=%s, project=%s", title, desc, user.getId(), project.getId());
