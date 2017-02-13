@@ -33,4 +33,13 @@ public class GitConfig {
         registration.setName("gitAuthFilter");
         return registration;
     }
+
+    @Bean
+    public FilterRegistrationBean gitFilter() {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(new GitActivityFilter(context));
+        registration.addUrlPatterns("/git/repos/*");
+        registration.setName("gitActivityFilter");
+        return registration;
+    }
 }
