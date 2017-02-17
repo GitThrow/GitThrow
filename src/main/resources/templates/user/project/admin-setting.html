@@ -11,8 +11,9 @@
   <link rel="stylesheet" href="../../../static/plugins/select2/select2.min.css" th:href="@{/plugins/select2/select2.min.css}">
 </head>
 <body class="skin-blue">
-<div class="wrapper">
+<div id="bg"></div>
 
+<div class="wrapper" id="wrapper">
   <div th:replace="user/project/fragment/project-page-content :: project-page-topmenu"></div>
   <div th:replace="user/project/fragment/project-page-content :: project-page-sidebar"></div>
 
@@ -90,6 +91,27 @@
           </div>
         </form>
       </div>
+
+      <div class="box box-info">
+        <div class="box-header with-border">
+          <h3 class="box-title">プロジェクトテーマ</h3>
+        </div>
+        <form v-on:submit.prevent id="theme-form">
+          <div class="box-body">
+            <div class="form-group">
+              <label for="theme-img">背景画像</label>
+              <input type="file" id="theme-img" ref="file" @change="updateImage" name="image">
+            </div>
+            <div class="form-group">
+              <label for="opacity">透明度</label>
+              <input type="number" class="form-control" min="0" max="1" step="0.01" name="opacity" id="opacity" v-model.number="opacity" @change="updateOpacity">
+            </div>
+          </div>
+          <div class="box-footer">
+            <button type="submit" v-on:click="postFormData" class="btn btn-primary pull-right"><i class="fa fa-check"></i> 更新</button>
+          </div>
+        </form>
+      </div>
     </section>
   </div><!-- end content -->
 
@@ -106,6 +128,49 @@
 <!-- Select2 -->
 <script src="../../../static/plugins/select2/select2.full.min.js" th:src="@{/plugins/select2/select2.full.min.js}"></script>
 <script th:inline="javascript">
+  var vue = new Vue({
+      el: "#theme-form",
+      data: {
+          opacity: [[${opacity}]]
+      },
+      methods: {
+        updateImage() {
+          const elFile = this.$refs.file;
+          if (elFile.files && elFile.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              console.log("更新");
+              $('#bg').css('background-image', "url('"+e.target.result+"')");
+            };
+            reader.readAsDataURL(elFile.files[0]);
+          }
+        },
+        updateOpacity() {
+          $("#wrapper").css('opacity', this.opacity);
+        },
+        postFormData(e) {
+          var form = document.getElementById("theme-form");
+          console.log(form);
+          var formData = new FormData( form );
+          console.log(formData);
+          $.ajax({
+            url: '/project/'+[[${project.id}]]+'/admin-settings/theme',
+            method: 'post',
+            dataType: 'json',
+            // dataに FormDataを指定
+            data: formData,
+            // Ajaxがdataを整形しない指定
+            processData: false,
+            // contentTypeもfalseに指定
+            contentType: false,
+            headers: {
+              'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+            }
+          });
+        }
+      }
+  });
+
   $(function () {
     //select2
     $(".select2").select2();

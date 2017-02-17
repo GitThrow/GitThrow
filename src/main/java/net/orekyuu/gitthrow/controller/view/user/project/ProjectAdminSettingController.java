@@ -5,6 +5,8 @@ import net.orekyuu.gitthrow.infra.ProjectOwnerOnly;
 import net.orekyuu.gitthrow.project.domain.model.Project;
 import net.orekyuu.gitthrow.project.usecase.ProjectUsecase;
 import net.orekyuu.gitthrow.service.exceptions.ProjectNotFoundException;
+import net.orekyuu.gitthrow.theme.domain.model.ThemeImage;
+import net.orekyuu.gitthrow.theme.port.ProjectThemeImageRepository;
 import net.orekyuu.gitthrow.user.domain.model.User;
 import net.orekyuu.gitthrow.user.usecase.UserUsecase;
 import net.orekyuu.gitthrow.user.util.BotUserUtil;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,6 +38,8 @@ public class ProjectAdminSettingController {
     private ProjectUsecase projectUsecase;
     @Autowired
     private UserUsecase userService;
+    @Autowired
+    private ProjectThemeImageRepository projectThemeImageRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectAdminSettingController.class);
     @ModelAttribute("projectMember")
@@ -111,6 +117,15 @@ public class ProjectAdminSettingController {
         return "redirect:/project/" + projectId + "/admin-settings";
     }
 
+    @PostMapping(value = "/project/{projectId}/admin-settings/theme")
+    @ProjectOwnerOnly
+    @Transactional(readOnly = false)
+    public String updateTheme(@ProjectName @PathVariable String projectId, @Valid ProjectThemeForm form, BindingResult result) throws IOException {
+        byte[] bytes = form.getImage().getBytes();
+        projectThemeImageRepository.save(projectId, new ThemeImage(bytes.length == 0 ? null : bytes, form.getOpacity(), LocalDateTime.now()));
+        return "redirect:/project/" + projectId + "/admin-settings";
+    }
+
     public static class NewMemberForm {
         @NotNull
         @Size(min = 3, max = 32)
@@ -145,6 +160,28 @@ public class ProjectAdminSettingController {
 
         public void setAvatar(MultipartFile avatar) {
             this.avatar = avatar;
+        }
+    }
+
+    public static class ProjectThemeForm {
+
+        private double opacity;
+        private MultipartFile image;
+
+        public double getOpacity() {
+            return opacity;
+        }
+
+        public void setOpacity(double opacity) {
+            this.opacity = opacity;
+        }
+
+        public MultipartFile getImage() {
+            return image;
+        }
+
+        public void setImage(MultipartFile image) {
+            this.image = image;
         }
     }
 }

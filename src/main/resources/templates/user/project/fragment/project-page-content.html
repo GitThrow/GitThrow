@@ -21,8 +21,23 @@
   <link href="../../../../static/css/project.css" rel="stylesheet" type="text/css"
         th:href="@{/css/project.css}"/>
   <script src="https://unpkg.com/vue/dist/vue.js"></script>
+
+  <style th:inline="text">
+    #bg {
+      background-image: url('/project/[[${project.id}]]/theme');
+      background-size: cover;
+      margin: 0;
+      position: fixed;
+      width: 100%;
+      height: 100%
+    }
+    .wrapper {
+      opacity: [[${opacity}]];
+    }
+  </style>
 </head>
 <body class="skin-blue">
+<div id="bg"></div>
 <div class="wrapper">
 
   <!-- トップメニュー -->
