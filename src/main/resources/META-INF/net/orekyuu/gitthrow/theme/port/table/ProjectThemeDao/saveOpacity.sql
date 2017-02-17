@@ -1,0 +1,1 @@
+UPDATE project_theme SET opacity = /*table.opacity*/1, updated_at = /*table.updatedAt*/NULL WHERE project_id = /*table.projectId*/''

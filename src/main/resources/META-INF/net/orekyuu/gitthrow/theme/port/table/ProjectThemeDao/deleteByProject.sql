@@ -1,0 +1,1 @@
+DELETE FROM project_theme WHERE project_id = /*projectId*/''
