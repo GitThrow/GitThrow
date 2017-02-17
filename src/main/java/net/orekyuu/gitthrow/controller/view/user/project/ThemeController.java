@@ -1,6 +1,8 @@
 package net.orekyuu.gitthrow.controller.view.user.project;
 
 import net.orekyuu.gitthrow.project.domain.model.Project;
+import net.orekyuu.gitthrow.service.exceptions.ContentNotFoundException;
+import net.orekyuu.gitthrow.theme.domain.model.ThemeImage;
 import net.orekyuu.gitthrow.theme.port.ProjectThemeImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -26,21 +28,19 @@ public class ThemeController {
     public ResponseEntity<byte[]> showThemeImage(
         Project project,
         @RequestHeader(value = "If-Modified-Since", required = false) String ifModifiedSinceHeader) {
-
-        return repository.findByProject(project.getId()).map(it -> {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_PNG);
-            headers.setLastModified(it.getLastModified().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
-            headers.setCacheControl("no-cache");
-            if (ifModifiedSinceHeader != null) {
-                TemporalAccessor accessor = DateTimeFormatter.RFC_1123_DATE_TIME.parse(ifModifiedSinceHeader);
-                LocalDateTime ifModifiedSince = LocalDateTime.from(accessor);
-                if (ifModifiedSince.isAfter(it.getLastModified())) {
-                    return new ResponseEntity<byte[]>(headers, HttpStatus.NOT_MODIFIED);
-                }
+        ThemeImage image = repository.findByProject(project.getId())
+            .orElseThrow(() -> new ContentNotFoundException(project.getId()));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_PNG);
+        headers.setLastModified(image.getLastModified().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        headers.setCacheControl("no-cache");
+        if (ifModifiedSinceHeader != null) {
+            TemporalAccessor accessor = DateTimeFormatter.RFC_1123_DATE_TIME.parse(ifModifiedSinceHeader);
+            LocalDateTime ifModifiedSince = LocalDateTime.from(accessor);
+            if (ifModifiedSince.isAfter(image.getLastModified())) {
+                return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
             }
-            return new ResponseEntity<>(it.getImg(), headers, HttpStatus.OK);
-        }).orElse(new ResponseEntity<>((byte[]) null, HttpStatus.NOT_FOUND));
-
+        }
+        return new ResponseEntity<>(image.getImg(), headers, HttpStatus.OK);
     }
 }
