@@ -1,0 +1,45 @@
+.activity-list {
+  padding: 10px;
+}
+
+.activity-list > li {
+  background-color: #e5e9ee;
+  margin: 10px;
+  width: auto;
+  list-style-type: none;
+  display: flex;
+  display: -webkit-flex;
+  flex-direction: row;
+  align-items: stretch;
+  -webkit-align-items: stretch;
+}
+
+.activity-list > li > div.icon {
+  width: 75px;
+  height: 75px;
+  margin: 10px;
+}
+
+.activity-list > li > div.icon > img {
+  width: 75px;
+  height: 75px;
+}
+
+.activity-list > li > div.content {
+  flex: 1;
+  padding: 0;
+  min-height: 75px;
+  margin-right: 5px;
+}
+
+.activity-list > li > div.content > div.header {
+  display: flex;
+  display: -webkit-flex;
+  flex-direction: row;
+  align-items: stretch;
+  font-size: large;
+}
+
+.activity-list > li > div.content > div.header > a {
+  margin: 0; flex: 1;
+}
