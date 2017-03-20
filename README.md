@@ -12,6 +12,8 @@ GitサーバーのホストやCIするためのWebアプリです
 - 成果物の管理
 
 ## 使い方  
+詳しい説明は[Document](./document/Document.md)を確認してください
+
 ### とりあえず試したい場合  
 1. `java -jar GitThrow.jar`を実行
 1. http://localhost:8080/にアクセス
