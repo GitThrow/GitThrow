@@ -69,7 +69,7 @@ public class ProjectUsecaseTest {
         Assertions.assertThat(project)
             .is(testFields("projectId", "projectName", user1));
         Assertions.assertThat(project.getMember())
-            .hasSize(2)
+            .hasSize(1)
             .contains(user1);
 
         RemoteRepository repo = factory.create("projectId");
@@ -97,40 +97,42 @@ public class ProjectUsecaseTest {
 
     @Test
     public void joinMember() {
-        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(2);
+        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(1);
 
         Project project = usecase.join(hogeProject, user2);
 
-        Assertions.assertThat(hogeProject.getMember()).hasSize(3);
-        Assertions.assertThat(project.getMember()).hasSize(3);
-        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(3);
+        Assertions.assertThat(hogeProject.getMember()).hasSize(1);//元のデータは変わらない
+        Assertions.assertThat(project.getMember()).hasSize(2);
+        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(2);
 
         Assertions.assertThatThrownBy(() -> usecase.join(hogeProject, user2))
             .isInstanceOf(PolicyException.class);
-        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(3);
+        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(2);
     }
 
     @Test
     public void withdrawMember() {
         //メンバーの削除
+        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(1);
+        hogeProject = usecase.join(hogeProject, user2);
         Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(2);
-        usecase.join(hogeProject, user2);
-        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(3);
         Project project = usecase.withdraw(hogeProject, user2);
-        Assertions.assertThat(project.getMember()).hasSize(2);
-        Assertions.assertThat(hogeProject.getMember()).hasSize(2);
-        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(2);
+        Assertions.assertThat(project.getMember()).hasSize(1);
+        Assertions.assertThat(hogeProject.getMember()).hasSize(2); //hogeProjectのメンバー数は変わらない
+        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(1);
 
+        hogeProject = usecase.findById("hoge").get();
         //管理者は削除できない
         Assertions.assertThatThrownBy(() -> usecase.withdraw(hogeProject, user1)).isInstanceOf(PolicyException.class);
-        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(2);
-        Assertions.assertThat(hogeProject.getMember()).hasSize(2);
+        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(1);
+        Assertions.assertThat(hogeProject.getMember()).hasSize(1);
 
+        hogeProject = usecase.findById("hoge").get();
         //botは削除できない
         User bot = userUsecase.findById(BotUserUtil.toBotUserId(hogeProject.getId())).get();
         Assertions.assertThatThrownBy(() -> usecase.withdraw(hogeProject, bot)).isInstanceOf(PolicyException.class);
-        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(2);
-        Assertions.assertThat(hogeProject.getMember()).hasSize(2);
+        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(1);
+        Assertions.assertThat(hogeProject.getMember()).hasSize(1);
     }
 
     @Test
@@ -138,7 +140,7 @@ public class ProjectUsecaseTest {
         usecase.join(hogeProject, user2);
         Project project = usecase.join(hogeProject, user3);
 
-        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(4);
+        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(3);
 
         project.getMember().remove(user2);
         project.renameProject("fuga");
@@ -146,10 +148,10 @@ public class ProjectUsecaseTest {
 
         Project save = usecase.save(project);
         Assertions.assertThat(save).is(testFields("hoge", "fuga", user3));
-        Assertions.assertThat(save.getMember()).hasSize(4);
+        Assertions.assertThat(save.getMember()).hasSize(3);
 
         Assertions.assertThat(usecase.findById("hoge").get()).is(testFields("hoge", "fuga", user3));
-        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(4);
+        Assertions.assertThat(usecase.findById("hoge").get().getMember()).hasSize(3);
     }
 
     @Test
