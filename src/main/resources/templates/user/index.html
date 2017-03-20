@@ -17,7 +17,7 @@
 
     <!-- コンテンツヘッダ -->
     <section class="content-header">
-      <h1>ページタイトル</h1>
+      <h1>ダッシュボード</h1>
     </section>
 
     <!-- メインコンテンツ -->
@@ -26,10 +26,23 @@
       <!-- コンテンツ1 -->
       <div class="box">
         <div class="box-header with-border">
-          <h3 class="box-title">新規プロジェクト</h3>
+          <h3 class="box-title">アクティビティ</h3>
         </div>
         <div class="box-body">
-          <p>ボックスボディー</p>
+          <ul class="activity-list" id="activity">
+            <li v-for="it in activities">
+              <div class="icon">
+                <img v-bind:src="toIconUrl(it)" alt="" class="img-circle">
+              </div>
+              <div class="content">
+                <div class="header">
+                  <a v-html="it.title" v-bind:href="toLink(it)"></a>
+                  <div v-html="it.createdAt"></div>
+                </div>
+                <div v-html="marked(it.description)"></div>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
 
@@ -42,5 +55,38 @@
 
 </div><!-- end wrapper -->
 <div th:replace="user/fragment/user-page-content :: user-page-script" ></div>
+<!-- marked.js -->
+<script src="../../static/plugins/marked/marked.min.js" th:src="@{/plugins/marked/marked.min.js}"></script>
+<script src="../../static/js/highlight.pack.js" th:src="@{/js/highlight.pack.js}"></script>
+<script>
+  var options = {
+    sanitize:true,
+    highlight: function(code, lang) {
+      return hljs.highlightAuto(code, [lang]).value;
+    }
+  };
+
+  var vm = new Vue({
+    el: '#activity',
+    data: {
+      activities: []
+    },
+    methods: {
+      marked: function (str) {
+        return marked(str, options);
+      },
+      toIconUrl: function (it) {
+        return '/user/icon/'+it.user.id;
+      },
+      toLink: function (it) {
+        return '/project/' + it.projectId;
+      }
+    }
+  });
+
+  fetchUserActivities().then(function (req) {
+    vm.activities = req.data;
+  });
+</script>
 </body>
 </html>
