@@ -7,6 +7,7 @@ import net.orekyuu.gitthrow.user.usecase.PasswordNotMatchException;
 import net.orekyuu.gitthrow.user.usecase.UserUsecase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -35,10 +36,12 @@ public class UserSettingController {
     @Autowired
     private UserUsecase userUsecase;
 
-    @GetMapping("/userUsecase-setting")
+    @GetMapping("/user-setting")
     public String show(Model model, @AuthenticationPrincipal WorkbenchUserDetails principal) {
         UserSettingForm form = (UserSettingForm) model.asMap().get("userSettingForm");
-        User user = principal.getUser();
+
+        String id = principal.getUser().getId();
+        User user = userUsecase.findById(id, true).orElseThrow(() -> new UsernameNotFoundException(id));
         form.name = user.getName();
         form.email = user.getEmail();
 
@@ -47,20 +50,21 @@ public class UserSettingController {
             form.useGravatar = "on";
         }
 
-        return "userUsecase/userUsecase-setting";
+        return "user/user-setting";
     }
 
-    @PostMapping("/userUsecase-setting")
+    @PostMapping("/user-setting")
     public String update(@Valid UserSettingForm form, BindingResult result, @AuthenticationPrincipal WorkbenchUserDetails principal) {
 
         //データに変更があるかどうか
         boolean change = false;
 
         if (result.hasErrors()) {
-            return "userUsecase/userUsecase-setting";
+            return "user/user-setting";
         }
 
-        User user = principal.getUser();
+        String id = principal.getUser().getId();
+        User user = userUsecase.findById(id, true).orElseThrow(() -> new UsernameNotFoundException(id));
         if (!Objects.equals(user.getName(), form.name)) {
             user.changeName(form.name);
             change = true;
@@ -103,7 +107,7 @@ public class UserSettingController {
         }
 
         userUsecase.save(user);
-        return "redirect:/userUsecase-setting" + (!change ? "" : "?update=success");
+        return "redirect:/user-setting" + (!change ? "" : "?update=success");
     }
 
     @PostMapping("/userUsecase-setting-pw")
@@ -113,17 +117,17 @@ public class UserSettingController {
         if (result.hasErrors()) {
             attr.addFlashAttribute("org.springframework.validation.BindingResult.userPWSettingForm", result);
             attr.addFlashAttribute("userPWSettingForm", form);
-            return "redirect:/userUsecase-setting";
+            return "redirect:/user-setting";
         }
 
         User user = principal.getUser();
 
         try {
             userUsecase.changePassword(user, form.oldPassword, form.password);
-            return "redirect:/userUsecase-setting?update=success";
+            return "redirect:/user-setting?update=success";
         } catch (PasswordNotMatchException e) {
             //パスワードがマッチしない
-            return "redirect:/userUsecase-setting?update=pw_error";
+            return "redirect:/user-setting?update=pw_error";
         }
     }
 
