@@ -74,10 +74,6 @@ public class ProjectUsecase {
             if (project.getOwner().equals(user)) {
                 throw new PolicyException();
             }
-
-            if (BotUserUtil.isProjectBot(project.getId(), user.getId())) {
-                throw new PolicyException();
-            }
             projectUserDao.delete(new ProjectUserTable(project.getId(), user.getId()));
             member.remove(user);
             return new Project(project.getId(), project.getName(), project.getOwner(), member);

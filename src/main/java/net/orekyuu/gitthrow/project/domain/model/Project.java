@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public final class Project {
 
@@ -63,7 +64,8 @@ public final class Project {
      * @return プロジェクトメンバー
      */
     public List<User> getMember() {
-        return member;
+        //botは弾く
+        return member.stream().filter(user -> !user.isBotUser()).collect(Collectors.toList());
     }
 
     public String getId() {
