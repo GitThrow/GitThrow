@@ -13,12 +13,16 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.ReceiveCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 @Component
+@ComponentScan
 public class GitPushListener implements ApplicationListener<PostReceiveHookEvent> {
 
     @Autowired
@@ -28,8 +32,20 @@ public class GitPushListener implements ApplicationListener<PostReceiveHookEvent
 
     @Autowired
     private RemoteRepositoryFactory factory;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
     @Override
     public void onApplicationEvent(PostReceiveHookEvent event) {
+        transactionTemplate.setReadOnly(false);
+        transactionTemplate.execute((TransactionCallback<Void>) status -> {
+            onPostReceiceHook(event);
+            return null;
+        });
+    }
+
+    private void onPostReceiceHook(PostReceiveHookEvent event) {
         RemoteRepository repository = factory.create(event.getProject().getId());
         for (ReceiveCommand command : event.getCommands()) {
             //CREATEとUPDATE以外はActivityに残したくないので弾く

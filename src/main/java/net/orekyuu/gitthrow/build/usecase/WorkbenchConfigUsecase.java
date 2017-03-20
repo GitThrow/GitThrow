@@ -16,7 +16,7 @@ import java.util.Optional;
 public class WorkbenchConfigUsecase {
 
     private final RemoteRepositoryFactory factory;
-    public static final String WORKBENCH_CONFIG_PATH = ".workbenchconfig.json";
+    public static final String WORKBENCH_CONFIG_PATH = "workbenchconfig.json";
 
     public WorkbenchConfigUsecase(RemoteRepositoryFactory factory) {
         this.factory = factory;

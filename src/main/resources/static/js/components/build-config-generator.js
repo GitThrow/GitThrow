@@ -32,22 +32,22 @@ Vue.component('build-config-generator', {
                 return false;
             }
             if (this.enableBuildSettings) {
-                if (this.toStringArray(this.buildCommand).length == 0) {
+                if (this.toStringArray(this.buildCommand).length === 0) {
                     return false;
                 }
-                if (this.toStringArray(this.artifactPath).length == 0) {
+                if (this.toStringArray(this.artifactPath).length === 0) {
                     return false;
                 }
             }
             if (this.enableTestSettings) {
-                if (this.toStringArray(this.testCommand).length == 0) {
+                if (this.toStringArray(this.testCommand).length === 0) {
                     return false;
                 }
             }
             return true;
         },
         toStringArray: function (str) {
-            return str.split('\n').filter(str => str.length != 0);
+            return str.split('\n').filter(str => str.length !== 0);
         }
     },
     template: `
@@ -84,7 +84,7 @@ Vue.component('build-config-generator', {
           </div>
       </div>
       <div class="box-footer">
-        <a download=".workbenchconfig.json" :class="{disabled: !validate()}" type="submit" class="btn btn-info pull-right" @click="onDownload($event)">Download</a>
+        <a download="workbenchconfig.json" :class="{disabled: !validate()}" type="submit" class="btn btn-info pull-right" @click="onDownload($event)">Download</a>
       </div>
     </form>
 `
