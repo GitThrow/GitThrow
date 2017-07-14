@@ -42,8 +42,6 @@ public class PullRequestUsecase {
         PullRequest pullRequest = pullRequestRepository.create(project, title, desc, reviewer, proponent, base, target);
         activityUsecase.createNewPullRequestActivity(project, pullRequest);
         TestJob job = testJob();
-        job.setPrNum(pullRequest.getPullrequestNum());
-        job.setHash(target);
         job.start(new NullSseEmitter(), project, userUsecase.findById(BotUserUtil.toBotUserId(project.getId())).orElseThrow(() -> new RuntimeException("BotUser not found.")));
         return pullRequest;
     }
